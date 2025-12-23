@@ -22,6 +22,7 @@ import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
 import com.neobuk.app.viewmodels.SubscriptionViewModel
+import com.neobuk.app.ui.components.PlanSelectionList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +32,8 @@ fun SubscriptionScreen(
 ) {
     val status by viewModel.status.collectAsState()
     val subscription by viewModel.subscription.collectAsState()
+    
+    var selectedPlan by remember(subscription) { mutableStateOf(subscription?.planType) }
 
     Column(
         modifier = Modifier
@@ -99,38 +102,43 @@ fun SubscriptionScreen(
                 }
             }
 
-            // Upgrade Options
-            if (status != SubscriptionStatus.ACTIVE || (subscription?.planType == PlanType.MONTHLY)) {
-                item {
-                    Text(
-                        if (status == SubscriptionStatus.ACTIVE) "Upgrade to Yearly" else "Choose a Plan", 
-                        style = AppTextStyles.sectionTitle, 
-                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
-                    )
-                    
-                    val pushYearly = status == SubscriptionStatus.ACTIVE
-                    
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // Monthly Plan
-                        if (subscription?.planType != PlanType.MONTHLY) {
-                            PlanOptionCard(
-                                title = "Monthly Plan",
-                                price = "KES 249",
-                                period = "/mo",
-                                isRecommended = !pushYearly,
-                                onClick = { viewModel.upgradeToActive() }
-                            )
-                        }
+            // Upgrade/Change Options
+            item {
+                Text(
+                    if (status == SubscriptionStatus.ACTIVE) "Change Plan" else "Choose a Plan", 
+                    style = AppTextStyles.sectionTitle, 
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+                )
+                
+                PlanSelectionList(
+                    selectedPlan = selectedPlan,
+                    onPlanSelected = { selectedPlan = it },
+                    showTrial = status == SubscriptionStatus.LOCKED || status == SubscriptionStatus.GRACE_PERIOD,
+                    currentPlan = subscription?.planType
+                )
 
-                        // Yearly Plan
-                        PlanOptionCard(
-                            title = "Yearly Plan",
-                            price = "KES 2,490",
-                            period = "/yr",
-                            badge = "Save 2 months",
-                            isRecommended = pushYearly,
-                            onClick = { viewModel.upgradeToYearly() }
-                        )
+                if (selectedPlan != null && selectedPlan != subscription?.planType) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = {
+                            when(selectedPlan) {
+                                PlanType.MONTHLY -> viewModel.upgradeToActive()
+                                PlanType.YEARLY -> viewModel.upgradeToYearly()
+                                PlanType.FREE_TRIAL -> viewModel.simulateActiveTrial()
+                                else -> {}
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal)
+                    ) {
+                        val buttonText = when(selectedPlan) {
+                            PlanType.FREE_TRIAL -> "Start Free Trial"
+                            PlanType.MONTHLY -> "Subscribe Monthly"
+                            PlanType.YEARLY -> "Subscribe Yearly"
+                            else -> "Confirm Upgrade"
+                        }
+                        Text(buttonText, style = AppTextStyles.buttonLarge)
                     }
                 }
             }
@@ -159,64 +167,6 @@ fun SubscriptionScreen(
     }
 }
 
-@Composable
-fun PlanOptionCard(
-    title: String,
-    price: String,
-    period: String,
-    badge: String? = null,
-    isRecommended: Boolean = false,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isRecommended) NeoBukTeal.copy(alpha = 0.05f) else MaterialTheme.colorScheme.surface
-        ),
-        border = if (isRecommended) androidx.compose.foundation.BorderStroke(2.dp, NeoBukTeal) else null,
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            if (badge != null) {
-                Surface(
-                    color = Color(0xFFFACC15), // Yellow for attention
-                    shape = RoundedCornerShape(bottomStart = 12.dp),
-                    modifier = Modifier.align(Alignment.TopEnd)
-                ) {
-                    Text(
-                        text = badge,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style = AppTextStyles.caption.copy(fontWeight = FontWeight.Bold),
-                        color = Color.Black
-                    )
-                }
-            }
-
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(title, style = AppTextStyles.bodyBold)
-                        Row(verticalAlignment = Alignment.Bottom) {
-                            Text(price, style = AppTextStyles.pageTitle.copy(fontSize = 24.sp), color = NeoBukTeal)
-                            Text(period, style = AppTextStyles.secondary, modifier = Modifier.padding(bottom = 4.dp))
-                        }
-                    }
-                    
-                    Icon(
-                        Icons.Default.CheckCircle, 
-                        contentDescription = null, 
-                        tint = if (isRecommended) NeoBukTeal else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun StatusCard(status: SubscriptionStatus, plan: PlanType?) {

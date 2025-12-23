@@ -36,6 +36,7 @@ import com.neobuk.app.ui.components.NeoBukLogoLarge
 import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
+import com.neobuk.app.ui.components.PlanSelectionList
 import java.util.Date
 
 enum class SignupStep {
@@ -462,36 +463,9 @@ fun SubscriptionPlanStep(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Free Trial
-        PlanCard(
-            title = "1 Month Free Trial",
-            price = "KES 0",
-            subtitle = "No charge today.",
-            selected = formData.selectedPlan == PlanType.FREE_TRIAL,
-            onClick = { onUpdate(formData.copy(selectedPlan = PlanType.FREE_TRIAL)) }
-        )
-        
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        // Monthly
-        PlanCard(
-            title = "Monthly Plan",
-            price = "KES 249",
-            subtitle = "Billed monthly",
-            selected = formData.selectedPlan == PlanType.MONTHLY,
-            onClick = { onUpdate(formData.copy(selectedPlan = PlanType.MONTHLY)) }
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        // Yearly
-        PlanCard(
-            title = "Yearly Plan",
-            price = "KES 2,490",
-            subtitle = "Save 2 months (KES 207/mo)",
-            selected = formData.selectedPlan == PlanType.YEARLY,
-            badge = "BEST VALUE",
-            onClick = { onUpdate(formData.copy(selectedPlan = PlanType.YEARLY)) }
+        PlanSelectionList(
+            selectedPlan = formData.selectedPlan,
+            onPlanSelected = { onUpdate(formData.copy(selectedPlan = it)) }
         )
         
         Spacer(modifier = Modifier.height(32.dp))
@@ -503,59 +477,17 @@ fun SubscriptionPlanStep(
             colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
             enabled = formData.selectedPlan != null
         ) {
-            val buttonText = if (formData.selectedPlan == PlanType.FREE_TRIAL) "Start Free Trial" else "Continue to Payment"
+            val buttonText = when(formData.selectedPlan) {
+                PlanType.FREE_TRIAL -> "Start Free Trial"
+                PlanType.MONTHLY -> "Subscribe Monthly"
+                PlanType.YEARLY -> "Subscribe Yearly"
+                else -> "Continue"
+            }
             Text(buttonText, style = AppTextStyles.buttonLarge)
         }
     }
 }
 
-@Composable
-fun PlanCard(
-    title: String,
-    price: String,
-    subtitle: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    badge: String? = null
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) NeoBukTeal.copy(alpha = 0.05f) else Color.White
-        ),
-        border = if (selected) androidx.compose.foundation.BorderStroke(2.dp, NeoBukTeal) 
-                 else androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f)),
-        elevation = CardDefaults.cardElevation(if (selected) 4.dp else 1.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(
-                selected = selected,
-                onClick = onClick,
-                colors = RadioButtonDefaults.colors(selectedColor = NeoBukTeal)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                if (badge != null) {
-                    Text(
-                        text = badge,
-                        style = AppTextStyles.caption,
-                        color = Color.White,
-                        modifier = Modifier
-                            .background(Color(0xFFF59E0B), RoundedCornerShape(4.dp))
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-                Text(title, style = AppTextStyles.bodyBold)
-                Text(subtitle, style = AppTextStyles.secondary, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Text(price, style = AppTextStyles.pageTitle, fontWeight = FontWeight.Bold)
-        }
-    }
-}
 
 // ----------------------------------------------------------------------------------
 // STEP 4: PAYMENT

@@ -19,3 +19,11 @@
 ### 🟢 Trust & Security
 - [ ] **Audit Trail**: Basic logging of record creations and edits for transparency.
 - [ ] **Privacy Dashboard**: A visible "Security & Privacy" screen in Settings summarizing data ownership and security protocols.
+
+### 📊 Internal Admin Dashboard
+- [ ] **Technical Implementation (Internal)**: Build the monitoring pipeline for core metrics (Reference: `INTERNAL_DASHBOARD.md`):
+    - [ ] **DAU (Daily Active Businesses)**: Tracking unique business activity per day.
+    - [ ] **Transaction Volume**: Sales recorded per business to identify power users.
+    - [ ] **Ritual Engagement**: % of users successfully using "Funga Siku".
+    - [ ] **Conversion Funnel**: Trial → Paid conversion rates.
+    - [ ] **Sync Performance**: Ratio of "Offline Saves" vs "Online Saves" to monitor connectivity impact.

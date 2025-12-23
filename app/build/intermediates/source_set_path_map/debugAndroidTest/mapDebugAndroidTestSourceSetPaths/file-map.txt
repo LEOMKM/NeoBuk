@@ -1,4 +1,0 @@
-com.neobuk.app.test.app-androidTest-0 /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build/generated/res/resValues/androidTest/debug
-com.neobuk.app.test.app-mergeDebugAndroidTestResources-1 /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
-com.neobuk.app.test.app-mergeDebugAndroidTestResources-2 /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
-com.neobuk.app.test.app-debugAndroidTest-3 /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build/intermediates/merged_res/debugAndroidTest/mergeDebugAndroidTestResources

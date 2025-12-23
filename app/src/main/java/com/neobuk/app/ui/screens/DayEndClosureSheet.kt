@@ -39,7 +39,10 @@ fun DayEndClosureSheet(
             .padding(bottom = 32.dp) // Extra padding
     ) {
         if (!isConfirmed) {
-            ClosureSummaryContent(onConfirm = { isConfirmed = true })
+            ClosureSummaryContent(
+                onConfirm = { isConfirmed = true },
+                onDismiss = onDismiss
+            )
         } else {
             ClosureSuccessContent(onDismiss = {
                 onConfirmClosure()
@@ -51,7 +54,7 @@ fun DayEndClosureSheet(
 }
 
 @Composable
-fun ClosureSummaryContent(onConfirm: () -> Unit) {
+fun ClosureSummaryContent(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,7 +71,7 @@ fun ClosureSummaryContent(onConfirm: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Close Today?",
+            text = "Funga Siku?",
             style = AppTextStyles.pageTitle,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -127,7 +130,16 @@ fun ClosureSummaryContent(onConfirm: () -> Unit) {
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal)
         ) {
-            Text("Confirm Day Closed", style = AppTextStyles.buttonLarge)
+            Text("Confirm Funga Siku", style = AppTextStyles.buttonLarge)
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        TextButton(
+            onClick = onDismiss,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Later", style = AppTextStyles.body, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

@@ -48,6 +48,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.Receipt
 
+import com.neobuk.app.ui.theme.NeoBukWarning
+import com.neobuk.app.ui.theme.NeoBukSuccess
 import androidx.compose.material.icons.filled.LockClock
 
 @Composable
@@ -149,7 +151,7 @@ fun HomeScreen(
                 name = "Sugar",
                 price = "KES 150 per kg",
                 stockStatus = "Available",
-                stockColor = Color(0xFF4CAF50), // Green
+                stockColor = NeoBukSuccess,
                 quantity = "32 units left",
                 iconBg = MaterialTheme.colorScheme.surfaceVariant
             )
@@ -302,7 +304,7 @@ fun QuickActionsRow(
                 .height(52.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (isEnabled) Color(0xFFF59E0B) else MaterialTheme.colorScheme.surfaceVariant
+                containerColor = if (isEnabled) NeoBukWarning else MaterialTheme.colorScheme.surfaceVariant
             ),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
@@ -344,7 +346,7 @@ fun QuickActionsRow(
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                "Close",
+                "Funga Siku",
                 style = AppTextStyles.buttonMedium,
                 color = Color.White,
                 maxLines = 1
@@ -378,8 +380,8 @@ fun MetricsRow(onViewSales: () -> Unit = {}) {
             value = "KES",
             amount = "3,200",
             icon = Icons.Outlined.AttachMoney,
-            iconColor = Color(0xFFFFA000), // Amber for Expenses/Gold
-            iconBg = Color(0xFFFFA000).copy(alpha = 0.15f),
+            iconColor = NeoBukWarning,
+            iconBg = NeoBukWarning.copy(alpha = 0.15f),
             index = 1
         )
         MetricCard(
@@ -388,8 +390,8 @@ fun MetricsRow(onViewSales: () -> Unit = {}) {
             value = "KES",
             amount = "9,250",
             icon = Icons.Filled.Timeline,
-            iconColor = Color(0xFF4CAF50), // Green
-            iconBg = Color(0xFF4CAF50).copy(alpha = 0.15f),
+            iconColor = NeoBukSuccess,
+            iconBg = NeoBukSuccess.copy(alpha = 0.15f),
             index = 2
         )
     }
@@ -561,7 +563,7 @@ fun WeeklyPerformanceCard(onViewAll: () -> Unit = {}) {
             ) {
                 LegendItem("Sales", NeoBukTeal)
                 Spacer(modifier = Modifier.width(16.dp))
-                LegendItem("Profit", Color(0xFFffc107))
+                LegendItem("Profit", NeoBukWarning)
             }
         }
     }

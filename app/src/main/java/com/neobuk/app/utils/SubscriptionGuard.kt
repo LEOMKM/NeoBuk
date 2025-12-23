@@ -16,7 +16,6 @@ object SubscriptionGuard {
             SubscriptionStatus.LOCKED -> GuardResult.Blocked("Subscription is locked. Please renew to continue.")
             SubscriptionStatus.PAST_DUE -> GuardResult.Blocked("Payment past due. Please update payment method.")
             SubscriptionStatus.CANCELED -> GuardResult.Blocked("Subscription canceled.")
-            else -> GuardResult.Blocked("Access restricted.")
         }
     }
 }

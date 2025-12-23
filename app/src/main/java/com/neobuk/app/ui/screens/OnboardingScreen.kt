@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neobuk.app.ui.theme.AppTextStyles
@@ -144,17 +145,21 @@ fun OnboardingScreen(
             }
         }
 
-        // Skip Button - Top Right (Moved here to be on top of the Pager)
-        if (pagerState.currentPage < pages.size - 1) {
+    }
+
+    // Skip Button - Absolute Overlay
+    if (pagerState.currentPage < pages.size - 1) {
+        Box(modifier = Modifier.fillMaxSize()) {
             TextButton(
                 onClick = onFinishOnboarding,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(16.dp)
+                    .padding(top = 8.dp, end = 8.dp)
+                    .zIndex(10f) // Ensure it's on top of everything
             ) {
                 Text(
                     "Skip",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.primary,
                     style = AppTextStyles.bodyBold
                 )
             }

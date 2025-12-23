@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.ui.theme.NeoBukTeal
+import com.neobuk.app.ui.theme.NeoBukWarning
 import com.neobuk.app.ui.theme.Tokens
 
 @Composable
@@ -18,7 +19,7 @@ fun TrialGracePeriodBanner(onSubscribeClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)), // Light orange
+        colors = CardDefaults.cardColors(containerColor = NeoBukWarning.copy(alpha = 0.1f)), // Light warning
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -27,18 +28,18 @@ fun TrialGracePeriodBanner(onSubscribeClick: () -> Unit) {
             Text(
                 "Your trial has ended",
                 style = AppTextStyles.bodyBold,
-                color = Color(0xFFE65100) // Dark Orange
+                color = NeoBukWarning
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 "Choose a plan to continue recording sales and expenses.",
                 style = AppTextStyles.body,
-                color = Color(0xFFE65100)
+                color = NeoBukWarning
             )
             Spacer(modifier = Modifier.height(12.dp))
             Button(
                 onClick = onSubscribeClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE65100)),
+                colors = ButtonDefaults.buttonColors(containerColor = NeoBukWarning),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text("Subscribe Now", color = Color.White)

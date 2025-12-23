@@ -36,19 +36,27 @@ import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.NeoBukCyan
 import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.ui.screens.sales.NewSaleScreen
+import com.neobuk.app.ui.screens.receipt.ReceiptScreen
+import com.neobuk.app.ui.screens.receipt.ReceiptData
+import com.neobuk.app.ui.screens.receipt.ReceiptItem
+import com.neobuk.app.ui.screens.receipt.ReceiptUtils
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SalesHistoryScreen() {
     var showDetailSheet by remember { mutableStateOf(false) }
     var showNewSaleSheet by remember { mutableStateOf(false) }
+    var showReceiptView by remember { mutableStateOf(false) }
     var selectedTransaction by remember { mutableStateOf<TransactionData?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val transactions = listOf(
-        TransactionData("Multiple Items (5)", "M-PESA", Color(0xFFE8F5E9), Color(0xFF2E7D32), "KES 2,450", "May 15, 2025 • 14:35", "Jane Wambui"),
+        TransactionData("Multiple Items (5)", "M-PESA", Color(0xFFE8F5E9), Color(0xFF2E7D32), "KES 2,450", "May 15, 2025 • 14:35", "Jane Wambui", "QK29X7A451"),
         TransactionData("Sugar (5kg), Cooking Oil (2L)", "Cash", Color(0xFFE3F2FD), Color(0xFF1565C0), "KES 1,350", "May 15, 2025 • 13:22", "Walk-in Customer"),
-        TransactionData("Maize Flour (10kg)", "M-PESA", Color(0xFFE8F5E9), Color(0xFF2E7D32), "KES 1,200", "May 15, 2025 • 11:47", "Mama Njeri"),
+        TransactionData("Maize Flour (10kg)", "M-PESA", Color(0xFFE8F5E9), Color(0xFF2E7D32), "KES 1,200", "May 15, 2025 • 11:47", "Mama Njeri", "QK29X7B892"),
         TransactionData("Tea Leaves (500g), Sugar...", "Cash", Color(0xFFE3F2FD), Color(0xFF1565C0), "KES 750", "May 15, 2025 • 10:15", "John Kamau")
     )
 
@@ -171,7 +179,11 @@ fun SalesHistoryScreen() {
         ) {
             SalesDetailSheet(
                 transaction = selectedTransaction!!,
-                onClose = { showDetailSheet = false }
+                onClose = { showDetailSheet = false },
+                onViewReceipt = {
+                    showDetailSheet = false // Close sheet
+                    showReceiptView = true // Open full screen receipt
+                }
             )
         }
     }
@@ -186,10 +198,38 @@ fun SalesHistoryScreen() {
         ) {
             NewSaleScreen(
                 onDismiss = { showNewSaleSheet = false },
-                onCompleteSale = { items, customer, paymentMethod ->
-                    // Handle sale completion
-                    showNewSaleSheet = false
+                onCompleteSale = { _, _, _ ->
                 }
+            )
+        }
+    }
+
+    if (showReceiptView && selectedTransaction != null) {
+        // Mock mapping for demo purposes
+        val mockItems = listOf(
+            ReceiptItem("Maize Flour", 2, "120", "240"),
+            ReceiptItem("Sugar", 3, "150", "450"),
+            ReceiptItem("Cooking Oil", 2, "220", "440")
+        )
+        val receiptData = ReceiptData(
+            businessName = "Mama Njeri's Shop", // Pull from user pref in real app
+            receiptId = "SALE-${selectedTransaction!!.date.filter { it.isDigit() }.take(8)}-001",
+            date = selectedTransaction!!.date,
+            paymentMethod = selectedTransaction!!.paymentMethod,
+            customerName = selectedTransaction!!.customer,
+            totalAmount = selectedTransaction!!.amount,
+
+            items = mockItems,
+            paymentRef = selectedTransaction!!.paymentRef
+        )
+
+        Dialog(
+            onDismissRequest = { showReceiptView = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false) // Full screen
+        ) {
+            ReceiptScreen(
+                data = receiptData,
+                onBack = { showReceiptView = false }
             )
         }
     }
@@ -202,11 +242,17 @@ data class TransactionData(
     val paymentTextColor: Color,
     val amount: String,
     val date: String,
-    val customer: String
+
+    val customer: String,
+    val paymentRef: String? = null
 )
 
 @Composable
-fun SalesDetailSheet(transaction: TransactionData, onClose: () -> Unit) {
+fun SalesDetailSheet(
+    transaction: TransactionData, 
+    onClose: () -> Unit,
+    onViewReceipt: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -327,24 +373,28 @@ fun SalesDetailSheet(transaction: TransactionData, onClose: () -> Unit) {
         // Actions
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Button(
-                onClick = {},
+                onClick = onViewReceipt,
                 modifier = Modifier.weight(1f).height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
             ) {
                 Icon(Icons.Default.Print, null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Print Receipt", color = MaterialTheme.colorScheme.onSurface)
+                Text("View Receipt", color = MaterialTheme.colorScheme.onSurface)
             }
             
+            val context = LocalContext.current
             Button(
-                onClick = {},
+                onClick = {
+                     // Quick Share Text
+                     ReceiptUtils.shareText(context, "Receipt for ${transaction.amount} from Mama Njeri's Shop. Paid via ${transaction.paymentMethod}.")
+                },
                 modifier = Modifier.weight(1f).height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = NeoBukCyan)
             ) {
                 Icon(Icons.Default.Email, null, tint = Color.White, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Send Receipt", color = Color.White)
+                Text("Quick Share", color = Color.White)
             }
         }
     }

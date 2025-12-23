@@ -35,6 +35,9 @@ import androidx.compose.ui.unit.sp
 import com.neobuk.app.ui.theme.NeoBukCyan
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
+import com.neobuk.app.ui.theme.NeoBukSuccess
+import com.neobuk.app.ui.theme.NeoBukWarning
+import com.neobuk.app.ui.theme.NeoBukError
 import com.neobuk.app.ui.theme.AppTextStyles
 
 // Data Classes
@@ -72,9 +75,9 @@ fun ReportsScreen() {
 
     val paymentMethods = listOf(
         PaymentMethodData("M-PESA", 65, NeoBukTeal),
-        PaymentMethodData("Cash", 25, Color(0xFFFBBF24)),
+        PaymentMethodData("Cash", 25, NeoBukWarning),
         PaymentMethodData("Credit", 7, Color(0xFFA855F7)),
-        PaymentMethodData("Bank", 3, Color(0xFF22C55E))
+        PaymentMethodData("Bank", 3, NeoBukSuccess)
     )
 
     val topProducts = listOf(
@@ -422,7 +425,7 @@ fun KPICard(
                 Text(
                     text = "${if (kpi.isPositive) "↑" else "↓"} ${kotlin.math.abs(kpi.changePercent)}%",
                     style = AppTextStyles.labelLarge.copy(fontWeight = FontWeight.Bold),
-                    color = if (kpi.isPositive) Color(0xFF10B981) else Color(0xFFEF4444)
+                    color = if (kpi.isPositive) NeoBukSuccess else NeoBukError
                 )
             }
 

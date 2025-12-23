@@ -405,11 +405,11 @@ These rules ensure data integrity and prevent conflicts:
 
 ---
 
-## 20. Day Close (The Daily Ritual)
+## 20. Funga Siku (The Daily Ritual)
 
 ### 20.1 What “Day Close” Really Is
-Day Close is not bookkeeping; it is a simple question asked once per day: **“Are you done for today?”**
-When the owner taps "Close Day", the app:
+Day Close (renamed to **Funga Siku** in the UI) is not bookkeeping; it is a simple question asked once per day: **“Are you done for today?”**
+When the owner taps "**Funga Siku**", the app:
 - Summarizes today’s activity
 - Locks today as “reviewed” (psychological bookmark)
 - Gives psychological closure
@@ -427,17 +427,17 @@ To maintain its power, it MUST NOT be:
 - ❌ A financial period lock or tax action
 It is a **choice**, not a gate.
 
-### 20.4 Exact Day Close UX (V1)
+### 20.4 Exact Funga Siku UX (V1)
 - **Entry Points**: 1. Home Screen (evening prompt) 2. Reports → Today.
 - **Prompt Timing**: After 6pm or when opening the app at night.
-- **Copy**: *“Close today? Review today’s sales and expenses.”*
-- **Action Buttons**: `Close Day` (Primary), `Later` (Neutral).
+- **Copy**: *“Funga Siku? Review today’s sales and expenses.”*
+- **Action Buttons**: `Funga Siku` (Primary), `Later` (Neutral).
 
 ### 20.5 Review Screen & Feedback
 Before confirming, show a single summary:
 - **Metrics**: Total Sales, Total Expenses, Net (Sales – Expenses).
 - **Metadata**: Number of sales, number of expenses.
-- **Action**: Tap `Confirm Day Close` to finish.
+- **Action**: Tap `Confirm Funga Siku` to finish.
 
 ### 20.6 Technical Implementation & Data Rule
 - **Action**: Create a `day_closure` record (see Section 20.8).
@@ -474,3 +474,23 @@ Before confirming, show a single summary:
 
 ### 21.3 Hybrid Capability
 - Support for businesses that provide both services and sell physical products (e.g., a salon selling hair products).
+
+---
+
+## 22. Internal Analytics & Monitoring
+
+To ensure data-driven growth and avoid "flying blind," the following core metrics must be trackable via an internal dashboard before public launch:
+
+### 22.1 Operational Metrics
+- **DAU (Daily Active Businesses)**: Count of unique businesses recording at least one transaction per day.
+- **Transaction Density**: Average number of sales/expenses recorded per active business.
+- **Feature Adoption**: % of active users utilizing the "Day Close" ritual.
+
+### 22.2 Business Health Metrics
+- **Conversion Rate**: Trial-to-paid subscription conversion percentage.
+- **Churn Rate**: Frequency of businesses becoming "Locked" without upgrading.
+- **Support Volume**: Number of "One-tap support" queries per business.
+
+### 22.3 Technical Performance
+- **Sync Reliability**: Ratio of **Offline Saves** vs. **Online Saves** to monitor real-world connectivity impact.
+- **Sync Latency**: Time taken for a deferred record to reach Supabase once online.

@@ -74,4 +74,7 @@ dependencies {
     // Debugging
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Barcode generation
+    implementation("com.google.zxing:core:3.5.3")
 }

@@ -16,8 +16,10 @@ val NeoBukCyan = Color(0xFF67E8F9)       // Soft Cyan - Accents
 val NeoBukBackground = Color(0xFFF9FAFB) // Neutral Background
 val NeoBukSurface = Color(0xFFFFFFFF)    // White Surface
 val NeoBukTextPrimary = Color(0xFF0F172A)// Text Primary
-val NeoBukTextSecondary = Color(0xFF475569) // Text Secondary
-val NeoBukError = Color(0xFFD32F2F)      // Error default
+val NeoBukTextSecondary = Color(0xFF334155) // Text Secondary (Slate 700 for better contrast)
+val NeoBukSuccess = Color(0xFF059669)       // Muted Emerald - Success/Sync
+val NeoBukWarning = Color(0xFFD97706)       // Muted Amber - Pending/Warnings
+val NeoBukError = Color(0xFFDC2626)         // Muted Red - Error default
 
 // Dark Mode Colors
 val NeoBukDarkBackground = Color(0xFF111827) // Gray 900

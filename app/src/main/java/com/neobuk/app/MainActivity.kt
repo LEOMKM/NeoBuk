@@ -89,6 +89,7 @@ import com.neobuk.app.ui.screens.ManageServicesScreen
 import com.neobuk.app.ui.screens.MoreScreen
 import com.neobuk.app.ui.screens.ProductsScreen
 import com.neobuk.app.ui.screens.ReportsScreen
+import com.neobuk.app.ui.screens.SalesHistoryScreen
 import com.neobuk.app.ui.screens.ServicesScreen
 import com.neobuk.app.ui.screens.SubscriptionLockedScreen
 import com.neobuk.app.ui.screens.SubscriptionScreen
@@ -405,9 +406,9 @@ fun NeoBukApp(
                         // Viewing is allowed, but actions should be guarded
                         onViewInventory = { selectedTab = 1 }, // Navigating to view is fine
                         onViewReports = { selectedTab = 3 },
-                        onViewSales = { selectedTab = 1 },
+                        onViewSales = { selectedTab = 6 },
                         onRecordSale = { 
-                            guard { selectedTab = 1 } // Navigating to create sale
+                            guard { selectedTab = 6 } // Navigating to sales history
                         },
                         onRecordExpense = { 
                             guard { selectedTab = 5 } 
@@ -435,7 +436,7 @@ fun NeoBukApp(
                         onNavigateToSubscription = { selectedTab = 8 }
                     )
                     5 -> ExpensesScreen() // Accessible from Home but not in bottom nav
-                    // 6 -> Was StaffScreen, merged into ManageServices
+                    6 -> SalesHistoryScreen()
                     7 -> ManageServicesScreen(onBack = { selectedTab = 4 }) // Manage Services
                     8 -> SubscriptionScreen(onBack = { selectedTab = 4 }, viewModel = subscriptionViewModel)
                 }

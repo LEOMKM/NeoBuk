@@ -16,8 +16,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.AppTextStyles
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.material.icons.automirrored.outlined.Chat
 
 data class MenuItem(
     val title: String,
@@ -76,10 +82,108 @@ fun MoreScreen(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // 1. One-tap Support (Prominent at the top for trust)
+            item {
+                SupportSection()
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             items(menuItems.size) { index ->
                 MoreMenuItem(item = menuItems[index])
             }
+            
+            item { Spacer(modifier = Modifier.height(24.dp)) }
         }
+    }
+}
+
+@Composable
+fun SupportSection() {
+    val context = LocalContext.current
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = NeoBukTeal.copy(alpha = 0.05f)),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                "Need help? Talk to us",
+                style = AppTextStyles.bodyBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                "We are available to support your business.",
+                style = AppTextStyles.secondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                SupportAction(
+                    icon = Icons.AutoMirrored.Outlined.Chat,
+                    label = "WhatsApp",
+                    color = Color(0xFF25D366),
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/254700000000"))
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                
+                SupportAction(
+                    icon = Icons.Outlined.Phone,
+                    label = "Call",
+                    color = NeoBukTeal,
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:+254700000000"))
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+
+                SupportAction(
+                    icon = Icons.Outlined.Email,
+                    label = "Email",
+                    color = Color(0xFFEA4335),
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_SENDTO).apply {
+                            data = Uri.parse("mailto:support@neobuk.co.ke")
+                            putExtra(Intent.EXTRA_SUBJECT, "NeoBuk Support Request")
+                        }
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SupportAction(
+    icon: ImageVector,
+    label: String,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier.height(48.dp),
+        shape = RoundedCornerShape(10.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.3f)),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = color)
+    ) {
+        Icon(icon, null, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(label, fontSize = 11.sp, fontWeight = FontWeight.Bold)
     }
 }
 
