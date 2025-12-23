@@ -487,8 +487,8 @@ object ReceiptUtils {
         // NeoBuk Logo Text (gradient effect simulated with bold teal)
         val logoPaint = android.graphics.Paint().apply {
             color = AndroidColor.rgb(0, 121, 107) // NeoBuk Teal
-            textSize = 16f
-            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            textSize = 18f // Slightly larger for cursive
+            typeface = android.graphics.Typeface.create("cursive", android.graphics.Typeface.BOLD)
             textAlign = android.graphics.Paint.Align.CENTER
         }
         canvas.drawText("NeoBuk", centerX, y, logoPaint)

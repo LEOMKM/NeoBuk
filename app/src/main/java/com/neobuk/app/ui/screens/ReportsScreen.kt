@@ -39,6 +39,15 @@ import com.neobuk.app.ui.theme.NeoBukSuccess
 import com.neobuk.app.ui.theme.NeoBukWarning
 import com.neobuk.app.ui.theme.NeoBukError
 import com.neobuk.app.ui.theme.AppTextStyles
+import android.graphics.Color as AndroidColor
+import android.graphics.Typeface
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
+import android.os.Environment
+import android.widget.Toast
+import android.content.Context
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 
 // Data Classes
 data class ReportKPI(
@@ -135,8 +144,12 @@ fun ReportsScreen() {
                     
                     // Export Reports (at top for quick access)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        val context = LocalContext.current
                         OutlinedButton(
-                            onClick = { },
+                            onClick = { 
+                                val businessName = "Mama Njeri's Shop" // Mock for now
+                                ReportUtils.downloadReportPdf(context, businessName, selectedFilter, kpis, topProducts, paymentMethods)
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .height(40.dp),
@@ -154,7 +167,10 @@ fun ReportsScreen() {
                         }
 
                         OutlinedButton(
-                            onClick = { },
+                            onClick = { 
+                                val businessName = "Mama Njeri's Shop" // Mock
+                                ReportUtils.downloadReportCsv(context, businessName, selectedFilter, kpis, topProducts, paymentMethods)
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .height(40.dp),
@@ -349,8 +365,12 @@ fun ReportsScreen() {
         }
 
         // Download FAB
+        val context = LocalContext.current
         FloatingActionButton(
-            onClick = { /* Download reports */ },
+            onClick = { 
+                val businessName = "Mama Njeri's Shop" // Mock for now
+                ReportUtils.downloadReportPdf(context, businessName, selectedFilter, kpis, topProducts, paymentMethods)
+            },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
@@ -669,3 +689,276 @@ fun TopProductItem(
 }
 
 
+
+object ReportUtils {
+    fun generatePdfFile(context: Context, businessName: String, period: String, kpis: List<ReportKPI>, topProducts: List<TopProduct>, paymentMethods: List<PaymentMethodData>): java.io.File {
+        val pdfDocument = PdfDocument()
+        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
+        
+        // Paints
+        val titlePaint = Paint().apply {
+            color = AndroidColor.BLACK
+            textSize = 24f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            textAlign = Paint.Align.CENTER
+        }
+        
+        val headerPaint = Paint().apply {
+            color = AndroidColor.rgb(0, 121, 107)
+            textSize = 18f
+            typeface = Typeface.DEFAULT_BOLD
+            textAlign = Paint.Align.LEFT
+        }
+        
+        val subHeaderPaint = Paint().apply {
+             color = AndroidColor.rgb(0, 121, 107)
+             textSize = 18f
+             typeface = Typeface.DEFAULT_BOLD
+             textAlign = Paint.Align.CENTER
+        }
+        
+        val textPaint = Paint().apply {
+            color = AndroidColor.BLACK
+            textSize = 12f
+        }
+        
+        val rightTextPaint = Paint().apply {
+            color = AndroidColor.BLACK
+            textSize = 12f
+            textAlign = Paint.Align.RIGHT
+        }
+        
+        val grayPaint = Paint().apply {
+            color = AndroidColor.GRAY
+            textSize = 10f
+        }
+
+        var y = 60f
+        val centerX = 595f / 2
+        val margin = 50f
+        
+        // Title
+        canvas.drawText(businessName, centerX, y, titlePaint)
+        y += 30
+        
+        canvas.drawText("Business Report", centerX, y, subHeaderPaint)
+        y += 30
+        canvas.drawText("Period: $period", centerX, y, Paint().apply { 
+            color = AndroidColor.GRAY
+            textSize = 14f
+            textAlign = Paint.Align.CENTER
+        })
+        y += 40
+
+        // Smart Insight
+        val topProduct = topProducts.maxByOrNull { it.revenue }
+        val insight = if (topProduct != null) "Sales are moving! ${topProduct.name} is your top revenue product." else "Check your sales data to see insights."
+        canvas.drawText(insight, centerX, y, Paint().apply {
+            color = AndroidColor.rgb(46, 125, 50) // Dark Green
+            textSize = 12f
+            textAlign = Paint.Align.CENTER
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
+        })
+        y += 50
+        
+        // KPI Section
+        canvas.drawText("Key Metrics", margin, y, headerPaint)
+        y += 30
+        
+        kpis.forEach { kpi ->
+            canvas.drawText(kpi.subtitle, margin, y, grayPaint)
+            val valueText = "${kpi.title} ${kpi.value}"
+            canvas.drawText(valueText, 595f - margin, y, rightTextPaint.apply { typeface = Typeface.DEFAULT_BOLD })
+            rightTextPaint.typeface = Typeface.DEFAULT
+            y += 20
+        }
+        y += 20
+        
+        // Separator
+        canvas.drawLine(margin, y, 595f - margin, y, Paint().apply { color = AndroidColor.LTGRAY })
+        y += 30
+        
+        // Top Products
+        canvas.drawText("Top Products", margin, y, headerPaint)
+        y += 30
+        
+        // Table Header
+        val leftAlignGray = Paint().apply { color = AndroidColor.GRAY; textSize=10f; textAlign=Paint.Align.LEFT }
+        val centerAlignGray = Paint().apply { color = AndroidColor.GRAY; textSize=10f; textAlign=Paint.Align.CENTER }
+        val rightAlignGray = Paint().apply { color = AndroidColor.GRAY; textSize=10f; textAlign=Paint.Align.RIGHT }
+        
+        canvas.drawText("Product", margin, y, leftAlignGray)
+        canvas.drawText("Units", centerX, y, centerAlignGray)
+        canvas.drawText("Revenue", 595f - margin, y, rightAlignGray)
+        y += 20
+         
+        topProducts.forEach { prod ->
+            canvas.drawText(prod.name, margin, y, textPaint)
+            canvas.drawText(prod.unitsSold.toString(), centerX, y, Paint().apply { color=AndroidColor.BLACK; textSize=12f; textAlign=Paint.Align.CENTER })
+            val formattedRevenue = String.format("%,.0f", prod.revenue)
+            canvas.drawText("KES $formattedRevenue", 595f - margin, y, rightTextPaint)
+            y += 20
+        }
+         
+        y += 20
+        canvas.drawLine(margin, y, 595f - margin, y, Paint().apply { color = AndroidColor.LTGRAY })
+        y += 30
+         
+          // Payment Methods
+        canvas.drawText("Payment Methods", margin, y, headerPaint)
+        y += 30
+        
+        // Extract Total Sales for Payment Method calculations
+        val totalSalesKpi = kpis.find { it.subtitle == "Total Sales" }
+        val totalSales = totalSalesKpi?.value?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+        
+        paymentMethods.forEach { method ->
+             canvas.drawText(method.method, margin, y, textPaint)
+             val amount = totalSales * (method.percentage / 100.0)
+             val formattedAmount = String.format("%,.0f", amount)
+             canvas.drawText("${method.percentage}% (KES $formattedAmount)", 595f - margin, y, rightTextPaint)
+             y += 20
+        }
+        
+        // Footer
+        y = 800f
+        // NeoBuk Logo Text
+        val logoPaint = Paint().apply {
+            color = AndroidColor.rgb(0, 121, 107) // NeoBuk Teal
+            textSize = 18f // Slightly larger for cursive
+            typeface = Typeface.create("cursive", Typeface.BOLD)
+            textAlign = Paint.Align.CENTER
+        }
+        canvas.drawText("NeoBuk", centerX, y, logoPaint)
+        y += 15
+        val dateFormat = java.text.SimpleDateFormat("MMM dd, yyyy 'at' h:mm a", java.util.Locale.getDefault())
+        val timestamp = dateFormat.format(java.util.Date())
+        
+        canvas.drawText("Digital Report • $timestamp", centerX, y, Paint().apply { 
+            color = AndroidColor.GRAY
+            textSize = 9f
+            textAlign = Paint.Align.CENTER
+        })
+        
+        pdfDocument.finishPage(page)
+        
+        val file = java.io.File(context.cacheDir, "Report_${System.currentTimeMillis()}.pdf")
+        try {
+            pdfDocument.writeTo(java.io.FileOutputStream(file))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        pdfDocument.close()
+        return file
+    }
+    
+    fun downloadReportPdf(context: Context, businessName: String, period: String, kpis: List<ReportKPI>, topProducts: List<TopProduct>, paymentMethods: List<PaymentMethodData>) {
+        val file = generatePdfFile(context, businessName, period, kpis, topProducts, paymentMethods)
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            val contentValues = android.content.ContentValues().apply {
+                put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, "NeoBuk_Report_${System.currentTimeMillis()}.pdf")
+                put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
+            val resolver = context.contentResolver
+            val uri = resolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            if (uri != null) {
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    java.io.FileInputStream(file).use { inputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+                Toast.makeText(context, "Report saved to Downloads", Toast.LENGTH_SHORT).show()
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/pdf")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                context.startActivity(Intent.createChooser(intent, "Open Report"))
+             }
+        }
+    }
+
+
+
+    fun generateCsvFile(context: Context, businessName: String, period: String, kpis: List<ReportKPI>, topProducts: List<TopProduct>, paymentMethods: List<PaymentMethodData>): java.io.File {
+        val fileName = "Report_${System.currentTimeMillis()}.csv"
+        val file = java.io.File(context.cacheDir, fileName)
+        
+        file.printWriter().use { out ->
+            out.println("Business Report")
+            out.println("Business Name, $businessName")
+            out.println("Period, $period")
+            out.println()
+            
+            out.println("Key Metrics")
+            out.println("Metric,Value")
+            kpis.forEach { kpi ->
+                out.println("${kpi.subtitle},${kpi.title} ${kpi.value.replace(",", "")}")
+            }
+            out.println()
+            
+            out.println("Top Products")
+            out.println("Product,Units Sold,Revenue")
+            topProducts.forEach { prod ->
+                out.println("${prod.name},${prod.unitsSold},${prod.revenue}")
+            }
+            out.println()
+            
+            out.println("Payment Methods")
+            out.println("Method,Percentage,Amount")
+            
+            // Calculate total sales for amount
+            val totalSalesKpi = kpis.find { it.subtitle == "Total Sales" }
+            val totalSales = totalSalesKpi?.value?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+            
+            paymentMethods.forEach { method ->
+                val amount = totalSales * (method.percentage / 100.0)
+                val formattedAmount = String.format("%.0f", amount)
+                out.println("${method.method},${method.percentage}%,$formattedAmount")
+            }
+            out.println()
+            out.println("Generated by NeoBuk")
+        }
+        return file
+    }
+
+    fun downloadReportCsv(context: Context, businessName: String, period: String, kpis: List<ReportKPI>, topProducts: List<TopProduct>, paymentMethods: List<PaymentMethodData>) {
+        val file = generateCsvFile(context, businessName, period, kpis, topProducts, paymentMethods)
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            val contentValues = android.content.ContentValues().apply {
+                put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, "NeoBuk_Report_${System.currentTimeMillis()}.csv")
+                put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
+            val resolver = context.contentResolver
+            val uri = resolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            if (uri != null) {
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    java.io.FileInputStream(file).use { inputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+                Toast.makeText(context, "CSV saved to Downloads", Toast.LENGTH_SHORT).show()
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "text/csv")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                try {
+                    context.startActivity(Intent.createChooser(intent, "Open CSV"))
+                } catch (e: Exception) {
+                    Toast.makeText(context, "No app found to open CSV", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                 Toast.makeText(context, "Failed to save CSV", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+             Toast.makeText(context, "Download not supported on this device version yet", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+}
