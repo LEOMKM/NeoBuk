@@ -74,6 +74,7 @@ fun ReceiptScreen(
     }
     
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text("E-Receipt", style = AppTextStyles.bodyBold.copy(color = Color.White)) },
@@ -85,64 +86,29 @@ fun ReceiptScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NeoBukTeal)
             )
         },
-        containerColor = NeoBukTeal, // Background similar to image header
-        bottomBar = {
-            // Action Buttons pinned to bottom
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(NeoBukTeal) // Match background
-                    .padding(16.dp), // Padding around buttons
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Share Button (Text/WhatsApp)
-                Button(
-                    onClick = { ReceiptUtils.shareText(context, ReceiptUtils.generatePlainText(data)) },
-                    modifier = Modifier.weight(1f).height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                   Icon(Icons.Default.Share, null, tint = NeoBukTeal)
-                   Spacer(modifier = Modifier.width(8.dp))
-                   Text("Share", color = NeoBukTeal, style = AppTextStyles.buttonMedium)
-                }
-                
-                // Print/PDF Button
-                Button(
-                    onClick = { ReceiptUtils.printReceipt(context, data) },
-                    modifier = Modifier.weight(1f).height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black), // Dark button like design
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                   Icon(Icons.Default.Print, null, tint = Color.White)
-                   Spacer(modifier = Modifier.width(8.dp))
-                   Text("Download / Print", color = Color.White, style = AppTextStyles.buttonMedium.copy(fontSize = 14.sp))
-                }
-            }
-        }
+        containerColor = NeoBukTeal
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally // Center the card
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(20.dp))
             
-            // Receipt Card
+            // Receipt Card - Wrap Content
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f) // Fill available space but leave room for buttons if needed, or scroll
-                    .verticalScroll(rememberScrollState()),
+                    .padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(24.dp)
+                        .padding(vertical = 24.dp, horizontal = 56.dp)
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -175,7 +141,11 @@ fun ReceiptScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text("Date", style = AppTextStyles.body, color = Color.Gray)
-                        Text(data.date, style = AppTextStyles.bodyBold.copy(color = Color.Black))
+                        Text(
+                            data.date, 
+                            style = AppTextStyles.bodyBold.copy(color = Color.Black),
+                            textAlign = TextAlign.End
+                        )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(
@@ -183,10 +153,21 @@ fun ReceiptScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text("Method", style = AppTextStyles.body, color = Color.Gray)
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(data.paymentMethod, style = AppTextStyles.bodyBold.copy(color = Color.Black))
+                        Column(
+                            horizontalAlignment = Alignment.End,
+                            modifier = Modifier.weight(1f).padding(start = 32.dp)
+                        ) {
+                            Text(
+                                data.paymentMethod, 
+                                style = AppTextStyles.bodyBold.copy(color = Color.Black),
+                                textAlign = TextAlign.End
+                            )
                             if (!data.paymentRef.isNullOrEmpty()) {
-                                Text("Ref: ${data.paymentRef}", style = AppTextStyles.caption.copy(color = Color.Gray))
+                                Text(
+                                    "Ref: ${data.paymentRef}", 
+                                    style = AppTextStyles.caption.copy(color = Color.Gray),
+                                    textAlign = TextAlign.End
+                                )
                             }
                         }
                     }
@@ -196,7 +177,28 @@ fun ReceiptScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text("Business", style = AppTextStyles.body, color = Color.Gray)
-                        Text(data.businessName, style = AppTextStyles.bodyBold.copy(color = Color.Black))
+                        Text(
+                            data.businessName, 
+                            style = AppTextStyles.bodyBold.copy(color = Color.Black),
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.weight(1f).padding(start = 32.dp)
+                        )
+                    }
+                    
+                    if (data.customerName != null && data.paymentMethod.contains("M-PESA", ignoreCase = true)) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Customer", style = AppTextStyles.body, color = Color.Gray)
+                            Text(
+                                data.customerName, 
+                                style = AppTextStyles.bodyBold.copy(color = Color.Black),
+                                textAlign = TextAlign.End,
+                                modifier = Modifier.weight(1f).padding(start = 32.dp)
+                            )
+                        }
                     }
                     
                     HorizontalDivider(modifier = Modifier.padding(vertical = 24.dp), color = MaterialTheme.colorScheme.outlineVariant)
@@ -264,6 +266,44 @@ fun ReceiptScreen(
                     Text("Digital Receipt", style = AppTextStyles.caption.copy(fontSize = 10.sp), color = Color.Gray)
                 }
             }
+            
+            // Action Buttons - Inside Teal Background
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Share Button
+                OutlinedButton(
+                    onClick = { ReceiptUtils.sharePdf(context, data) },
+                    modifier = Modifier.weight(1f).height(54.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color.White,
+                        contentColor = NeoBukTeal
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
+                ) {
+                   Icon(Icons.Default.Share, null, tint = NeoBukTeal)
+                   Spacer(modifier = Modifier.width(6.dp))
+                   Text("Share", color = NeoBukTeal, style = AppTextStyles.buttonMedium)
+                }
+                
+                // Download Button
+                Button(
+                    onClick = { ReceiptUtils.downloadPdf(context, data) },
+                    modifier = Modifier.weight(1f).height(54.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                   Icon(Icons.Default.Print, null, tint = NeoBukTeal)
+                   Spacer(modifier = Modifier.width(6.dp))
+                   Text("Download", color = NeoBukTeal, style = AppTextStyles.buttonMedium)
+                }
+            }
         }
     }
 }
@@ -290,106 +330,188 @@ object ReceiptUtils {
     }
 
     fun generatePlainText(data: ReceiptData): String {
-        val sb = StringBuilder()
-        sb.appendLine("🧾 *RECEIPT* from ${data.businessName}")
-        sb.appendLine("Date: ${data.date}")
-        sb.appendLine("Receipt No: ${data.receiptId}")
-        sb.appendLine("--------------------------------")
+        return generateHtml(data) // Unused now but kept for compatibility or fallback
+    }
+
+    private fun startPdfPage(): android.graphics.pdf.PdfDocument {
+        return android.graphics.pdf.PdfDocument()
+    }
+
+    fun generatePdfFile(context: Context, data: ReceiptData): java.io.File {
+        val pdfDocument = android.graphics.pdf.PdfDocument()
+        // A4 size in points (approx 595x842)
+        val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(595, 842, 1).create()
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
+        val paint = android.graphics.Paint()
+        val titlePaint = android.graphics.Paint().apply {
+            color = AndroidColor.BLACK
+            textSize = 24f
+            typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+            textAlign = android.graphics.Paint.Align.CENTER
+        }
+        val headerPaint = android.graphics.Paint().apply {
+            color = AndroidColor.rgb(0, 121, 107) // NeoBuk Teal
+            textSize = 18f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            textAlign = android.graphics.Paint.Align.CENTER
+        }
+        val textPaint = android.graphics.Paint().apply {
+            color = AndroidColor.BLACK
+            textSize = 14f
+        }
+        val rightTextPaint = android.graphics.Paint().apply {
+            color = AndroidColor.BLACK
+            textSize = 14f
+            textAlign = android.graphics.Paint.Align.RIGHT
+        }
+        val grayPaint = android.graphics.Paint().apply {
+            color = AndroidColor.GRAY
+            textSize = 12f
+        }
+
+        var y = 60f
+        val centerX = 595f / 2
+        val margin = 150f
+
+        // Success Checkmark Icon (Circle with check)
+        val checkCircleRadius = 30f
+        val checkCirclePaint = android.graphics.Paint().apply {
+            color = AndroidColor.rgb(232, 245, 233) // Light green background
+            style = android.graphics.Paint.Style.FILL
+        }
+        canvas.drawCircle(centerX, y + checkCircleRadius, checkCircleRadius, checkCirclePaint)
         
+        // Draw checkmark inside circle
+        val checkPaint = android.graphics.Paint().apply {
+            color = AndroidColor.rgb(46, 125, 50) // Dark green
+            strokeWidth = 4f
+            style = android.graphics.Paint.Style.STROKE
+            strokeCap = android.graphics.Paint.Cap.ROUND
+            strokeJoin = android.graphics.Paint.Join.ROUND
+        }
+        val checkPath = android.graphics.Path()
+        checkPath.moveTo(centerX - 12f, y + checkCircleRadius)
+        checkPath.lineTo(centerX - 4f, y + checkCircleRadius + 8f)
+        checkPath.lineTo(centerX + 12f, y + checkCircleRadius - 8f)
+        canvas.drawPath(checkPath, checkPaint)
+        
+        y += checkCircleRadius * 2 + 20
+
+        // Payment Received Title
+        canvas.drawText("Payment Received", centerX, y, titlePaint)
+        y += 30
+        
+        // Total Amount (prominent)
+        val amountPaint = android.graphics.Paint().apply {
+            color = AndroidColor.rgb(0, 121, 107) // NeoBuk Teal
+            textSize = 28f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            textAlign = android.graphics.Paint.Align.CENTER
+        }
+        canvas.drawText(data.totalAmount, centerX, y, amountPaint)
+        
+        y += 30
+        
+        // Meta Data
+        canvas.drawText("Date", margin, y, grayPaint.apply { textAlign = android.graphics.Paint.Align.LEFT })
+        canvas.drawText(data.date, 595f - margin, y, rightTextPaint)
+        y += 20
+        canvas.drawText("Method", margin, y, grayPaint)
+        
+        // Payment method with reference (if exists)
+        if (!data.paymentRef.isNullOrEmpty()) {
+            canvas.drawText(data.paymentMethod, 595f - margin, y, rightTextPaint)
+            y += 15
+            canvas.drawText("Ref: ${data.paymentRef}", 595f - margin, y, grayPaint.apply { 
+                textAlign = android.graphics.Paint.Align.RIGHT
+                textSize = 10f 
+            })
+            grayPaint.textSize = 12f // Reset
+            grayPaint.textAlign = android.graphics.Paint.Align.LEFT
+            y += 5
+        } else {
+            canvas.drawText(data.paymentMethod, 595f - margin, y, rightTextPaint)
+        }
+        
+        y += 20
+        canvas.drawText("Business", margin, y, grayPaint)
+        canvas.drawText(data.businessName, 595f - margin, y, rightTextPaint)
+        y += 20
+        
+        if (data.customerName != null && data.paymentMethod.contains("M-PESA", ignoreCase = true)) {
+            canvas.drawText("Customer", margin, y, grayPaint)
+            canvas.drawText(data.customerName, 595f - margin, y, rightTextPaint)
+            y += 20
+        }
+
+        y += 10
+        paint.color = AndroidColor.LTGRAY
+        paint.strokeWidth = 1f
+        canvas.drawLine(margin, y, 595f - margin, y, paint)
+        y += 30
+
+        // Items Header
+        canvas.drawText("Item", margin, y, grayPaint.apply { textAlign = android.graphics.Paint.Align.LEFT })
+        canvas.drawText("Cost", 595f - margin, y, grayPaint.apply { textAlign = android.graphics.Paint.Align.RIGHT })
+        y += 20
+
         data.items.forEach { item ->
-            sb.appendLine("${item.name} (x${item.quantity})")
-            sb.appendLine("  @ ${item.price} = ${item.total}")
-        }
-        
-        sb.appendLine("--------------------------------")
-        sb.appendLine("*TOTAL: ${data.totalAmount}*")
-        sb.appendLine("Paid via: ${data.paymentMethod}")
-        if (!data.paymentRef.isNullOrEmpty()) sb.appendLine("Ref: ${data.paymentRef}")
-        sb.appendLine("--------------------------------")
-        if (data.customerName != null) sb.appendLine("Customer: ${data.customerName}")
-        sb.appendLine("Thank you for your business!")
-        
-        return sb.toString()
-    }
-
-    private fun bitmapToBase64(bitmap: Bitmap): String {
-        val byteArrayOutputStream = java.io.ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-        val byteArray = byteArrayOutputStream.toByteArray()
-        return android.util.Base64.encodeToString(byteArray, android.util.Base64.NO_WRAP)
-    }
-
-    fun generateHtml(data: ReceiptData): String {
-        // Generate barcode for HTML
-        val barcodeBitmap = generateBarcodeBitmap(data.receiptId, 400, 100)
-        val barcodeBase64 = barcodeBitmap?.let { bitmapToBase64(it) }
-
-        val itemsHtml = data.items.joinToString("") { item ->
-            """
-            <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;">
-                    <div style="font-weight: bold;">${item.name}</div>
-                    <div style="font-size: 12px; color: #666;">${item.quantity} x ${item.price}</div>
-                </td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right; vertical-align: top;">
-                    ${item.total}
-                </td>
-            </tr>
-            """
+            canvas.drawText(item.name, margin, y, textPaint.apply { typeface = android.graphics.Typeface.DEFAULT_BOLD })
+            canvas.drawText(item.total, 595f - margin, y, rightTextPaint.apply { typeface = android.graphics.Typeface.DEFAULT_BOLD })
+            y += 15
+            canvas.drawText("${item.quantity} x ${item.price}", margin, y, grayPaint.apply { textAlign = android.graphics.Paint.Align.LEFT })
+            textPaint.typeface = android.graphics.Typeface.DEFAULT // Reset
+            rightTextPaint.typeface = android.graphics.Typeface.DEFAULT
+            y += 25
         }
 
-        return """
-            <html>
-            <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    body { font-family: 'Helvetica', sans-serif; padding: 20px; color: #333; max-width: 400px; margin: 0 auto; background-color: #fff; }
-                    .header { text-align: center; margin-bottom: 20px; }
-                    .title { font-size: 24px; font-weight: bold; margin-bottom: 5px; color: #00796B; }
-                    .meta { font-size: 14px; color: #666; margin-bottom: 5px; }
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                    .totals { text-align: right; margin-top: 20px; border-top: 2px solid #333; padding-top: 10px; }
-                    .total-row { font-size: 18px; font-weight: bold; color: #000; }
-                    .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #999; }
-                    .barcode { text-align: center; margin-top: 20px; }
-                    .barcode img { max-width: 100%; height: auto; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <div class="title">${data.businessName}</div>
-                    <div class="meta">Receipt No: ${data.receiptId}</div>
-                    <div class="meta">${data.date}</div>
-                    ${if (data.customerName != null) "<div class='meta'>Customer: ${data.customerName}</div>" else ""}
-                </div>
+        y += 10
+        canvas.drawLine(margin, y, 595f - margin, y, paint)
+        y += 40
 
-                <table>
-                    ${itemsHtml}
-                </table>
+        // Barcode
+        val barcodeBitmap = generateBarcodeBitmap(data.receiptId, 300, 60)
+        if (barcodeBitmap != null) {
+             val barcodeX = (595f - 300f) / 2
+             canvas.drawBitmap(barcodeBitmap, barcodeX, y, null)
+             y += 70
+        }
+        
+        canvas.drawText("Receipt No: ${data.receiptId}", centerX, y, grayPaint.apply { 
+            textAlign = android.graphics.Paint.Align.CENTER
+            textSize = 10f
+        })
+        y += 30
+        
+        // NeoBuk Logo Text (gradient effect simulated with bold teal)
+        val logoPaint = android.graphics.Paint().apply {
+            color = AndroidColor.rgb(0, 121, 107) // NeoBuk Teal
+            textSize = 16f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            textAlign = android.graphics.Paint.Align.CENTER
+        }
+        canvas.drawText("NeoBuk", centerX, y, logoPaint)
+        y += 15
+        canvas.drawText("Digital Receipt", centerX, y, grayPaint.apply { 
+            textAlign = android.graphics.Paint.Align.CENTER
+            textSize = 9f
+        })
 
-                <div class="totals">
-                    <div class="total-row">TOTAL: ${data.totalAmount}</div>
-                    <div class="meta" style="margin-top: 5px;">Paid via ${data.paymentMethod}</div>
-                    ${if (!data.paymentRef.isNullOrEmpty()) "<div class='meta'>Ref: ${data.paymentRef}</div>" else ""}
-                </div>
+        pdfDocument.finishPage(page)
 
-                ${if (barcodeBase64 != null) """
-                <div class="barcode">
-                    <img src="data:image/png;base64,$barcodeBase64" alt="Barcode" />
-                    <div style="font-size: 10px; margin-top: 4px;">${data.receiptId}</div>
-                </div>
-                """ else ""}
-
-                <div class="footer">
-                    Thank you!<br>
-                    Generated by NeoBuk
-                </div>
-            </body>
-            </html>
-        """.trimIndent()
+        val file = java.io.File(context.cacheDir, "Receipt_${data.receiptId}.pdf")
+        try {
+            pdfDocument.writeTo(java.io.FileOutputStream(file))
+        } catch (e: java.io.IOException) {
+            e.printStackTrace()
+        }
+        pdfDocument.close()
+        return file
     }
 
     fun shareText(context: Context, text: String) {
+       // Only used as fallback now
         val sendIntent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, text)
@@ -397,6 +519,63 @@ object ReceiptUtils {
         }
         val shareIntent = Intent.createChooser(sendIntent, "Share Receipt")
         context.startActivity(shareIntent)
+    }
+
+    fun sharePdf(context: Context, data: ReceiptData) {
+        val file = generatePdfFile(context, data)
+        val uri = androidx.core.content.FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            file
+        )
+        
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/pdf"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, "Receipt from ${data.businessName}")
+            putExtra(Intent.EXTRA_TEXT, "Here is your receipt for ${data.totalAmount}.")
+            // padding = 10 removed
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        context.startActivity(Intent.createChooser(intent, "Share Receipt PDF"))
+    }
+    
+    fun downloadPdf(context: Context, data: ReceiptData) {
+        // Direct download using MediaStore is best but verbose.
+        // For simple user delight, we can try to copy to a visible public folder directly.
+        // OR fallback to PrintManager if file operations fail.
+        
+        val pdfFile = generatePdfFile(context, data)
+        
+        // Android 10+ (Q) uses MediaStore
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            val contentValues = android.content.ContentValues().apply {
+                put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, "Receipt_${data.receiptId}.pdf")
+                put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_DOWNLOADS)
+            }
+            val resolver = context.contentResolver
+            val uri = resolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            if (uri != null) {
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    java.io.FileInputStream(pdfFile).use { inputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+                android.widget.Toast.makeText(context, "Saved to Downloads", android.widget.Toast.LENGTH_SHORT).show()
+                // view intent
+                val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/pdf")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                // context.startActivity(viewIntent) // Optional
+            } else {
+                 android.widget.Toast.makeText(context, "Failed to save PDF", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        } else {
+             // Legacy External Storage (needs permission, usually granted in dev environment or we fallback to print)
+             printReceipt(context, data) // Fallback for older devices/no permission
+        }
     }
 
     fun printReceipt(context: Context, data: ReceiptData) {
@@ -418,5 +597,54 @@ object ReceiptUtils {
             builder.setMediaSize(PrintAttributes.MediaSize.ISO_A4)
             it.print("NeoBuk_Receipt", printAdapter, builder.build())
         }
+    }
+
+    // Keep this for Print function if needed
+    fun generateHtml(data: ReceiptData): String {
+        // Reuse previous logic but kept internal if only needed for PrintManager fallback
+         val itemsHtml = data.items.joinToString("") { item ->
+            """
+            <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                    <div style="font-weight: bold;">${item.name}</div>
+                    <div style="font-size: 12px; color: #666;">${item.quantity} x ${item.price}</div>
+                </td>
+                <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right; vertical-align: top;">
+                    ${item.total}
+                </td>
+            </tr>
+            """
+        }
+        return """
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { font-family: 'Helvetica', sans-serif; padding: 20px; color: #333; max-width: 400px; margin: 0 auto; background-color: #fff; }
+                    .header { text-align: center; margin-bottom: 20px; }
+                    .title { font-size: 24px; font-weight: bold; margin-bottom: 5px; color: #00796B; }
+                    .meta { font-size: 14px; color: #666; margin-bottom: 5px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    .totals { text-align: right; margin-top: 20px; border-top: 2px solid #333; padding-top: 10px; }
+                    .total-row { font-size: 18px; font-weight: bold; color: #000; }
+                    .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #999; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="title">${data.businessName}</div>
+                    <div class="meta">Receipt No: ${data.receiptId}</div>
+                    <div class="meta">${data.date}</div>
+                </div>
+                <table>${itemsHtml}</table>
+                <div class="totals"><div class="total-row">TOTAL: ${data.totalAmount}</div></div>
+                <div class="footer">Generated by NeoBuk</div>
+            </body>
+            </html>
+        """.trimIndent()
+    }
+    
+    private fun bitmapToBase64(bitmap: Bitmap): String {
+        return "" // deprecated
     }
 }

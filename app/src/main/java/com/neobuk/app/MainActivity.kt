@@ -129,13 +129,25 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainNavigation() {
-    var authState by remember { mutableStateOf(AuthState.ONBOARDING) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val sharedPreferences = remember { context.getSharedPreferences("neobuk_prefs", android.content.Context.MODE_PRIVATE) }
+    val hasCompletedOnboarding = remember { sharedPreferences.getBoolean("onboarding_complete", false) }
+    
+    // Initialize state based on preference
+    var authState by remember { 
+        mutableStateOf(if (hasCompletedOnboarding) AuthState.LOGIN else AuthState.ONBOARDING) 
+    }
+    
     var businessName by remember { mutableStateOf("Kasarani Shop") }
 
     when (authState) {
         AuthState.ONBOARDING -> {
             OnboardingScreen(
-                onFinishOnboarding = { authState = AuthState.LOGIN }
+                onFinishOnboarding = { 
+                    // Save preference
+                    sharedPreferences.edit().putBoolean("onboarding_complete", true).apply()
+                    authState = AuthState.LOGIN 
+                }
             )
         }
         AuthState.LOGIN -> {

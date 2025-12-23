@@ -4,3 +4,4 @@ color ic_launcher_background
 drawable newbuk
 string app_name
 style Theme.NeoBuk
+xml provider_paths

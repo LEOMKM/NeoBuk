@@ -1,3 +1,4 @@
+com.neobuk.app:xml/provider_paths = 0x7f0b0000
 com.neobuk.app:styleable/NavHost = 0x7f0a000b
 com.neobuk.app:styleable/NavDeepLink = 0x7f0a0009
 com.neobuk.app:styleable/NavAction = 0x7f0a0007

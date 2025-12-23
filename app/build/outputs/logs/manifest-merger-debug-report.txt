@@ -1,9 +1,20 @@
 -- Merging decision tree log ---
+provider#androidx.core.content.FileProvider
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:22:9-30:20
+	android:grantUriPermissions
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:26:13-47
+	android:authorities
+		INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:24:13-60
+	android:exported
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:25:13-37
+	android:name
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:23:13-62
 manifest
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-23:12
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-23:12
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-23:12
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-23:12
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-33:12
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-33:12
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-33:12
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-33:12
 MERGED from [androidx.media3:media3-common:1.9.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/cfc63498cb777268f7a3786e8bb0fef9/transformed/media3-common-1.9.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.media3:media3-common-ktx:1.9.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/54b1d353c53c4f155f37a45dd8e11b72/transformed/media3-common-ktx-1.9.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common:2.7.7] /Users/leonard.mutugi/.gradle/caches/transforms-4/83440a0fdd6c6e93e2e19e6d3884191e/transformed/navigation-common-2.7.7/AndroidManifest.xml:17:1-22:12
@@ -66,8 +77,8 @@ MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/leonard.mutugi/.gradl
 	xmlns:android
 		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:11-69
 application
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:4:5-21:19
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:4:5-21:19
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:4:5-31:19
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:4:5-31:19
 MERGED from [androidx.compose.ui:ui-test-manifest:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/7cc197ffd1026cbfa1784b22de9378c0/transformed/ui-test-manifest-1.6.8/AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-test-manifest:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/7cc197ffd1026cbfa1784b22de9378c0/transformed/ui-test-manifest-1.6.8/AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/4a655a9ab40658dcb25937f1f96099aa/transformed/ui-tooling-release/AndroidManifest.xml:22:5-26:19
@@ -120,6 +131,12 @@ category#android.intent.category.LAUNCHER
 ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:18:17-77
 	android:name
 		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:18:27-74
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:27:13-29:58
+	android:resource
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:29:17-55
+	android:name
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:28:17-67
 uses-sdk
 INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml
