@@ -1,0 +1,19 @@
+<lint-module
+    format="1"
+    dir="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app"
+    name=":app"
+    type="APP"
+    maven="NeoBuk:app:unspecified"
+    agpVersion="8.5.0"
+    buildFolder="build"
+    bootClassPath="/Users/leonard.mutugi/Library/Android/sdk/platforms/android-35/android.jar:/Users/leonard.mutugi/Library/Android/sdk/build-tools/34.0.0/core-lambda-stubs.jar"
+    javaSourceLevel="1.8"
+    compileTarget="android-35"
+    neverShrinking="true">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="debug"/>
+</lint-module>
