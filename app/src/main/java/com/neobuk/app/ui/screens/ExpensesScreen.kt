@@ -132,25 +132,7 @@ fun ExpensesScreen() {
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "Expense Tracker",
-                            style = AppTextStyles.pageTitle,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "Track and manage your business expenses",
-                            style = AppTextStyles.secondary,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                
+                // Header removed (moved to Toolbar)
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 // Prominent Add Expense Button

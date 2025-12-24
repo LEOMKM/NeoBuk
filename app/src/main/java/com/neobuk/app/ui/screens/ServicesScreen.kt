@@ -76,18 +76,7 @@ fun ServicesScreen() {
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            Text(
-                text = "Services",
-                style = AppTextStyles.pageTitle,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Record services and view history",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Record Service Button
             Button(

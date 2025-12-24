@@ -1,10 +1,10 @@
 [
     {
-        "merged": "com.neobuk.app-debug-51:/drawable_newbuk.png.flat",
-        "source": "com.neobuk.app-main-53:/drawable/newbuk.png"
+        "merged": "com.neobuk.app-debug-53:/drawable_newbuk.png.flat",
+        "source": "com.neobuk.app-main-55:/drawable/newbuk.png"
     },
     {
-        "merged": "com.neobuk.app-debug-51:/xml_provider_paths.xml.flat",
-        "source": "com.neobuk.app-main-53:/xml/provider_paths.xml"
+        "merged": "com.neobuk.app-debug-53:/xml_provider_paths.xml.flat",
+        "source": "com.neobuk.app-main-55:/xml/provider_paths.xml"
     }
 ]

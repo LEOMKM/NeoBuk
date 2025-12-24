@@ -50,7 +50,11 @@ import androidx.compose.material.icons.outlined.Receipt
 
 import com.neobuk.app.ui.theme.NeoBukWarning
 import com.neobuk.app.ui.theme.NeoBukSuccess
+
 import androidx.compose.material.icons.filled.LockClock
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun HomeScreen(
@@ -61,7 +65,10 @@ fun HomeScreen(
     onRecordSale: () -> Unit = {},
     onRecordExpense: () -> Unit = {},
     onCloseDay: () -> Unit = {},
-    onSubscribeClick: () -> Unit = {}
+
+    onSubscribeClick: () -> Unit = {},
+    onShowNetProfitInfo: () -> Unit = {},
+    onViewTasks: () -> Unit = {}
 ) {
     var showTrialEndedModal by remember { mutableStateOf(false) }
 
@@ -115,12 +122,66 @@ fun HomeScreen(
 
         // 3. Key Metrics Row (Sales, Expenses, Profit)
         item {
+
+
             MetricsRow(onViewSales = onViewSales)
         }
 
-        // Spacer between KPIs and Weekly Performance
+        // Net Profit & Things to do Row
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Left: Net Profit (Lighter, Breathing)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Your net profit is ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "KES 42,350 (28%)",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = "Info",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clickable { onShowNetProfitInfo() }
+                    )
+                }
+
+                // Right: Things to do (Action)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onViewTasks() }
+                ) {
+                    Text(
+                        text = "Things to do",
+                        style = AppTextStyles.sectionTitle,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
         // 4. Weekly Performance Chart
@@ -272,7 +333,7 @@ fun QuickActionsRow(
         Button(
             onClick = onRecordSale,
             modifier = Modifier
-                .weight(1f)
+                .weight(0.9f)
                 .height(52.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
@@ -328,7 +389,7 @@ fun QuickActionsRow(
         Button(
             onClick = onCloseDay,
             modifier = Modifier
-                .weight(0.9f) // Slightly less weight for 'Close'
+                .weight(1.3f) // More weight for 'Funga Siku' to prevent truncation
                 .height(52.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
@@ -455,17 +516,23 @@ fun MetricCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1
                     )
-                    Text(
-                        text = value,
-                        style = AppTextStyles.caption,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = amount,
-                        style = AppTextStyles.amountSmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        Text(
+                            text = value,
+                            style = AppTextStyles.caption.copy(fontSize = 10.sp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 2.dp, end = 2.dp)
+                        )
+                        Text(
+                            text = amount,
+                            style = AppTextStyles.amountSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
         }

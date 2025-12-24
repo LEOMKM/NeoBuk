@@ -40,23 +40,8 @@ fun SubscriptionScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.onSurface)
-            }
-            Text(
-                "Subscription",
-                style = AppTextStyles.pageTitle,
-                modifier = Modifier.weight(1f)
-            )
-        }
+        // Header removed (moved to Toolbar)
+
 
         LazyColumn(
             contentPadding = PaddingValues(16.dp),

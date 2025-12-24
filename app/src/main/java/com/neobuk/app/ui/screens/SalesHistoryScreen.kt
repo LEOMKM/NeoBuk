@@ -67,18 +67,8 @@ fun SalesHistoryScreen() {
         // 1. Header Section
         item {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Sales History",
-                    style = AppTextStyles.pageTitle,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = "See your past sales",
-                    style = AppTextStyles.secondary,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
+                // Header removed (moved to Toolbar)
+
                 
                 // Prominent New Sale Button
                 Button(
@@ -453,6 +443,11 @@ fun FilterChipItem(text: String, selected: Boolean) {
 
 @Composable
 fun SummaryCard() {
+    var chartVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        chartVisible = true
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -507,13 +502,13 @@ fun SummaryCard() {
                 }
                 
                 // Bars
-                ChartBar(0.3f, "8AM")
-                ChartBar(0.6f, "")
-                ChartBar(0.9f, "12PM")
-                ChartBar(0.5f, "")
-                ChartBar(0.45f, "4PM")
-                ChartBar(0.25f, "")
-                ChartBar(0.15f, "8PM")
+                ChartBar(0.3f, "8AM", chartVisible, 0)
+                ChartBar(0.6f, "", chartVisible, 1)
+                ChartBar(0.9f, "12PM", chartVisible, 2)
+                ChartBar(0.5f, "", chartVisible, 3)
+                ChartBar(0.45f, "4PM", chartVisible, 4)
+                ChartBar(0.25f, "", chartVisible, 5)
+                ChartBar(0.15f, "8PM", chartVisible, 6)
             }
         }
     }
@@ -532,7 +527,17 @@ fun MiniStatItem(modifier: Modifier, value: String, label: String) {
 }
 
 @Composable
-fun ChartBar(height: Float, label: String) {
+fun ChartBar(height: Float, label: String, isVisible: Boolean = true, index: Int = 0) {
+    val animatedHeight by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isVisible) height else 0f,
+        animationSpec = androidx.compose.animation.core.tween(
+            durationMillis = 600,
+            delayMillis = index * 100,
+            easing = androidx.compose.animation.core.FastOutSlowInEasing
+        ),
+        label = "BarHeightAnimation"
+    )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
@@ -541,7 +546,7 @@ fun ChartBar(height: Float, label: String) {
         Box(
             modifier = Modifier
                 .width(20.dp)
-                .fillMaxHeight(height)
+                .fillMaxHeight(animatedHeight)
                 .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
                 .background(NeoBukCyan)
         )

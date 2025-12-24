@@ -65,12 +65,8 @@ fun ProductsScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            Text(
-                text = "My Stock",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            // Header removed (moved to Toolbar)
+
             
             Spacer(modifier = Modifier.height(16.dp))
             
@@ -369,10 +365,26 @@ fun ProductCard(product: Product) {
             
             // Price
             Text(
-                text = "KES ${product.sellingPrice} per ${product.unit}",
+                text = "KES ${String.format("%.0f", product.sellingPrice)} per ${product.unit}",
                 style = AppTextStyles.secondary,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            
+            // Margin Badge
+            if (product.costPrice > 0 && product.sellingPrice > 0) {
+                 val profit = product.sellingPrice - product.costPrice
+                 val margin = (profit / product.sellingPrice) * 100
+                 val isProfitable = profit >= 0
+                 val marginColor = if (isProfitable) Color(0xFF10B981) else Color(0xFFEF4444)
+                 
+                 Spacer(modifier = Modifier.height(4.dp))
+                 Text(
+                    text = "Margin: ${String.format("%.0f", margin)}%",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = marginColor,
+                    fontWeight = FontWeight.Medium
+                 )
+            }
             
             Spacer(modifier = Modifier.height(8.dp))
             

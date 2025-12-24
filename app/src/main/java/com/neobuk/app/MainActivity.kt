@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
@@ -93,6 +96,7 @@ import com.neobuk.app.ui.screens.SalesHistoryScreen
 import com.neobuk.app.ui.screens.ServicesScreen
 import com.neobuk.app.ui.screens.SubscriptionLockedScreen
 import com.neobuk.app.ui.screens.SubscriptionScreen
+import com.neobuk.app.ui.screens.TasksScreen
 import com.neobuk.app.ui.screens.auth.LoginScreen
 import com.neobuk.app.ui.screens.auth.SignupScreen
 import com.neobuk.app.ui.screens.OnboardingScreen
@@ -102,6 +106,7 @@ import com.neobuk.app.ui.screens.products.ScanStockSheet
 import com.neobuk.app.ui.screens.products.UpdateStockSheet
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.NeoBukTheme
+import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.viewmodels.InventoryViewModel
 import com.neobuk.app.viewmodels.SubscriptionViewModel
 import kotlinx.coroutines.launch
@@ -184,6 +189,7 @@ sealed class SheetScreen {
     data class UpdateStock(val product: Product) : SheetScreen()
     object Profile : SheetScreen()
     object DayEndClosure : SheetScreen()
+    object NetProfitInfo : SheetScreen()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -281,8 +287,43 @@ fun NeoBukApp(
         topBar = {
             NeoBukToolbar(
                 title = { 
-                    // Only show subtitle on Home Screen (Tab 0)
-                    NeoBukLogo(subtitle = if (selectedTab == 0) toolbarSubtitle else null) 
+                    if (selectedTab == 0) {
+                        NeoBukLogo(subtitle = toolbarSubtitle)
+                    } else {
+                        val titleText = when(selectedTab) {
+                            1 -> "Products"
+                            2 -> "Services"
+                            3 -> "Reports"
+                            4 -> "More"
+                            5 -> "Expenses"
+                            6 -> "Sales History"
+                            7 -> "Manage Services"
+                            8 -> "Subscription"
+                            9 -> "Tasks"
+                            else -> ""
+                        }
+                        Text(
+                            text = titleText,
+                            style = AppTextStyles.pageTitle,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                },
+                navigationIcon = {
+                    if (selectedTab != 0) {
+                        IconButton(onClick = { 
+                            when(selectedTab) {
+                                7, 8 -> selectedTab = 4 // Back to 'More' screen
+                                9 -> selectedTab = 0 // TASKS -> HOME
+                                else -> selectedTab = 0 // Back to 'Home' screen
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack, 
+                                contentDescription = "Back"
+                            )
+                        }
+                    }
                 },
                 actions = {
                     HomeActions(
@@ -429,7 +470,12 @@ fun NeoBukApp(
                            currentSheetScreen = SheetScreen.DayEndClosure
                            showBottomSheet = true
                         },
-                        onSubscribeClick = { subscriptionViewModel.upgradeToActive() }
+                        onSubscribeClick = { subscriptionViewModel.upgradeToActive() },
+                        onShowNetProfitInfo = {
+                            currentSheetScreen = SheetScreen.NetProfitInfo
+                            showBottomSheet = true
+                        },
+                        onViewTasks = { selectedTab = 9 }
                     )
                     1 -> ProductsScreen(
                         viewModel = inventoryViewModel,
@@ -451,6 +497,7 @@ fun NeoBukApp(
                     6 -> SalesHistoryScreen()
                     7 -> ManageServicesScreen(onBack = { selectedTab = 4 }) // Manage Services
                     8 -> SubscriptionScreen(onBack = { selectedTab = 4 }, viewModel = subscriptionViewModel)
+                    9 -> TasksScreen(onBack = { selectedTab = 0 })
                 }
             }
         }
@@ -578,11 +625,92 @@ fun NeoBukApp(
                             }
                         )
                     }
+
+
+                    is SheetScreen.NetProfitInfo -> {
+                        NetProfitInfoSheet(
+                            onDismiss = {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) showBottomSheet = false
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
     }
   }
+}
+
+@Composable
+fun NetProfitInfoSheet(onDismiss: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+            .padding(bottom = 32.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "How net profit is calculated",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            IconButton(onClick = onDismiss) {
+                Icon(Icons.Default.Close, contentDescription = "Close")
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        Text(
+            text = "Net profit shows what you actually earn after costs.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Formula
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Formula:",
+                    style = AppTextStyles.bodyBold,
+                    color = NeoBukTeal
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Selling price − Buying price − Expenses",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        Text(
+            text = "Example:",
+            style = AppTextStyles.bodyBold
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "If you sell goods for KES 10,000, buy them at KES 6,000, and spend KES 1,000 on expenses, your net profit is KES 3,000.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            lineHeight = 22.sp
+        )
+    }
 }
 
 // Add ProfileBottomSheet Composable here

@@ -82,17 +82,17 @@
 50        </provider>
 51
 52        <activity
-52-->[androidx.compose.ui:ui-test-manifest:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/7cc197ffd1026cbfa1784b22de9378c0/transformed/ui-test-manifest-1.6.8/AndroidManifest.xml:23:9-25:39
+52-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/22bbff2bbeda7cb7a5f7d2ea57877304/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:23:9-25:39
 53            android:name="androidx.activity.ComponentActivity"
-53-->[androidx.compose.ui:ui-test-manifest:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/7cc197ffd1026cbfa1784b22de9378c0/transformed/ui-test-manifest-1.6.8/AndroidManifest.xml:24:13-63
+53-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/22bbff2bbeda7cb7a5f7d2ea57877304/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:24:13-63
 54            android:exported="true" />
-54-->[androidx.compose.ui:ui-test-manifest:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/7cc197ffd1026cbfa1784b22de9378c0/transformed/ui-test-manifest-1.6.8/AndroidManifest.xml:25:13-36
+54-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/22bbff2bbeda7cb7a5f7d2ea57877304/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:25:13-36
 55        <activity
-55-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/4a655a9ab40658dcb25937f1f96099aa/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
+55-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/261dd4c2a5321a61300f8032dbd47205/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
 56            android:name="androidx.compose.ui.tooling.PreviewActivity"
-56-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/4a655a9ab40658dcb25937f1f96099aa/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
+56-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/261dd4c2a5321a61300f8032dbd47205/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
 57            android:exported="true" />
-57-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/leonard.mutugi/.gradle/caches/transforms-4/4a655a9ab40658dcb25937f1f96099aa/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
+57-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/261dd4c2a5321a61300f8032dbd47205/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
 58
 59        <provider
 59-->[androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/transforms-4/1a8dd8b586000eded0416f6cc0011877/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20

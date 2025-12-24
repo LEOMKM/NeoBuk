@@ -113,18 +113,8 @@ fun ReportsScreen() {
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
-                    Text(
-                        text = "Business Reports",
-                        style = AppTextStyles.pageTitle,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = "See how your shop is doing",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    // Header Removed
 
-                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Filter Chips
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -154,7 +144,8 @@ fun ReportsScreen() {
                                 .weight(1f)
                                 .height(40.dp),
                             shape = RoundedCornerShape(10.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444))
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEF4444)),
+                            contentPadding = PaddingValues(horizontal = 8.dp)
                         ) {
                             Icon(
                                 Icons.Default.PictureAsPdf,
@@ -163,7 +154,7 @@ fun ReportsScreen() {
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("PDF", color = Color(0xFFEF4444), style = AppTextStyles.body)
+                            Text("PDF", color = Color(0xFFEF4444), style = AppTextStyles.body, maxLines = 1)
                         }
 
                         OutlinedButton(
@@ -175,7 +166,8 @@ fun ReportsScreen() {
                                 .weight(1f)
                                 .height(40.dp),
                             shape = RoundedCornerShape(10.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, NeoBukTeal)
+                            border = androidx.compose.foundation.BorderStroke(1.dp, NeoBukTeal),
+                            contentPadding = PaddingValues(horizontal = 8.dp)
                         ) {
                             Icon(
                                 Icons.Default.TableChart,
@@ -184,16 +176,17 @@ fun ReportsScreen() {
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Excel", color = NeoBukTeal, style = AppTextStyles.body)
+                            Text("Excel", color = NeoBukTeal, style = AppTextStyles.body, maxLines = 1)
                         }
                         
                         Button(
                             onClick = { },
                             modifier = Modifier
-                                .weight(1f)
+                                .weight(1.2f) // Give more space
                                 .height(40.dp),
                             shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal)
+                            colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
+                            contentPadding = PaddingValues(horizontal = 8.dp)
                         ) {
                             Icon(
                                 Icons.Default.Settings,
@@ -202,7 +195,7 @@ fun ReportsScreen() {
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Custom", style = AppTextStyles.body)
+                            Text("Custom", style = AppTextStyles.body, maxLines = 1)
                         }
                     }
                 }

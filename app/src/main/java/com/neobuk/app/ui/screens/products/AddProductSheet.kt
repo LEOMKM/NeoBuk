@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neobuk.app.ui.theme.NeoBukCyan
 import com.neobuk.app.ui.theme.Tokens
+import com.neobuk.app.ui.theme.AppTextStyles
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,8 +89,8 @@ fun AddProductSheet(
             Column {
                 Text(
                     text = "Add New Product",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    style = AppTextStyles.pageTitle,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 if (batchMode) {
                     Text("Batch Mode Active", fontSize = 12.sp, color = NeoBukCyan)
@@ -181,6 +182,53 @@ fun AddProductSheet(
                         colors = inputColors(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
+                }
+            }
+            
+            // Profit Margin Visualization
+            val cp = costPrice.toDoubleOrNull() ?: 0.0
+            val sp = sellingPrice.toDoubleOrNull() ?: 0.0
+            if (cp > 0 && sp > 0) {
+                val profit = sp - cp
+                val margin = (profit / sp) * 100
+                val isProfitable = profit >= 0
+                val marginColor = if (isProfitable) Color(0xFF10B981) else Color(0xFFEF4444) // Green or Red
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(marginColor.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = if (isProfitable) "Profit Margin" else "Loss",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = marginColor
+                        )
+                        Text(
+                            text = "${String.format("%.0f", margin)}%",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = marginColor
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                         Text(
+                            text = "Profit per unit",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = marginColor
+                        )
+                        Text(
+                            text = "KES ${String.format("%.0f", profit)}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = marginColor
+                        )
+                    }
                 }
             }
             

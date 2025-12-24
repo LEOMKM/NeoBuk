@@ -59,23 +59,7 @@ fun MoreScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Header
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-        ) {
-            Text(
-                text = "More",
-                style = AppTextStyles.pageTitle,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Additional features and settings",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        // Header removed (moved to Toolbar)
 
         // Menu Items
         LazyColumn(
@@ -133,7 +117,7 @@ fun SupportSection() {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/254700000000"))
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1.3f) // More weight for WhatsApp
                 )
                 
                 SupportAction(
@@ -144,7 +128,7 @@ fun SupportSection() {
                         val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:+254700000000"))
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(0.85f)
                 )
 
                 SupportAction(
@@ -158,7 +142,7 @@ fun SupportSection() {
                         }
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(0.85f)
                 )
             }
         }
@@ -182,8 +166,8 @@ fun SupportAction(
         colors = ButtonDefaults.outlinedButtonColors(contentColor = color)
     ) {
         Icon(icon, null, modifier = Modifier.size(18.dp))
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(label, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(label, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
     }
 }
 
