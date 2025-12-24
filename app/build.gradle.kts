@@ -77,4 +77,7 @@ dependencies {
 
     // Barcode generation
     implementation("com.google.zxing:core:3.5.3")
+    
+    // Splash Screen API (backwards compatible)
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }

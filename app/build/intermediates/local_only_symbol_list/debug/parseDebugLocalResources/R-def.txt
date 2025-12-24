@@ -1,7 +1,17 @@
 R_DEF: Internal format may change without notice
 local
 color ic_launcher_background
+color neobuk_cyan
+color neobuk_teal
+color neobuk_teal_dark
+color splash_background_dark
+color splash_background_light
+drawable icon1
+drawable icon2
+drawable icon3
 drawable newbuk
+drawable splash_icon
 string app_name
 style Theme.NeoBuk
+style Theme.NeoBuk.Splash
 xml provider_paths

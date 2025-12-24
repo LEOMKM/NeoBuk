@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- NeoBuk Brand Colors -->
+    <color name="neobuk_teal">#00897B</color>
+    <color name="neobuk_teal_dark">#00695C</color>
+    <color name="neobuk_cyan">#00BCD4</color>
+    
+    <!-- Splash Screen Colors -->
+    <color name="splash_background_light">#00897B</color>
+    <color name="splash_background_dark">#004D40</color>
+</resources>

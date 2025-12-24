@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- White circular background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"/>
+    
+    <!-- Simplified NeoBuk hexagon shape - Teal -->
+    <path
+        android:fillColor="#00897B"
+        android:pathData="M54,26 L72,38 L72,62 L54,74 L36,62 L36,38 Z"/>
+    
+    <!-- Inner accent - White -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,34 L64,42 L64,58 L54,66 L44,58 L44,42 Z"/>
+    
+    <!-- "N" letter hint -->
+    <path
+        android:fillColor="#00897B"
+        android:pathData="M48,44 L48,56 L52,50 L56,56 L56,44"
+        android:strokeWidth="2"
+        android:strokeColor="#00897B"/>
+</vector>

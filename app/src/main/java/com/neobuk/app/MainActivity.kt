@@ -72,6 +72,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.material3.HorizontalDivider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neobuk.app.data.models.Product
@@ -109,7 +116,10 @@ import com.neobuk.app.ui.theme.NeoBukTheme
 import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.viewmodels.InventoryViewModel
 import com.neobuk.app.viewmodels.SubscriptionViewModel
+import com.neobuk.app.viewmodels.TasksViewModel
 import kotlinx.coroutines.launch
+import androidx.core.content.edit
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 // Define keys for navigation or state
 enum class AuthState {
@@ -123,6 +133,9 @@ enum class BusinessType {
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Install the splash screen - must be before super.onCreate()
+        installSplashScreen()
+        
         super.onCreate(savedInstanceState)
         setContent {
             NeoBukTheme {
@@ -150,7 +163,7 @@ fun MainNavigation() {
             OnboardingScreen(
                 onFinishOnboarding = { 
                     // Save preference
-                    sharedPreferences.edit().putBoolean("onboarding_complete", true).apply()
+                    sharedPreferences.edit { putBoolean("onboarding_complete", true) }
                     authState = AuthState.LOGIN 
                 }
             )
@@ -216,10 +229,13 @@ fun NeoBukApp(
     val scope = rememberCoroutineScope()
 
     // ViewModels
+    // ViewModels
     val inventoryViewModel: InventoryViewModel = viewModel()
+    val tasksViewModel: TasksViewModel = viewModel()
     val subscriptionViewModel: SubscriptionViewModel = viewModel()
     val subscriptionStatus by subscriptionViewModel.status.collectAsState()
     val subscription by subscriptionViewModel.subscription.collectAsState()
+    val pendingTasksCount by tasksViewModel.pendingTaskCount.collectAsState()
 
     // Subtitle Logic: "Today..." OR "Trial..."
     val toolbarSubtitle = remember(subscription, subscriptionStatus) {
@@ -337,98 +353,116 @@ fun NeoBukApp(
             )
         },
         bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp,
-                actions = {
-                    // Left Side: Products, Services
-                    
-                    // Products (Index 1)
-                    IconButton(onClick = { selectedTab = 1 }, modifier = Modifier.weight(1f)) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = if (selectedTab == 1) Icons.Filled.Inventory else Icons.Outlined.Inventory,
-                                contentDescription = "Products",
-                                tint = if (selectedTab == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                "Products",
-                                fontSize = 10.sp,
-                                color = if (selectedTab == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
+            // Box to handle potential shadow casting if needed, primarily used here for structure relative to the FAB
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                BottomAppBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 8.dp, // This gives the minty tint in M3
+                    modifier = Modifier
+                        .clip(CurvedBottomBarShape(fabSize = 64.dp, cutoutRadius = 40.dp)), // Apply the custom curve
+                    actions = {
+                        // 1. Products (Left)
+                        NavigationItem(
+                            selected = selectedTab == 1,
+                            onClick = { selectedTab = 1 },
+                            icon = if (selectedTab == 1) Icons.Filled.Inventory else Icons.Outlined.Inventory,
+                            label = "Products",
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        // 2. Services (Left)
+                        NavigationItem(
+                            selected = selectedTab == 2,
+                            onClick = { selectedTab = 2 },
+                            icon = if (selectedTab == 2) Icons.Filled.Build else Icons.Outlined.Build,
+                            label = "Services",
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        // Spacer for the Home Button (Center)
+                        Spacer(modifier = Modifier.weight(1f))
+                        
+                        // 3. Reports (Right)
+                        NavigationItem(
+                            selected = selectedTab == 3,
+                            onClick = { selectedTab = 3 },
+                            icon = if (selectedTab == 3) Icons.Filled.Assessment else Icons.Outlined.Assessment,
+                            label = "Reports",
+                            modifier = Modifier.weight(1f)
+                        )
 
-                    // Services (Index 2)
-                    IconButton(onClick = { selectedTab = 2 }, modifier = Modifier.weight(1f)) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = if (selectedTab == 2) Icons.Filled.Build else Icons.Outlined.Build,
-                                contentDescription = "Services",
-                                tint = if (selectedTab == 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                "Services",
-                                fontSize = 10.sp,
-                                color = if (selectedTab == 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        // 4. More (Right)
+                        NavigationItem(
+                            selected = selectedTab == 4,
+                            onClick = { selectedTab = 4 },
+                            icon = if (selectedTab == 4) Icons.Filled.MoreVert else Icons.Outlined.MoreVert,
+                            label = "More",
+                            modifier = Modifier.weight(1f)
+                        )
                     }
-
-                    // Space for Home FAB
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // Right Side: Reports, More
-                    // Reports (Index 3)
-                    IconButton(onClick = { selectedTab = 3 }, modifier = Modifier.weight(1f)) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = if (selectedTab == 3) Icons.Filled.Assessment else Icons.Outlined.Assessment,
-                                contentDescription = "Reports",
-                                tint = if (selectedTab == 3) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                "Reports",
-                                fontSize = 10.sp,
-                                color = if (selectedTab == 3) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-
-                    // More (Index 4)
-                    IconButton(onClick = { selectedTab = 4 }, modifier = Modifier.weight(1f)) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = if (selectedTab == 4) Icons.Filled.MoreVert else Icons.Outlined.MoreVert,
-                                contentDescription = "More",
-                                tint = if (selectedTab == 4) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                "More",
-                                fontSize = 10.sp,
-                                color = if (selectedTab == 4) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-            )
+                )
+            }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { selectedTab = 0 }, // Home
-                containerColor = if (selectedTab == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = if (selectedTab == 0) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 8.dp),
-                modifier = Modifier
-                    .size(64.dp)
-                    .offset(y = 40.dp) // Overlap the BottomAppBar
-            ) {
-                Icon(
-                    Icons.Filled.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(32.dp)
+            // Micro-interaction: scale animation on selection
+            val scale by androidx.compose.animation.core.animateFloatAsState(
+                targetValue = if (selectedTab == 0) 1.0f else 0.96f,
+                animationSpec = androidx.compose.animation.core.spring(
+                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                    stiffness = androidx.compose.animation.core.Spring.StiffnessMedium
+                ),
+                label = "FABScale"
+            )
+            
+            // Outer ring for enhanced depth (softer than before)
+            Box(contentAlignment = Alignment.Center) {
+                // Softer shadow ring
+                Box(
+                    modifier = Modifier
+                        .size(68.dp)
+                        .offset(y = 32.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.06f))
                 )
+                
+                FloatingActionButton(
+                    onClick = { 
+                        selectedTab = 0
+                        // Trigger haptic feedback if available
+                        // context.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    },
+                    containerColor = if (selectedTab == 0) 
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.92f) 
+                    else 
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f),
+                    contentColor = if (selectedTab == 0) 
+                        MaterialTheme.colorScheme.onPrimary 
+                    else 
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    shape = CircleShape,
+                    elevation = FloatingActionButtonDefaults.elevation(
+                        defaultElevation = 2.dp, // Even lower elevation to sit more "flush"
+                        pressedElevation = 4.dp,
+                        focusedElevation = 2.dp,
+                        hoveredElevation = 3.dp
+                    ),
+                    modifier = Modifier
+                        .size(64.dp)
+                        .offset(y = 40.dp) // Pushed further down (was 32) to nest deeply in the curve
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                        }
+                ) {
+                    Icon(
+                        Icons.Filled.Home,
+                        contentDescription = "Home",
+                        modifier = Modifier.size(30.dp) // Slightly smaller for balance
+                    )
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.Center
@@ -475,7 +509,8 @@ fun NeoBukApp(
                             currentSheetScreen = SheetScreen.NetProfitInfo
                             showBottomSheet = true
                         },
-                        onViewTasks = { selectedTab = 9 }
+                        onViewTasks = { selectedTab = 9 },
+                        pendingTasksCount = pendingTasksCount
                     )
                     1 -> ProductsScreen(
                         viewModel = inventoryViewModel,
@@ -497,7 +532,7 @@ fun NeoBukApp(
                     6 -> SalesHistoryScreen()
                     7 -> ManageServicesScreen(onBack = { selectedTab = 4 }) // Manage Services
                     8 -> SubscriptionScreen(onBack = { selectedTab = 4 }, viewModel = subscriptionViewModel)
-                    9 -> TasksScreen(onBack = { selectedTab = 0 })
+                    9 -> TasksScreen(onBack = { selectedTab = 0 }, viewModel = inventoryViewModel, tasksViewModel = tasksViewModel)
                 }
             }
         }
@@ -903,11 +938,127 @@ fun SelectionCard(
             }
         }
     }
+    }
+
+/**
+ * Navigation Item with clear active state indicators
+ * - Icon color change (filled vs outlined)
+ * - Label weight increase when active
+ * - Underline dot indicator
+ * - Consistent sizing for visual balance
+ */
+@Composable
+fun NavigationItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    // We utilize a Column with clickable instead of IconButton to allow 
+    // for flexible height (Icon + Text + Dot) without clipping
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp)) // Ripple shape
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp) // Internal padding
+    ) {
+        // Icon with consistent size
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = if (selected) 
+                MaterialTheme.colorScheme.primary 
+            else 
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            modifier = Modifier.size(24.dp)
+        )
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        // Label is now visible because we aren't constrained by IconButton
+        Text(
+            text = label,
+            fontSize = 10.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (selected) 
+                MaterialTheme.colorScheme.primary 
+            else 
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            maxLines = 1
+        )
+        
+        Spacer(modifier = Modifier.height(2.dp))
+        
+        // Active indicator dot
+        Box(
+            modifier = Modifier
+                .size(4.dp)
+                .clip(CircleShape)
+                .background(
+                    if (selected) 
+                        MaterialTheme.colorScheme.primary 
+                    else 
+                        Color.Transparent
+                )
+        )
+    }
 }
 
 @Composable
 fun PlaceholderScreen(text: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(text)
+    }
+}
+
+/**
+ * Custom Shape for the BottomAppBar to create a smooth circular cutout (notch)
+ * at the top center to cradle the Home FAB.
+ */
+class CurvedBottomBarShape(
+    private val fabSize: androidx.compose.ui.unit.Dp,
+    private val cutoutRadius: androidx.compose.ui.unit.Dp
+) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        return Outline.Generic(Path().apply {
+            val width = size.width
+            val height = size.height
+            val circleRadiusPx = with(density) { cutoutRadius.toPx() }
+            val center = width / 2f
+
+            // Start at top left
+            moveTo(0f, 0f)
+
+            // Draw straight line to the start of the curve
+            lineTo(center - circleRadiusPx - 10f, 0f)
+
+            // Draw the curve (notch)
+            // We use cubicTo for a smooth ease-in and ease-out
+            cubicTo(
+                center - circleRadiusPx, 0f,           // Control point 1
+                center - circleRadiusPx, circleRadiusPx * 0.6f, // Control point 2 (dip)
+                center, circleRadiusPx * 0.6f          // End point (bottom of dip)
+            )
+            cubicTo(
+                center + circleRadiusPx, circleRadiusPx * 0.6f, // Control point 1
+                center + circleRadiusPx, 0f,           // Control point 2
+                center + circleRadiusPx + 10f, 0f      // End point (back to top)
+            )
+
+            // Draw to top right
+            lineTo(width, 0f)
+
+            // Finish the rectangle
+            lineTo(width, height)
+            lineTo(0f, height)
+            close()
+        })
     }
 }

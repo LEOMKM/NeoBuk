@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res"><file name="newbuk" path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/drawable/newbuk.png" qualifiers="" type="drawable"/><file path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values-night/themes.xml" qualifiers="night-v8"><style name="Theme.NeoBuk" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style><style name="Theme.NeoBuk.Splash" parent="Theme.SplashScreen">
+        
+        <item name="windowSplashScreenBackground">@color/splash_background_dark</item>
+        
+        <item name="windowSplashScreenAnimatedIcon">@drawable/newbuk</item>
+        
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_background_dark</item>
+        
+        <item name="postSplashScreenTheme">@style/Theme.NeoBuk</item>
+    </style></file><file path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values/colors.xml" qualifiers=""><color name="neobuk_teal">#00897B</color><color name="neobuk_teal_dark">#00695C</color><color name="neobuk_cyan">#00BCD4</color><color name="splash_background_light">#00897B</color><color name="splash_background_dark">#004D40</color></file><file path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values/themes.xml" qualifiers=""><style name="Theme.NeoBuk" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style><style name="Theme.NeoBuk.Splash" parent="Theme.SplashScreen">
+        
+        <item name="windowSplashScreenBackground">@color/neobuk_teal</item>
+        
+        <item name="windowSplashScreenAnimatedIcon">@drawable/newbuk</item>
+        
+        <item name="windowSplashScreenIconBackgroundColor">@color/neobuk_teal</item>
+        
+        <item name="postSplashScreenTheme">@style/Theme.NeoBuk</item>
+    </style></file><file path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values/strings.xml" qualifiers=""><string name="app_name">NeoBuk</string></file><file path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values/ic_launcher_background.xml" qualifiers=""><color name="ic_launcher_background">#1E88E5</color></file><file name="provider_paths" path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/xml/provider_paths.xml" qualifiers="" type="xml"/></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="release$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/release/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="release" generated-set="release$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/release/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build/generated/res/resValues/release"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build/generated/res/resValues/release"/></dataSet><mergedItems/></merger>

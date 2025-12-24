@@ -27,6 +27,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import com.neobuk.app.data.models.SubscriptionStatus
 import com.neobuk.app.ui.components.TrialGracePeriodBanner
@@ -68,9 +70,11 @@ fun HomeScreen(
 
     onSubscribeClick: () -> Unit = {},
     onShowNetProfitInfo: () -> Unit = {},
-    onViewTasks: () -> Unit = {}
+    onViewTasks: () -> Unit = {},
+    pendingTasksCount: Int = 0
 ) {
     var showTrialEndedModal by remember { mutableStateOf(false) }
+    var showCloseDayWarning by remember { mutableStateOf(false) }
 
     if (showTrialEndedModal) {
         TrialEndedModal(
@@ -78,6 +82,25 @@ fun HomeScreen(
             onSubscribe = { 
                 showTrialEndedModal = false 
                 onSubscribeClick() 
+            }
+        )
+    }
+    
+    if (showCloseDayWarning) {
+        AlertDialog(
+            onDismissRequest = { showCloseDayWarning = false },
+            title = { Text("Close Day") },
+            text = { Text("You still have $pendingTasksCount things to do today. Continue?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showCloseDayWarning = false
+                        onCloseDay()
+                    }
+                ) { Text("Continue") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCloseDayWarning = false }) { Text("Cancel") }
             }
         )
     }
@@ -116,7 +139,13 @@ fun HomeScreen(
                     }
                 },
                 isEnabled = subscriptionStatus != SubscriptionStatus.GRACE_PERIOD,
-                onCloseDay = onCloseDay
+                onCloseDay = {
+                    if (pendingTasksCount > 0) {
+                        showCloseDayWarning = true
+                    } else {
+                        onCloseDay()
+                    }
+                }
             )
         }
 
@@ -125,6 +154,16 @@ fun HomeScreen(
 
 
             MetricsRow(onViewSales = onViewSales)
+            
+            // Reassurance Text
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Figures update automatically as you record sales and expenses.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                modifier = Modifier.padding(horizontal = 16.dp),
+                fontSize = 11.sp
+            )
         }
 
         // Net Profit & Things to do Row

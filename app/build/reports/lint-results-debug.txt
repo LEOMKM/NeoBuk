@@ -1,0 +1,211 @@
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/products/AddProductSheet.kt:213: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                            text = "${String.format("%.0f", margin)}%",
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/products/AddProductSheet.kt:226: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                            text = "KES ${String.format("%.0f", profit)}",
+                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/AllExpensesScreen.kt:145: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                        "KES ${String.format("%,.0f", filteredExpenses.sumOf { it.third })}",
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/AllExpensesScreen.kt:221: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                "- KES ${String.format("%,.0f", amount)}",
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ExpensesScreen.kt:177: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    amount = "KES ${String.format("%,.0f", thisMonthExpenses)}",
+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ExpensesScreen.kt:428: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+            text = "KES ${String.format("%,.0f", amount)}",
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ExpensesScreen.kt:514: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    text = "-KES ${String.format("%,.0f", expense.amount)}",
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ExpensesScreen.kt:786: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    text = "KES ${String.format("%,.0f", expense.amount)}",
+                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ManageServicesScreen.kt:389: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    "KES ${String.format("%,.0f", service.basePrice)}",
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/sales/NewSaleScreen.kt:431: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                            "KES ${String.format("%,.0f", product.price)}",
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/sales/NewSaleScreen.kt:504: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                        "KES ${String.format("%,.0f", cartTotal)}",
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/sales/NewSaleScreen.kt:600: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    else "Complete Sale • KES ${String.format("%,.0f", cartTotal)}",
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ProductsScreen.kt:368: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                text = "KES ${String.format("%.0f", product.sellingPrice)} per ${product.unit}",
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ProductsScreen.kt:382: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    text = "Margin: ${String.format("%.0f", margin)}%",
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ReportsScreen.kt:671: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                "KES ${String.format("%,.0f", product.revenue)}",
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ReportsScreen.kt:793: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+            val formattedRevenue = String.format("%,.0f", prod.revenue)
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ReportsScreen.kt:813: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+             val formattedAmount = String.format("%,.0f", amount)
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ReportsScreen.kt:912: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                val formattedAmount = String.format("%.0f", amount)
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/SalesHistoryScreen.kt:765: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                        Text("KES ${String.format("%,.0f", item.quantity * item.price)}", fontWeight = FontWeight.Medium)
+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/SalesHistoryScreen.kt:779: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    Text("KES ${String.format("%,.0f", subtotal)}", style = AppTextStyles.amountLarge, color = NeoBukTeal)
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/SalesHistoryScreen.kt:846: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                "Complete Sale • KES ${String.format("%,.0f", subtotal)}",
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ServicesScreen.kt:176: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    "KES ${String.format("%,.0f", record.servicePrice)}",
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ServicesScreen.kt:205: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                        "KES ${String.format("%,.0f", record.commissionAmount)}",
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ServicesScreen.kt:213: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                        "KES ${String.format("%,.0f", record.businessAmount)}",
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ServicesScreen.kt:301: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    "KES ${String.format("%,.0f", service.basePrice)}",
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ServicesScreen.kt:398: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                            subtitle = "KES ${String.format("%,.0f", service.basePrice)}",
+                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ServicesScreen.kt:442: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                            SummaryRow("Price", "KES ${String.format("%,.0f", price)}")
+                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ServicesScreen.kt:446: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                                "KES ${String.format("%,.0f", commissionAmount)}",
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/java/com/neobuk/app/ui/screens/ServicesScreen.kt:451: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                                "KES ${String.format("%,.0f", businessAmount)}",
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "DefaultLocale":
+   Calling String#toLowerCase() or #toUpperCase() without specifying an
+   explicit locale is a common source of bugs. The reason for that is that
+   those methods will use the current locale on the user's device, and even
+   though the code appears to work correctly when you are developing the app,
+   it will fail in some locales. For example, in the Turkish locale, the
+   uppercase replacement for i is not I.
+
+   If you want the methods to just perform ASCII replacement, for example to
+   convert an enum name, call String#toUpperCase(Locale.ROOT) instead. If you
+   really want to use the current locale, call
+   String#toUpperCase(Locale.getDefault()) instead.
+
+   https://developer.android.com/reference/java/util/Locale.html#default_locale
+
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build.gradle.kts:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk = 35
+        ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application runs on a version of Android that is more recent than
+   your targetSdkVersion specifies that it has been tested with, various
+   compatibility modes kick in. This ensures that your application continues
+   to work, but it may look out of place. For example, if the targetSdkVersion
+   is less than 14, your app may get an option button in the UI.
+
+   To fix this issue, set the targetSdkVersion to the highest available value.
+   Then test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:14: Warning: Redundant label can be removed [RedundantLabel]
+            android:label="@string/app_name"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "RedundantLabel":
+   When an activity does not have a label attribute, it will use the one from
+   the application tag. Since the application has already specified the same
+   label, the label on this activity can be omitted.
+
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build.gradle.kts:58: Warning: A newer version of androidx.core:core-ktx than 1.13.1 is available: 1.17.0 [GradleDependency]
+    implementation("androidx.core:core-ktx:1.13.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build.gradle.kts:59: Warning: A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.8.4 is available: 2.10.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build.gradle.kts:60: Warning: A newer version of androidx.activity:activity-compose than 1.9.1 is available: 1.12.2 [GradleDependency]
+    implementation("androidx.activity:activity-compose:1.9.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build.gradle.kts:63: Warning: A newer version of androidx.compose:compose-bom than 2024.09.00 is available: 2025.12.01 [GradleDependency]
+    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build.gradle.kts:71: Warning: A newer version of androidx.navigation:navigation-compose than 2.7.7 is available: 2.9.6 [GradleDependency]
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/build.gradle.kts:82: Warning: A newer version of androidx.core:core-splashscreen than 1.0.1 is available: 1.2.0 [GradleDependency]
+    implementation("androidx.core:core-splashscreen:1.0.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values/colors.xml:5: Warning: The resource R.color.neobuk_teal_dark appears to be unused [UnusedResources]
+    <color name="neobuk_teal_dark">#00695C</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values/colors.xml:6: Warning: The resource R.color.neobuk_cyan appears to be unused [UnusedResources]
+    <color name="neobuk_cyan">#00BCD4</color>
+           ~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values/colors.xml:9: Warning: The resource R.color.splash_background_light appears to be unused [UnusedResources]
+    <color name="splash_background_light">#00897B</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values/ic_launcher_background.xml:3: Warning: The resource R.color.ic_launcher_background appears to be unused [UnusedResources]
+    <color name="ic_launcher_background">#1E88E5</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/drawable/newbuk.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+
+   Explanation for issues of type "IconLauncherShape":
+   According to the Android Design Guide
+   (https://d.android.com/r/studio-ui/designer/material/iconography) your
+   launcher icons should "use a distinct silhouette", a "three-dimensional,
+   front view, with a slight perspective as if viewed from above, so that
+   users perceive some depth."
+
+   The unique silhouette implies that your launcher icon should not be a
+   filled square.
+
+/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/drawable/newbuk.png: Warning: Found bitmap drawable res/drawable/newbuk.png in densityless folder [IconLocation]
+
+   Explanation for issues of type "IconLocation":
+   The res/drawable folder is intended for density-independent graphics such
+   as shapes defined in XML. For bitmaps, move it to drawable-mdpi and
+   consider providing higher and lower resolution versions in drawable-ldpi,
+   drawable-hdpi and drawable-xhdpi. If the icon really is density independent
+   (for example a solid color) you can place it in drawable-nodpi.
+
+   https://developer.android.com/guide/practices/screens_support.html
+
+0 errors, 43 warnings

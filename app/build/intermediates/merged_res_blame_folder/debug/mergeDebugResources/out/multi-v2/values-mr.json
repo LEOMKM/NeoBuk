@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.neobuk.app-mergeDebugResources-51:/values-mr/values-mr.xml",
+            "outputFile": "com.neobuk.app-mergeDebugResources-52:/values-mr/values-mr.xml",
             "map": [
                 {
-                    "source": "/Users/leonard.mutugi/.gradle/caches/transforms-4/27b59d90fbb9475ba7a975700215349b/transformed/foundation-release/res/values-mr/values-mr.xml",
+                    "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/b67f9c0c7bdd91320bf6924f5c01b099/transformed/foundation-release/res/values-mr/values-mr.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "/Users/leonard.mutugi/.gradle/caches/transforms-4/62c26e46ecb600905e1a00cdd4b73f7e/transformed/material3-release/res/values-mr/values-mr.xml",
+                    "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/1178b48b13932307ede22d2029f8352f/transformed/material3-release/res/values-mr/values-mr.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "/Users/leonard.mutugi/.gradle/caches/transforms-4/931a813c0b1c56b2e997d06cbf8e44a0/transformed/core-1.13.1/res/values-mr/values-mr.xml",
+                    "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/9155d5eaa60b313c76699f88d3330471/transformed/core-1.13.1/res/values-mr/values-mr.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -55,7 +55,7 @@
                     }
                 },
                 {
-                    "source": "/Users/leonard.mutugi/.gradle/caches/transforms-4/c0c1520e1a7440cb33c1cd2232ed7a7b/transformed/ui-release/res/values-mr/values-mr.xml",
+                    "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/57d2477949f79fc70453de5bdc463caf/transformed/ui-release/res/values-mr/values-mr.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
