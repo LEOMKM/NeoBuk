@@ -96,3 +96,56 @@ BEGIN
         CASE WHEN v_total_revenue > 0 THEN (v_profit / v_total_revenue * 100) ELSE 0 END;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- Function to get Weekly Performance (Sales & Profit for current week Mon-Sun)
+CREATE OR REPLACE FUNCTION get_weekly_performance(
+    p_business_id UUID
+)
+RETURNS TABLE (
+    day_name TEXT,
+    total_sales DECIMAL(12, 2),
+    total_profit DECIMAL(12, 2),
+    day_date DATE
+) AS $$
+DECLARE
+    v_start_of_week DATE;
+BEGIN
+    -- Get start of current week (Monday)
+    v_start_of_week := date_trunc('week', CURRENT_DATE)::DATE;
+    
+    RETURN QUERY
+    WITH date_series AS (
+        SELECT generate_series(v_start_of_week, v_start_of_week + 6, '1 day'::interval)::DATE as date_val
+    ),
+    daily_revenue AS (
+        SELECT DATE(sale_date) as d_date, SUM(total_amount) as amount
+        FROM sales
+        WHERE business_id = p_business_id AND payment_status = 'PAID' AND sale_date >= v_start_of_week
+        GROUP BY 1
+        UNION ALL
+        SELECT DATE(date_offered) as d_date, SUM(service_price) as amount
+        FROM service_records
+        WHERE business_id = p_business_id AND date_offered >= v_start_of_week
+        GROUP BY 1
+    ),
+    daily_expenses AS (
+        SELECT DATE(expense_date) as d_date, SUM(amount) as amount
+        FROM expenses
+        WHERE business_id = p_business_id AND expense_date >= v_start_of_week
+        GROUP BY 1
+    ),
+    total_daily_revenue AS (
+        SELECT d_date, SUM(amount) as amount FROM daily_revenue GROUP BY 1
+    )
+    SELECT 
+        TO_CHAR(ds.date_val, 'Dy') as day_name,
+        COALESCE(tdr.amount, 0) as total_sales,
+        COALESCE(tdr.amount, 0) - COALESCE(de.amount, 0) as total_profit,
+        ds.date_val
+    FROM date_series ds
+    LEFT JOIN total_daily_revenue tdr ON ds.date_val = tdr.d_date
+    LEFT JOIN daily_expenses de ON ds.date_val = de.d_date
+    ORDER BY ds.date_val;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

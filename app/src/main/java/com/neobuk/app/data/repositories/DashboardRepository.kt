@@ -9,7 +9,6 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Serializable
 data class DashboardMetrics(
@@ -18,6 +17,14 @@ data class DashboardMetrics(
     @SerialName("today_profit") val todayProfit: Double,
     @SerialName("sales_growth") val salesGrowth: String,
     @SerialName("net_profit_margin") val netProfitMargin: Double
+)
+
+@Serializable
+data class WeeklyPerformance(
+    @SerialName("day_name") val dayName: String,
+    @SerialName("total_sales") val totalSales: Double,
+    @SerialName("total_profit") val totalProfit: Double,
+    @SerialName("day_date") val dayDate: String
 )
 
 class DashboardRepository(private val supabase: SupabaseClient) {
@@ -39,6 +46,19 @@ class DashboardRepository(private val supabase: SupabaseClient) {
             Result.success(metrics)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    suspend fun getWeeklyPerformance(businessId: String): List<WeeklyPerformance> {
+        return try {
+            supabase.postgrest.rpc(
+                "get_weekly_performance",
+                buildJsonObject {
+                    put("p_business_id", businessId)
+                }
+            ).decodeList<WeeklyPerformance>()
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 }

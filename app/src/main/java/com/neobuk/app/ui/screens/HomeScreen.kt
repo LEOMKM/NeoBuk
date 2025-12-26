@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neobuk.app.data.models.SubscriptionStatus
+import com.neobuk.app.data.repositories.DashboardRepository
 import com.neobuk.app.data.repositories.DayClosure
 import com.neobuk.app.ui.components.TrialEndedModal
 import com.neobuk.app.ui.components.TrialGracePeriodBanner
@@ -39,6 +40,7 @@ import java.time.LocalDate
 
 import com.neobuk.app.viewmodels.DashboardViewModel
 import com.neobuk.app.viewmodels.TasksViewModel
+import com.neobuk.app.data.repositories.WeeklyPerformance
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -76,6 +78,7 @@ fun HomeScreen(
     // Closure, Dashboard, Tasks State
     val isTodayClosed by dayClosureViewModel.isTodayClosed.collectAsState()
     val metrics by dashboardViewModel.metrics.collectAsState()
+    val weeklyPerformance by dashboardViewModel.weeklyPerformance.collectAsState()
     val isLoadingMetrics by dashboardViewModel.isLoading.collectAsState()
     val pendingTasksCount by tasksViewModel.pendingTaskCount.collectAsState()
     
@@ -88,8 +91,11 @@ fun HomeScreen(
         }
     }
     
-    // Refresh dashboard when screen is resumed/re-composed largely or manually triggered in future
-    // For now simple init is fine. Can use Lifecycle event observer for resume.
+    // Refresh dashboard when screen is resumed/re-composed
+    LaunchedEffect(Unit) {
+        currentBusiness?.let { dashboardViewModel.setBusinessId(it.id) }
+        dashboardViewModel.fetchMetrics()
+    }
 
     if (showTrialEndedModal) {
         TrialEndedModal(
@@ -235,7 +241,7 @@ fun HomeScreen(
 
         // 4. Weekly Performance Chart
         item {
-            WeeklyPerformanceCard(onViewAll = onViewReports)
+            WeeklyPerformanceCard(weeklyData = weeklyPerformance, onViewAll = onViewReports)
         }
 
         // 5. Inventory Status
@@ -539,9 +545,15 @@ fun MetricCard(
 }
 
 @Composable
-fun WeeklyPerformanceCard(onViewAll: () -> Unit = {}) {
+fun WeeklyPerformanceCard(
+    weeklyData: List<WeeklyPerformance>,
+    onViewAll: () -> Unit = {}
+) {
     var chartVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { chartVisible = true }
+    LaunchedEffect(weeklyData) { chartVisible = true }
+    
+    // Sort just in case, though DB returns ordered
+    val sortedData = remember(weeklyData) { weeklyData.ifEmpty { emptyList() } }
     
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 0.dp), 
@@ -555,22 +567,45 @@ fun WeeklyPerformanceCard(onViewAll: () -> Unit = {}) {
                 Text("View All", style = AppTextStyles.buttonMedium, color = NeoBukTeal, modifier = Modifier.clickable { onViewAll() })
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Row(modifier = Modifier.fillMaxWidth().height(180.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
-                val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-                val heights = listOf(0.6f, 0.7f, 0.55f, 0.8f, 0.9f, 0.75f, 0.7f) // Mock for visual
-                days.forEachIndexed { index, day ->
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom, modifier = Modifier.fillMaxHeight()) {
-                        val animatedHeight by androidx.compose.animation.core.animateFloatAsState(
-                            targetValue = if (chartVisible) heights[index] else 0f,
-                            animationSpec = androidx.compose.animation.core.tween(300, index * 50, androidx.compose.animation.core.FastOutSlowInEasing),
-                            label = "BarHeight"
-                        )
-                        Box(modifier = Modifier.width(24.dp).fillMaxHeight(animatedHeight).clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)).background(NeoBukTeal.copy(alpha = 0.8f)))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(day, style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            
+            if (sortedData.isEmpty()) {
+                 Box(modifier = Modifier.fillMaxWidth().height(180.dp), contentAlignment = Alignment.Center) {
+                     Text("No data available yet", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                 }
+            } else {
+                Row(modifier = Modifier.fillMaxWidth().height(180.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+                    
+                    // Calculate max for scale
+                    val maxVal = sortedData.maxOfOrNull { it.totalSales }?.toFloat() ?: 1f
+                    val safeMax = if (maxVal <= 0f) 1f else maxVal
+                    
+                    for ((index, day) in sortedData.withIndex()) {
+                        // Calculate ratio
+                        val ratio = (day.totalSales.toFloat() / safeMax).coerceIn(0.01f, 1f)
+                        val targetHeight = if (day.totalSales > 0) ratio else 0.01f
+                        
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom, modifier = Modifier.fillMaxHeight().weight(1f)) {
+                            val animatedHeight by androidx.compose.animation.core.animateFloatAsState(
+                                targetValue = if (chartVisible) targetHeight else 0f,
+                                animationSpec = androidx.compose.animation.core.tween(500, index * 50, androidx.compose.animation.core.FastOutSlowInEasing),
+                                label = "BarHeight"
+                            )
+                            
+                            // tooltip on tap could be added here
+                            Box(
+                                modifier = Modifier
+                                    .width(16.dp) // skinnier bars to fit 7
+                                    .fillMaxHeight(animatedHeight)
+                                    .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                                    .background(NeoBukTeal.copy(alpha = 0.8f))
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(day.dayName, style = AppTextStyles.caption.copy(fontSize = 10.sp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 }
             }
+            
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 LegendItem("Sales", NeoBukTeal)
