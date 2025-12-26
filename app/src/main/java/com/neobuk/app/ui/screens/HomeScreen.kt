@@ -97,12 +97,15 @@ fun HomeScreen(
     val pendingTasksCount by tasksViewModel.pendingTaskCount.collectAsState()
     val products by productsViewModel.products.collectAsState()
     
-    // Derived State: Low Stock Items
-    // Filter strictly low stock or out of stock, active, tracking inventory
-    val lowStockItems = remember(products) {
-        products.filter { it.isActive && it.trackInventory && (it.isLowStock || it.quantity <= 0) }
-            .sortedBy { it.quantity } // Lowest quantity first (prioritize out of stock)
-            .take(5)
+    // Derived State: Stock Items to Display on Home
+    // Prioritize low stock/out of stock, then overall lowest quantity. Max 3.
+    val stockItems = remember(products) {
+        products.filter { it.isActive }
+            .sortedWith(
+                compareByDescending<Product> { it.trackInventory && (it.isLowStock || it.quantity <= 0) }
+                .thenBy { it.quantity }
+            )
+            .take(3)
     }
     
     // Initialize
@@ -288,19 +291,20 @@ fun HomeScreen(
         item {
             SectionHeader(title = "My Stock", actionText = "View All", onActionClick = onViewInventory)
             
-            if (lowStockItems.isEmpty()) {
+            if (stockItems.isEmpty()) {
                  Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.CheckCircle, null, tint = NeoBukSuccess, modifier = Modifier.size(32.dp))
+                        Icon(Icons.Filled.ShoppingBag, null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f), modifier = Modifier.size(32.dp))
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Stock is healthy!", style = AppTextStyles.body, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("No products added yet", style = AppTextStyles.body, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                  }
             } else {
-                lowStockItems.forEachIndexed { index, product ->
-                    val stockStatus = if (product.quantity <= 0) "Out of Stock" else "Running Low"
-                    val stockColor = if (product.quantity <= 0) MaterialTheme.colorScheme.error else NeoBukWarning
-                    val iconBg = if (product.quantity <= 0) MaterialTheme.colorScheme.errorContainer else NeoBukWarning.copy(alpha = 0.15f)
+                stockItems.forEachIndexed { index, product ->
+                    val isCritical = product.trackInventory && (product.isLowStock || product.quantity <= 0)
+                    val stockStatus = if (product.quantity <= 0) "Out of Stock" else if (isCritical) "Running Low" else "In Stock"
+                    val stockColor = if (product.quantity <= 0) MaterialTheme.colorScheme.error else if (isCritical) NeoBukWarning else NeoBukSuccess
+                    val iconBg = if (product.quantity <= 0) MaterialTheme.colorScheme.errorContainer else if (isCritical) NeoBukWarning.copy(alpha = 0.15f) else NeoBukSuccess.copy(alpha = 0.1f)
                     
                     InventoryItem(
                         name = product.name, 
@@ -311,7 +315,7 @@ fun HomeScreen(
                         iconBg = iconBg
                     )
                     
-                    if (index < lowStockItems.lastIndex) {
+                    if (index < stockItems.lastIndex) {
                         HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 16.dp))
                     }
                 }
@@ -681,17 +685,18 @@ fun WeeklyPerformanceCard(
                         .height(180.dp)
                 ) {
                     val w = size.width
-                    val h = size.height
+                    val h = size.height - 24.dp.toPx() // Bottom padding for axis labels and baseline
+                    val baselineY = h
                     
                     // Determine Max Value for Scale (e.g. max of Sales or Profit, +20% breathing room)
                     val maxSales = sortedData.maxOfOrNull { it.totalSales }?.toFloat() ?: 0f
                     val maxProfit = sortedData.maxOfOrNull { it.totalProfit }?.toFloat() ?: 0f
-                    val maxVal = maxOf(maxSales, maxProfit, 100f) * 1.2f
+                    val maxVal = maxOf(maxSales, maxProfit, 100f) * 1.25f
                     
                     // Layout calculations
                     val barCount = sortedData.size
                     val slotWidth = w / barCount
-                    val barWidth = 24.dp.toPx()
+                    val barWidth = 20.dp.toPx()
                     
                     val profitPath = Path()
                     var firstPoint = true
@@ -699,7 +704,7 @@ fun WeeklyPerformanceCard(
                     sortedData.forEachIndexed { index, day ->
                         val centerX = (index * slotWidth) + (slotWidth / 2)
                         
-                        // 1. Draw Sales Bar
+                        // 1. Draw Sales Bar (using current sales)
                         val salesHeight = (day.totalSales.toFloat() / maxVal) * h * animProgress
                         val barTop = h - salesHeight
                         

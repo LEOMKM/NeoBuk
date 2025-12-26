@@ -122,75 +122,66 @@ RETURNS TABLE (
     day_date DATE
 ) AS $$
 DECLARE
-    v_today_nairobi DATE;
     v_start_of_week DATE;
 BEGIN
-    -- Get Today and Start of Week (Monday) in Nairobi
-    v_today_nairobi := (CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi')::DATE;
-    v_start_of_week := date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi')::DATE;
+    -- Get start of current week (Monday) in Nairobi local time
+    v_start_of_week := (date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'))::DATE;
     
     RETURN QUERY
     WITH date_series AS (
         SELECT generate_series(v_start_of_week, v_start_of_week + 6, '1 day'::interval)::DATE as date_val
     ),
     daily_revenue AS (
-        SELECT 
-            (COALESCE(sale_date, created_at) AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, 
-            SUM(total_amount) as amount
-        FROM sales
-        WHERE business_id = p_business_id 
-          AND payment_status IN ('PAID', 'PARTIAL')
-          AND (COALESCE(sale_date, created_at) AT TIME ZONE 'Africa/Nairobi')::DATE >= v_start_of_week
-        GROUP BY 1
-        UNION ALL
-        SELECT 
-            (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, 
-            SUM(service_price) as amount
-        FROM service_records
-        WHERE business_id = p_business_id 
-          AND (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE >= v_start_of_week
-        GROUP BY 1
+        SELECT d_date, SUM(amount) as amount FROM (
+            SELECT (COALESCE(sale_date, created_at) AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, total_amount as amount
+            FROM sales
+            WHERE business_id = p_business_id 
+              AND payment_status IN ('PAID', 'PARTIAL') 
+              AND (COALESCE(sale_date, created_at) AT TIME ZONE 'Africa/Nairobi')::DATE >= v_start_of_week
+            UNION ALL
+            SELECT (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, service_price as amount
+            FROM service_records
+            WHERE business_id = p_business_id 
+              AND (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE >= v_start_of_week
+        ) r GROUP BY 1
     ),
     daily_cogs AS (
-        SELECT 
-            d_date, 
-            SUM(amount) as amount 
-        FROM (
+        SELECT d_date, SUM(amount) as amount FROM (
             -- Product COGS
             SELECT (COALESCE(s.sale_date, s.created_at) AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, 
-                   (si.quantity * si.unit_cost + si.commission_amount) as amount
+                   (si.quantity * COALESCE(si.unit_cost, 0) + COALESCE(si.commission_amount, 0)) as amount
             FROM sale_items si
             JOIN sales s ON si.sale_id = s.id
             WHERE s.business_id = p_business_id 
-              AND s.payment_status IN ('PAID', 'PARTIAL')
+              AND s.payment_status IN ('PAID', 'PARTIAL') 
               AND (COALESCE(s.sale_date, s.created_at) AT TIME ZONE 'Africa/Nairobi')::DATE >= v_start_of_week
             UNION ALL
             -- Service Commissions
-            SELECT (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, 
-                   commission_amount as amount
+            SELECT (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE as d_date,
+                   COALESCE(commission_amount, 0) as amount
             FROM service_records
             WHERE business_id = p_business_id 
               AND (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE >= v_start_of_week
         ) c GROUP BY 1
     ),
     daily_expenses AS (
-        SELECT expense_date::DATE as d_date, SUM(amount) as amount
+        SELECT (expense_date)::DATE as d_date, SUM(amount) as amount
         FROM expenses
         WHERE business_id = p_business_id 
           AND expense_date >= v_start_of_week
         GROUP BY 1
     ),
     all_stats AS (
-        SELECT d_date, amount as rev, 0 as cogs, 0 as expe FROM daily_revenue
+        SELECT d_date, amount as rev, 0::DECIMAL as cogs, 0::DECIMAL as expe FROM daily_revenue
         UNION ALL
-        SELECT d_date, 0 as rev, amount as cogs, 0 as expe FROM daily_cogs
+        SELECT d_date, 0::DECIMAL as rev, amount as cogs, 0::DECIMAL as expe FROM daily_cogs
         UNION ALL
-        SELECT d_date, 0 as rev, 0 as cogs, amount as expe FROM daily_expenses
+        SELECT d_date, 0::DECIMAL as rev, 0::DECIMAL as cogs, amount as expe FROM daily_expenses
     )
     SELECT 
-        TO_CHAR(ds.date_val, 'Dy') as day_name,
-        COALESCE(SUM(s.rev), 0)::DECIMAL(12, 2) as total_sales,
-        (COALESCE(SUM(s.rev), 0) - COALESCE(SUM(s.cogs), 0) - COALESCE(SUM(s.expe), 0))::DECIMAL(12, 2) as total_profit,
+        TO_CHAR(ds.date_val, 'Dy') as d_name,
+        COALESCE(SUM(s.rev), 0)::DECIMAL(12, 2) as t_sales,
+        (COALESCE(SUM(s.rev), 0) - COALESCE(SUM(s.cogs), 0) - COALESCE(SUM(s.expe), 0))::DECIMAL(12, 2) as t_profit,
         ds.date_val
     FROM date_series ds
     LEFT JOIN all_stats s ON ds.date_val = s.d_date
