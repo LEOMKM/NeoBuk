@@ -40,9 +40,19 @@ import java.time.LocalDate
 
 import com.neobuk.app.viewmodels.DashboardViewModel
 import com.neobuk.app.viewmodels.TasksViewModel
+import com.neobuk.app.viewmodels.ProductsViewModel
 import com.neobuk.app.data.repositories.WeeklyPerformance
+import com.neobuk.app.data.repositories.Product
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +76,8 @@ fun HomeScreen(
     authViewModel: AuthViewModel = koinViewModel(),
     dayClosureViewModel: DayClosureViewModel = koinViewModel(),
     dashboardViewModel: DashboardViewModel = koinViewModel(),
-    tasksViewModel: TasksViewModel = koinViewModel()
+    tasksViewModel: TasksViewModel = koinViewModel(),
+    productsViewModel: ProductsViewModel = koinViewModel()
 ) {
     var showTrialEndedModal by remember { mutableStateOf(false) }
     var showCloseDayWarning by remember { mutableStateOf(false) }
@@ -76,18 +87,28 @@ fun HomeScreen(
     val currentBusiness by authViewModel.currentBusiness.collectAsState()
     
     // Closure, Dashboard, Tasks State
+    // Closure, Dashboard, Tasks State
     val isTodayClosed by dayClosureViewModel.isTodayClosed.collectAsState()
     val metrics by dashboardViewModel.metrics.collectAsState()
     val weeklyPerformance by dashboardViewModel.weeklyPerformance.collectAsState()
     val isLoadingMetrics by dashboardViewModel.isLoading.collectAsState()
     val pendingTasksCount by tasksViewModel.pendingTaskCount.collectAsState()
+    val products by productsViewModel.products.collectAsState()
+    
+    // Derived State: Low Stock Items
+    // Filter strictly low stock or out of stock, active, tracking inventory
+    val lowStockItems = remember(products) {
+        products.filter { it.isActive && it.trackInventory && (it.isLowStock || it.quantity <= 0) }
+            .sortedBy { it.quantity } // Lowest quantity first (prioritize out of stock)
+            .take(5)
+    }
     
     // Initialize
     LaunchedEffect(currentBusiness) {
         currentBusiness?.let { 
             dayClosureViewModel.setBusinessId(it.id)
             dashboardViewModel.setBusinessId(it.id)
-            // Tasks auto-update via repo observation, no explicit init needed beyond dependency
+            productsViewModel.setBusinessId(it.id)
         }
     }
     
@@ -247,9 +268,35 @@ fun HomeScreen(
         // 5. Inventory Status
         item {
             SectionHeader(title = "My Stock", actionText = "View All", onActionClick = onViewInventory)
-            InventoryItem("Maize Flour", "KES 120 per kg", "Running Low", MaterialTheme.colorScheme.error, "5 units left", MaterialTheme.colorScheme.surfaceVariant)
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 16.dp))
-            InventoryItem("Sugar", "KES 150 per kg", "Available", NeoBukSuccess, "32 units left", MaterialTheme.colorScheme.surfaceVariant)
+            
+            if (lowStockItems.isEmpty()) {
+                 Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.CheckCircle, null, tint = NeoBukSuccess, modifier = Modifier.size(32.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Stock is healthy!", style = AppTextStyles.body, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                 }
+            } else {
+                lowStockItems.forEachIndexed { index, product ->
+                    val stockStatus = if (product.quantity <= 0) "Out of Stock" else "Running Low"
+                    val stockColor = if (product.quantity <= 0) MaterialTheme.colorScheme.error else NeoBukWarning
+                    val iconBg = if (product.quantity <= 0) MaterialTheme.colorScheme.errorContainer else NeoBukWarning.copy(alpha = 0.15f)
+                    
+                    InventoryItem(
+                        name = product.name, 
+                        price = "KES ${product.sellingPrice} per ${product.unit}", 
+                        stockStatus = stockStatus, 
+                        stockColor = stockColor, 
+                        quantity = "${product.quantity} ${product.unit} left", 
+                        iconBg = iconBg
+                    )
+                    
+                    if (index < lowStockItems.lastIndex) {
+                        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f), modifier = Modifier.padding(horizontal = 16.dp))
+                    }
+                }
+            }
         }
         
         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -554,7 +601,15 @@ fun WeeklyPerformanceCard(
     
     // Sort just in case, though DB returns ordered
     val sortedData = remember(weeklyData) { weeklyData.ifEmpty { emptyList() } }
+    val textMeasurer = rememberTextMeasurer()
     
+    // Animation state
+    val animProgress by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (chartVisible) 1f else 0f,
+        animationSpec = androidx.compose.animation.core.tween(1000, 0, androidx.compose.animation.core.FastOutSlowInEasing),
+        label = "ChartAnim"
+    )
+
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 0.dp), 
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -566,47 +621,97 @@ fun WeeklyPerformanceCard(
                 Text("Weekly Performance", style = AppTextStyles.sectionTitle, color = MaterialTheme.colorScheme.onSurface)
                 Text("View All", style = AppTextStyles.buttonMedium, color = NeoBukTeal, modifier = Modifier.clickable { onViewAll() })
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             
             if (sortedData.isEmpty()) {
                  Box(modifier = Modifier.fillMaxWidth().height(180.dp), contentAlignment = Alignment.Center) {
                      Text("No data available yet", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
                  }
             } else {
-                Row(modifier = Modifier.fillMaxWidth().height(180.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+                // Combined Chart (Bars + Line)
+                androidx.compose.foundation.Canvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                ) {
+                    val w = size.width
+                    val h = size.height
                     
-                    // Calculate max for scale
-                    val maxVal = sortedData.maxOfOrNull { it.totalSales }?.toFloat() ?: 1f
-                    val safeMax = if (maxVal <= 0f) 1f else maxVal
+                    // Determine Max Value for Scale (e.g. max of Sales or Profit, +20% breathing room)
+                    val maxSales = sortedData.maxOfOrNull { it.totalSales }?.toFloat() ?: 0f
+                    val maxProfit = sortedData.maxOfOrNull { it.totalProfit }?.toFloat() ?: 0f
+                    val maxVal = maxOf(maxSales, maxProfit, 100f) * 1.2f
                     
-                    for ((index, day) in sortedData.withIndex()) {
-                        // Calculate ratio
-                        val ratio = (day.totalSales.toFloat() / safeMax).coerceIn(0.01f, 1f)
-                        val targetHeight = if (day.totalSales > 0) ratio else 0.01f
+                    // Layout calculations
+                    val barCount = sortedData.size
+                    val spacing = 16.dp.toPx()
+                    // Total width available for bars = totalWidth - (spacing * (count-1)) - padding?
+                    // Better: divide width into 'slots'
+                    val slotWidth = w / barCount
+                    val barWidth = 24.dp.toPx()
+                    
+                    val profitPath = Path()
+                    var firstPoint = true
+                    
+                    sortedData.forEachIndexed { index, day ->
+                        val centerX = (index * slotWidth) + (slotWidth / 2)
                         
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom, modifier = Modifier.fillMaxHeight().weight(1f)) {
-                            val animatedHeight by androidx.compose.animation.core.animateFloatAsState(
-                                targetValue = if (chartVisible) targetHeight else 0f,
-                                animationSpec = androidx.compose.animation.core.tween(500, index * 50, androidx.compose.animation.core.FastOutSlowInEasing),
-                                label = "BarHeight"
-                            )
-                            
-                            // tooltip on tap could be added here
-                            Box(
-                                modifier = Modifier
-                                    .width(16.dp) // skinnier bars to fit 7
-                                    .fillMaxHeight(animatedHeight)
-                                    .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
-                                    .background(NeoBukTeal.copy(alpha = 0.8f))
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(day.dayName, style = AppTextStyles.caption.copy(fontSize = 10.sp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        // 1. Draw Sales Bar
+                        val salesHeight = (day.totalSales.toFloat() / maxVal) * h * animProgress
+                        val barTop = h - salesHeight
+                        
+                        drawRoundRect(
+                            color = NeoBukTeal.copy(alpha = 0.8f),
+                            topLeft = Offset(centerX - (barWidth / 2), barTop),
+                            size = Size(barWidth, salesHeight),
+                            cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
+                        )
+                        
+                        // 2. Add to Profit Path
+                        // Ensure profit is positive for drawing or handle negative profit (loss)? 
+                        // Assuming simple positive chart for now. If negative, it clips at bottom (0).
+                        val profitH = (day.totalProfit.toFloat().coerceAtLeast(0f) / maxVal) * h * animProgress
+                        val pointY = h - profitH
+                        
+                        if (firstPoint) {
+                            profitPath.moveTo(centerX, pointY)
+                            firstPoint = false
+                        } else {
+                            // Smooth bezier or straight line? Let's do straight for clarity on weekly, or cubic for polish.
+                            // Simple lineTo for robustness first.
+                             profitPath.lineTo(centerX, pointY)
                         }
+                        
+                        // Draw Point
+                        drawCircle(
+                            color = NeoBukWarning,
+                            radius = 3.dp.toPx(),
+                            center = Offset(centerX, pointY)
+                        )
+                        
+                        // 3. Draw Label (Day)
+                         val textResult = textMeasurer.measure(
+                            text = day.dayName.take(3),
+                            style = AppTextStyles.caption.copy(fontSize = 10.sp, color = Color.Gray)
+                        )
+                         drawText(
+                            textLayoutResult = textResult,
+                            topLeft = Offset(centerX - (textResult.size.width / 2), h + 4.dp.toPx())
+                        )
                     }
+                    
+                    // Stroke the Profit Path
+                    drawPath(
+                        path = profitPath,
+                        color = NeoBukWarning,
+                        style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
+                    )
                 }
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp)) // Extra space for labels drawn outside bounds if clip? Canvas bounds? Labels inside height?
+            // Labels are drawn at h + 4px. We need generic Spacer.
+            
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 LegendItem("Sales", NeoBukTeal)
                 Spacer(modifier = Modifier.width(16.dp))
