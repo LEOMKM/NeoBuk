@@ -15,6 +15,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
+import com.neobuk.app.domain.calculations.SalesCalculator
 
 /**
  * ViewModel for Sales functionality
@@ -176,8 +177,8 @@ class SalesViewModel(
     }
     
     private fun updateCartTotal() {
-        val subtotal = _cartItems.value.sumOf { it.totalPrice }
-        _cartTotal.value = (subtotal - _cartDiscount.value).coerceAtLeast(0.0)
+        val subtotal = SalesCalculator.calculateSubtotal(_cartItems.value)
+        _cartTotal.value = SalesCalculator.calculateTotal(subtotal, _cartDiscount.value)
     }
     
     // ============================================
@@ -286,44 +287,13 @@ class SalesViewModel(
      * Get hourly sales data for chart (4-hour intervals: 8AM, 12PM, 4PM, 8PM)
      * Returns list of sales totals for each interval
      */
+
     fun getHourlySalesData(): List<Double> {
-        val hourlySales = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) // 7 intervals (approx 4-hour each)
-        
-        val calendar = java.util.Calendar.getInstance()
-        val todayStart = calendar.apply {
-            set(java.util.Calendar.HOUR_OF_DAY, 0)
-            set(java.util.Calendar.MINUTE, 0)
-            set(java.util.Calendar.SECOND, 0)
-            set(java.util.Calendar.MILLISECOND, 0)
-        }.timeInMillis
-        
-        // Group sales into intervals
-        todaySales.value.forEach { sale ->
-            val hour = java.util.Calendar.getInstance().apply {
-                timeInMillis = sale.saleDate
-            }.get(java.util.Calendar.HOUR_OF_DAY)
-            
-            val intervalIndex = when (hour) {
-                in 6..9 -> 0    // 6AM-10AM
-                in 10..11 -> 1  // 10AM-12PM  
-                in 12..15 -> 2  // 12PM-4PM
-                in 16..17 -> 3  // 4PM-6PM
-                in 18..19 -> 4  // 6PM-8PM
-                in 20..21 -> 5  // 8PM-10PM
-                in 22..23, in 0..5 -> 6  // 10PM-6AM
-                else -> 2
-            }
-            
-            if (intervalIndex in hourlySales.indices) {
-                hourlySales[intervalIndex] += sale.totalAmount
-            }
-        }
-        
-        return hourlySales
+        return SalesCalculator.distributeHourlySales(todaySales.value)
     }
     
     // Calculated properties
-    val cartSubtotal: Double get() = _cartItems.value.sumOf { it.totalPrice }
+    val cartSubtotal: Double get() = SalesCalculator.calculateSubtotal(_cartItems.value)
     val cartItemCount: Int get() = _cartItems.value.size
     val cartQuantityCount: Double get() = _cartItems.value.sumOf { it.quantity }
     val hasItems: Boolean get() = _cartItems.value.isNotEmpty()
