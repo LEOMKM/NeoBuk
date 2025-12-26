@@ -77,6 +77,8 @@ RETURNS public.day_closures AS $$
 DECLARE
     v_sales_total DECIMAL(12, 2);
     v_sales_count INTEGER;
+    v_services_total DECIMAL(12, 2);
+    v_services_count INTEGER;
     v_expenses_total DECIMAL(12, 2);
     v_expenses_count INTEGER;
     v_cash_expected DECIMAL(12, 2);
@@ -87,7 +89,7 @@ BEGIN
         RAISE EXCEPTION 'Day is already closed for this date.';
     END IF;
 
-    -- Calculate Totals
+    -- 1. Calculate Product Totals
     SELECT 
         COALESCE(SUM(total_amount), 0),
         COUNT(*)
@@ -98,6 +100,18 @@ BEGIN
     WHERE business_id = p_business_id 
     AND DATE(sale_date) = p_date;
 
+    -- 2. Calculate Service Totals
+    SELECT 
+        COALESCE(SUM(service_price), 0),
+        COUNT(*)
+    INTO 
+        v_services_total,
+        v_services_count
+    FROM service_records
+    WHERE business_id = p_business_id 
+    AND DATE(date_offered) = p_date;
+
+    -- 3. Calculate Expense Totals
     SELECT 
         COALESCE(SUM(amount), 0),
         COUNT(*)
@@ -108,10 +122,10 @@ BEGIN
     WHERE business_id = p_business_id 
     AND DATE(expense_date) = p_date;
 
-    -- Calculate Expected Cash (Sales where payment_method = 'Cash' - Expenses where payment_method = 'Cash')
-    -- Assuming expenses don't strictly have 'payment_method' column in schema yet? 
-    -- Let's check 03_expenses schema. Usually expenses have paid_via.
-    -- For simplicity, let's assume all Sales with 'Cash' contribute.
+    -- 4. Calculate Expected Cash 
+    -- Formula: (Product Sales via Cash) + (Service Sales (assumed Cash)) - (Expenses (assumed Cash))
+    
+    -- A. Product Sales via Cash
     SELECT 
         COALESCE(SUM(total_amount), 0)
     INTO v_cash_expected
@@ -119,14 +133,19 @@ BEGIN
     WHERE business_id = p_business_id 
     AND DATE(sale_date) = p_date
     AND payment_method = 'Cash'; 
-    -- Minus cash expenses if applicable, but for now let's stick to Sales Cash.
+    
+    -- B. Add All Service Sales (assuming Cash for now as service_records lacks payment_method)
+    v_cash_expected := v_cash_expected + v_services_total;
+    
+    -- C. Subtract All Expenses (assuming Paid via Cash/Petty Cash)
+    v_cash_expected := v_cash_expected - v_expenses_total;
 
-    -- Insert Closure
+    -- 5. Insert Closure
     INSERT INTO day_closures (
         business_id, 
         closure_date,
-        total_sales_amount,
-        total_sales_count,
+        total_sales_amount, -- Includes both Products and Services
+        total_sales_count,  -- Includes both Products and Services
         total_expenses_amount,
         total_expenses_count,
         cash_in_hand_expected,
@@ -136,8 +155,8 @@ BEGIN
     ) VALUES (
         p_business_id,
         p_date,
-        v_sales_total,
-        v_sales_count,
+        v_sales_total + v_services_total,
+        v_sales_count + v_services_count,
         v_expenses_total,
         v_expenses_count,
         v_cash_expected,
