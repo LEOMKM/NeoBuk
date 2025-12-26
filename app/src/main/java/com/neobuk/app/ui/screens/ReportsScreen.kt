@@ -177,7 +177,9 @@ fun ReportsScreen(
 
                         // CSV logic same
                         OutlinedButton(
-                            onClick = { Toast.makeText(context, "CSV Export coming soon", Toast.LENGTH_SHORT).show() },
+                            onClick = { 
+                                ReportUtils.downloadReportCsv(context, businessName, selectedFilter, kpis, topProductsRaw, paymentMethods)
+                            },
                             modifier = Modifier.weight(1f).height(40.dp),
                             shape = RoundedCornerShape(10.dp),
                              border = androidx.compose.foundation.BorderStroke(1.dp, NeoBukTeal),
@@ -536,6 +538,46 @@ object ReportUtils {
         topProducts: List<TopProductReportItem>, 
         paymentMethods: List<UI_PaymentMethodData>
     ) {
-        // Implementation for CSV
+        val sb = StringBuilder()
+        
+        // 1. Header
+        sb.append("Business Name, $businessName\n")
+        sb.append("Report Period, $period\n\n")
+        
+        // 2. Key Metrics
+        sb.append("Key Metrics\n")
+        sb.append("Metric,Value\n")
+        kpis.forEach { kpi ->
+            sb.append("${kpi.subtitle},\"${kpi.title} ${kpi.value}\"\n")
+        }
+        sb.append("\n")
+        
+        // 3. Top Products
+        sb.append("Top Products\n")
+        sb.append("Rank,Product Name,Units Sold,Revenue\n")
+        topProducts.forEachIndexed { index, p ->
+            sb.append("${index + 1},${p.productName},${p.unitsSold},\"KES ${String.format("%,.2f", p.revenue)}\"\n")
+        }
+        sb.append("\n")
+        
+        // 4. Payment Methods
+        sb.append("Sales by Payment Method\n")
+        sb.append("Method,Amount,Percentage\n")
+        paymentMethods.forEach { method ->
+             sb.append("${method.method},\"KES ${String.format("%,.2f", method.total)}\",${method.percentage}%\n")
+        }
+
+        // Save File
+        val fileName = "NeoBuk_Report_${System.currentTimeMillis()}.csv"
+        val file = java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS), fileName)
+        
+        try {
+            val fos = java.io.FileOutputStream(file)
+            fos.write(sb.toString().toByteArray())
+            fos.close()
+            Toast.makeText(context, "Report saved to Downloads as $fileName", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(context, "Error saving CSV: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 }
