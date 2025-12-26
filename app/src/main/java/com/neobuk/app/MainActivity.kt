@@ -113,6 +113,9 @@ import com.neobuk.app.ui.screens.DayEndClosureSheet
 import com.neobuk.app.ui.screens.products.AddProductSheet
 import com.neobuk.app.ui.screens.products.ScanStockSheet
 import com.neobuk.app.ui.screens.products.UpdateStockSheet
+import com.neobuk.app.ui.screens.SettingsScreen
+import com.neobuk.app.ui.screens.SupportScreen
+import com.neobuk.app.ui.screens.AboutScreen
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.NeoBukTheme
 import com.neobuk.app.ui.theme.AppTextStyles
@@ -368,6 +371,9 @@ fun NeoBukApp(
                             7 -> "Manage Services"
                             8 -> "Subscription"
                             9 -> "Tasks"
+                            10 -> "Settings"
+                            11 -> "Support"
+                            12 -> "Legal / About"
                             else -> ""
                         }
                         Text(
@@ -381,7 +387,7 @@ fun NeoBukApp(
                     if (selectedTab != 0) {
                         IconButton(onClick = { 
                             when(selectedTab) {
-                                7, 8 -> selectedTab = 4 // Back to 'More' screen
+                                7, 8, 10, 11, 12 -> selectedTab = 4 // Back to 'More' screen
                                 9 -> selectedTab = 0 // TASKS -> HOME
                                 else -> selectedTab = 0 // Back to 'Home' screen
                             }
@@ -577,7 +583,10 @@ fun NeoBukApp(
                     4 -> MoreScreen(
                         businessType = businessType,
                         onNavigateToManageServices = { selectedTab = 7 },
-                        onNavigateToSubscription = { selectedTab = 8 }
+                        onNavigateToSubscription = { selectedTab = 8 },
+                        onNavigateToSettings = { selectedTab = 10 },
+                        onNavigateToSupport = { selectedTab = 11 },
+                        onNavigateToAbout = { selectedTab = 12 }
                     )
                     5 -> ExpensesScreen() // Accessible from Home but not in bottom nav
                     6 -> SalesHistoryScreen()
@@ -588,6 +597,9 @@ fun NeoBukApp(
                     ) // Manage Services
                     8 -> SubscriptionScreen(onBack = { selectedTab = 4 }, viewModel = subscriptionViewModel)
                     9 -> TasksScreen(onBack = { selectedTab = 0 }, viewModel = inventoryViewModel, tasksViewModel = tasksViewModel)
+                    10 -> SettingsScreen(onBack = { selectedTab = 4 })
+                    11 -> SupportScreen(onBack = { selectedTab = 4 })
+                    12 -> AboutScreen(onBack = { selectedTab = 4 })
                 }
             }
         }
@@ -604,7 +616,7 @@ fun NeoBukApp(
                             subscriptionStatus = subscriptionStatus,
                             onOptionClick = { option ->
                                 when (option) {
-                                    "Settings" -> selectedTab = 4 // Navigate to More Screen
+                                    "Settings" -> selectedTab = 10 // Navigate to Settings Screen
                                     "Logout" -> { 
                                          onLogout()
                                     }

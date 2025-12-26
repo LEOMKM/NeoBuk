@@ -82,6 +82,7 @@ fun HomeScreen(
     var showTrialEndedModal by remember { mutableStateOf(false) }
     var showCloseDayWarning by remember { mutableStateOf(false) }
     var showDayClosureSheet by remember { mutableStateOf(false) }
+    var showGrossProfitInfo by remember { mutableStateOf(false) }
     
     // Auth & Business State
     val currentBusiness by authViewModel.currentBusiness.collectAsState()
@@ -124,6 +125,18 @@ fun HomeScreen(
             onSubscribe = { 
                 showTrialEndedModal = false 
                 onSubscribeClick() 
+            }
+        )
+    }
+    
+    // Gross Profit Info Dialog
+    if (showGrossProfitInfo) {
+        AlertDialog(
+            onDismissRequest = { showGrossProfitInfo = false },
+            title = { Text("Gross Profit") },
+            text = { Text("Gross Profit is calculated as your Sales minus the Buying Price (cost) of the items sold.\n\nGP = Selling Price - Buying Price") },
+            confirmButton = {
+                TextButton(onClick = { showGrossProfitInfo = false }) { Text("Got it") }
             }
         )
     }
@@ -217,7 +230,8 @@ fun HomeScreen(
                 onViewSales = onViewSales,
                 todaySales = metrics?.todaySales?.let { currencyFormatter.format(it) } ?: "0",
                 todayExpenses = metrics?.todayExpenses?.let { currencyFormatter.format(it) } ?: "0",
-                todayProfit = metrics?.todayProfit?.let { currencyFormatter.format(it) } ?: "0"
+                grossProfit = metrics?.grossProfit?.let { currencyFormatter.format(it) } ?: "0",
+                onShowGrossProfitInfo = { showGrossProfitInfo = true }
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -239,11 +253,11 @@ fun HomeScreen(
             ) {
                 // Left: Net Profit
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Your net profit is ", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Your net profit today is ", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     val margin = metrics?.netProfitMargin?.let { "%.1f".format(it) } ?: "0"
                     val profit = metrics?.todayProfit?.let { NumberFormat.getNumberInstance(Locale.US).format(it) } ?: "0"
                     
-                    Text("KES $profit ($margin%)", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+                    Text("KES $profit ($margin%)", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = if ((metrics?.todayProfit ?: 0.0) >= 0) NeoBukProfit else Color.Red)
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(Icons.Outlined.Info, "Info", tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f), modifier = Modifier.size(16.dp).clickable { onShowNetProfitInfo() })
                 }
@@ -520,7 +534,8 @@ fun MetricsRow(
     onViewSales: () -> Unit = {},
     todaySales: String = "0",
     todayExpenses: String = "0",
-    todayProfit: String = "0"
+    grossProfit: String = "0",
+    onShowGrossProfitInfo: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -538,7 +553,18 @@ fun MetricsRow(
             onClick = onViewSales
         )
         MetricCard(Modifier.weight(1f), "Expenses", "KES", todayExpenses, Icons.Outlined.AttachMoney, NeoBukWarning, NeoBukWarning.copy(alpha = 0.15f), 1)
-        MetricCard(Modifier.weight(1f), "Profit", "KES", todayProfit, Icons.Filled.Timeline, NeoBukSuccess, NeoBukSuccess.copy(alpha = 0.15f), 2)
+        MetricCard(
+            modifier = Modifier.weight(1f), 
+            title = "Gross Profit", 
+            value = "KES", 
+            amount = grossProfit, 
+            icon = Icons.Filled.Timeline, 
+            iconColor = NeoBukSuccess, 
+            iconBg = NeoBukSuccess.copy(alpha = 0.15f), 
+            index = 2,
+            showInfo = true,
+            onInfoClick = onShowGrossProfitInfo
+        )
     }
 }
 
@@ -552,6 +578,8 @@ fun MetricCard(
     iconColor: Color,
     iconBg: Color,
     index: Int = 0,
+    showInfo: Boolean = false,
+    onInfoClick: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -575,8 +603,18 @@ fun MetricCard(
             enabled = onClick != null
         ) {
             Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(modifier = Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)).background(iconBg), contentAlignment = Alignment.Center) {
-                    Icon(icon, null, tint = iconColor, modifier = Modifier.size(18.dp))
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Box(modifier = Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)).background(iconBg), contentAlignment = Alignment.Center) {
+                        Icon(icon, null, tint = iconColor, modifier = Modifier.size(18.dp))
+                    }
+                    if (showInfo) {
+                        Icon(
+                            Icons.Outlined.Info,
+                            null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                            modifier = Modifier.size(16.dp).align(Alignment.TopEnd).clickable { onInfoClick?.invoke() }
+                        )
+                    }
                 }
                 Column {
                     Text(title, style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
@@ -624,10 +662,12 @@ fun WeeklyPerformanceCard(
             Spacer(modifier = Modifier.height(24.dp))
             
             if (sortedData.isEmpty()) {
-                 Box(modifier = Modifier.fillMaxWidth().height(180.dp), contentAlignment = Alignment.Center) {
-                     Text("No data available yet", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                 }
+                Box(modifier = Modifier.fillMaxWidth().height(180.dp), contentAlignment = Alignment.Center) {
+                    Text("No data available yet", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             } else {
+                val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                
                 // Combined Chart (Bars + Line)
                 androidx.compose.foundation.Canvas(
                     modifier = Modifier
@@ -644,9 +684,6 @@ fun WeeklyPerformanceCard(
                     
                     // Layout calculations
                     val barCount = sortedData.size
-                    val spacing = 16.dp.toPx()
-                    // Total width available for bars = totalWidth - (spacing * (count-1)) - padding?
-                    // Better: divide width into 'slots'
                     val slotWidth = w / barCount
                     val barWidth = 24.dp.toPx()
                     
@@ -667,34 +704,39 @@ fun WeeklyPerformanceCard(
                             cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
                         )
                         
-                        // 2. Add to Profit Path
-                        // Ensure profit is positive for drawing or handle negative profit (loss)? 
-                        // Assuming simple positive chart for now. If negative, it clips at bottom (0).
-                        val profitH = (day.totalProfit.toFloat().coerceAtLeast(0f) / maxVal) * h * animProgress
-                        val pointY = h - profitH
+                        // 2. Build Profit Curve
+                        val currentProfit = day.totalProfit.toFloat().coerceAtLeast(0f)
+                        val pointY = h - (currentProfit / maxVal) * h * animProgress
                         
                         if (firstPoint) {
                             profitPath.moveTo(centerX, pointY)
                             firstPoint = false
                         } else {
-                            // Smooth bezier or straight line? Let's do straight for clarity on weekly, or cubic for polish.
-                            // Simple lineTo for robustness first.
-                             profitPath.lineTo(centerX, pointY)
+                            // Smooth Cubic Bezier for "premium" feel
+                            val prevIndex = index - 1
+                            val prevCenterX = (prevIndex * slotWidth) + (slotWidth / 2)
+                            val prevProfit = sortedData[prevIndex].totalProfit.toFloat().coerceAtLeast(0f)
+                            val prevPointY = h - (prevProfit / maxVal) * h * animProgress
+                            
+                            profitPath.cubicTo(
+                                prevCenterX + (centerX - prevCenterX) / 2, prevPointY,
+                                prevCenterX + (centerX - prevCenterX) / 2, pointY,
+                                centerX, pointY
+                            )
                         }
                         
-                        // Draw Point
+                        // 3. Draw Legend Labels & Points
                         drawCircle(
                             color = NeoBukProfit,
-                            radius = 3.dp.toPx(),
+                            radius = 3.5.dp.toPx(),
                             center = Offset(centerX, pointY)
                         )
                         
-                        // 3. Draw Label (Day)
-                         val textResult = textMeasurer.measure(
+                        val textResult = textMeasurer.measure(
                             text = day.dayName.take(3),
-                            style = AppTextStyles.caption.copy(fontSize = 10.sp, color = Color.Gray)
+                            style = AppTextStyles.caption.copy(fontSize = 10.sp, color = labelColor)
                         )
-                         drawText(
+                        drawText(
                             textLayoutResult = textResult,
                             topLeft = Offset(centerX - (textResult.size.width / 2), h + 4.dp.toPx())
                         )
@@ -704,7 +746,7 @@ fun WeeklyPerformanceCard(
                     drawPath(
                         path = profitPath,
                         color = NeoBukProfit,
-                        style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
+                        style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
                     )
                 }
             }

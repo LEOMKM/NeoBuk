@@ -59,6 +59,7 @@ fun SalesHistoryScreen(
     var showNewSaleSheet by remember { mutableStateOf(false) }
     var showReceiptView by remember { mutableStateOf(false) }
     var selectedSale by remember { mutableStateOf<Sale?>(null) }
+    var selectedFilter by remember { mutableStateOf("Today") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // Observe Business State
@@ -68,6 +69,12 @@ fun SalesHistoryScreen(
     val sales by salesViewModel.sales.collectAsState()
     val todaySales by salesViewModel.todaySales.collectAsState()
     val isLoading by salesViewModel.isLoading.collectAsState()
+    
+    // Determine which sales to display based on filter
+    val displaySales = when (selectedFilter) {
+        "Today" -> todaySales
+        else -> sales // For now, show all sales for other filters
+    }
 
     // Initialize data when business is available
     LaunchedEffect(currentBusiness) {
@@ -112,12 +119,40 @@ fun SalesHistoryScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Filter Chips
+                // Filter Chips - Now Functional
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChipItem("Today", selected = true)
-                    FilterChipItem("This Week", selected = false)
-                    FilterChipItem("This Month", selected = false)
-                    FilterChipItem("Custom", selected = false)
+                    FilterChipItem(
+                        text = "Today", 
+                        selected = selectedFilter == "Today",
+                        onClick = { 
+                            selectedFilter = "Today"
+                            salesViewModel.loadSalesForFilter("Today")
+                        }
+                    )
+                    FilterChipItem(
+                        text = "This Week", 
+                        selected = selectedFilter == "This Week",
+                        onClick = { 
+                            selectedFilter = "This Week"
+                            salesViewModel.loadSalesForFilter("This Week")
+                        }
+                    )
+                    FilterChipItem(
+                        text = "This Month", 
+                        selected = selectedFilter == "This Month",
+                        onClick = { 
+                            selectedFilter = "This Month"
+                            salesViewModel.loadSalesForFilter("This Month")
+                        }
+                    )
+                    FilterChipItem(
+                        text = "Custom", 
+                        selected = selectedFilter == "Custom",
+                        onClick = { 
+                            selectedFilter = "Custom"
+                            // Custom logic can be implemented here
+                        }
+                    )
                 }
             }
         }
@@ -162,25 +197,25 @@ fun SalesHistoryScreen(
             }
         }
 
-        // 4. Transaction List
-        if (isLoading && sales.isEmpty()) {
+        // 4. Transaction List - Shows sales based on selected filter
+        if (isLoading && displaySales.isEmpty()) {
             item {
                 Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = NeoBukTeal)
                 }
             }
-        } else if (sales.isEmpty()) {
+        } else if (displaySales.isEmpty()) {
              item {
                  com.neobuk.app.ui.components.EmptyState(
-                     title = "No Sales Yet",
-                     description = "Your sales history is empty. Start recording transactions to see them here.",
+                     title = "No Sales Found",
+                     description = "No sales found for the selected period. Start recording transactions to see them here.",
                      imageId = com.neobuk.app.R.drawable.empty_sales,
                      buttonText = "Record First Sale",
                      onButtonClick = { showNewSaleSheet = true }
                  )
             }
         } else {
-            items(sales) { sale ->
+            items(displaySales) { sale ->
                 TransactionItem(
                     sale = sale,
                     onClick = {
@@ -224,7 +259,7 @@ fun SalesHistoryScreen(
                 onDismiss = { showNewSaleSheet = false },
                 onCompleteSale = {
                     showNewSaleSheet = false
-                    // Optional: Show success message via Snackbar
+                    salesViewModel.refreshData() // Refresh to show new sale
                 }
             )
         }
@@ -460,10 +495,10 @@ fun ItemRow(name: String, calc: String, price: String) {
 }
 
 @Composable
-fun FilterChipItem(text: String, selected: Boolean) {
+fun FilterChipItem(text: String, selected: Boolean, onClick: () -> Unit = {}) {
     if (selected) {
         Button(
-            onClick = {},
+            onClick = onClick,
             colors = ButtonDefaults.buttonColors(containerColor = NeoBukCyan),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
             modifier = Modifier.height(32.dp)
@@ -472,7 +507,7 @@ fun FilterChipItem(text: String, selected: Boolean) {
         }
     } else {
         FilledTonalButton(
-            onClick = {},
+            onClick = onClick,
             colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
             modifier = Modifier.height(32.dp)
@@ -491,6 +526,11 @@ fun SummaryCard(salesViewModel: SalesViewModel) {
     }
     val todaySalesCount by remember(salesViewModel) {
         derivedStateOf { salesViewModel.getTodaySalesCount() }
+    }
+    
+    // Get real hourly sales data
+    val hourlySalesData by remember(salesViewModel) {
+        derivedStateOf { salesViewModel.getHourlySalesData() }
     }
     
     LaunchedEffect(Unit) {
@@ -531,7 +571,10 @@ fun SummaryCard(salesViewModel: SalesViewModel) {
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Chart Area (Visual Clone - Mock Data for now)
+            // Chart Area - Real Data
+            val maxSales = hourlySalesData.maxOrNull() ?: 1.0
+            val chartMax = if (maxSales > 0) maxSales else 1000.0 // Prevent division by zero
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -539,26 +582,77 @@ fun SummaryCard(salesViewModel: SalesViewModel) {
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Y-Axis labels (Left side)
+                // Y-Axis labels (Left side) - Dynamic based on max sales
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxHeight().padding(bottom = 24.dp)
                 ) {
-                    Text("4 K", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("3 K", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("2 K", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("1 K", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        "${(chartMax * 1.0 / 1000).toInt()} K",
+                        style = AppTextStyles.caption, 
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "${(chartMax * 0.75 / 1000).toInt()} K", 
+                        style = AppTextStyles.caption, 
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "${(chartMax * 0.5 / 1000).toInt()} K", 
+                        style = AppTextStyles.caption, 
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "${(chartMax * 0.25 / 1000).toInt()} K", 
+                        style = AppTextStyles.caption, 
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Text("0 K", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 
-                // Bars
-                ChartBar(0.3f, "8AM", chartVisible, 0)
-                ChartBar(0.6f, "", chartVisible, 1)
-                ChartBar(0.9f, "12PM", chartVisible, 2)
-                ChartBar(0.5f, "", chartVisible, 3)
-                ChartBar(0.45f, "4PM", chartVisible, 4)
-                ChartBar(0.25f, "", chartVisible, 5)
-                ChartBar(0.15f, "8PM", chartVisible, 6)
+                // Bars with real data - normalized to chartMax
+                ChartBar(
+                    height = if (chartMax > 0) (hourlySalesData.getOrNull(0) ?: 0.0).toFloat() / chartMax.toFloat() else 0f,
+                    label = "8AM", 
+                    chartVisible, 
+                    0
+                )
+                ChartBar(
+                    height = if (chartMax > 0) (hourlySalesData.getOrNull(1) ?: 0.0).toFloat() / chartMax.toFloat() else 0f,
+                    label = "", 
+                    chartVisible, 
+                    1
+                )
+                ChartBar(
+                    height = if (chartMax > 0) (hourlySalesData.getOrNull(2) ?: 0.0).toFloat() / chartMax.toFloat() else 0f,
+                    label = "12PM", 
+                    chartVisible, 
+                    2
+                )
+                ChartBar(
+                    height = if (chartMax > 0) (hourlySalesData.getOrNull(3) ?: 0.0).toFloat() / chartMax.toFloat() else 0f,
+                    label = "", 
+                    chartVisible, 
+                    3
+                )
+                ChartBar(
+                    height = if (chartMax > 0) (hourlySalesData.getOrNull(4) ?: 0.0).toFloat() / chartMax.toFloat() else 0f,
+                    label = "4PM", 
+                    chartVisible, 
+                    4
+                )
+                ChartBar(
+                    height = if (chartMax > 0) (hourlySalesData.getOrNull(5) ?: 0.0).toFloat() / chartMax.toFloat() else 0f,
+                    label = "", 
+                    chartVisible, 
+                    5
+                )
+                ChartBar(
+                    height = if (chartMax > 0) (hourlySalesData.getOrNull(6) ?: 0.0).toFloat() / chartMax.toFloat() else 0f,
+                    label = "8PM", 
+                    chartVisible, 
+                    6
+                )
             }
         }
     }

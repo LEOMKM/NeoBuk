@@ -178,6 +178,7 @@ fun ScanTab(
     productsViewModel: ProductsViewModel,
     onProductFound: (Product) -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     var manualBarcode by remember { mutableStateOf("") }
     // In a real app, integrate CameraX here for scanning
     
@@ -268,7 +269,7 @@ fun ScanTab(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                     focusedBorderColor = NeoBukTeal
@@ -284,9 +285,20 @@ fun ScanTab(
                             barcode = manualBarcode,
                             onFound = { 
                                 onProductFound(it)
+                                android.widget.Toast.makeText(
+                                    context,
+                                    "Product found: ${it.name}",
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
                                 manualBarcode = "" 
                             },
-                            onNotFound = { /* Show error */ }
+                            onNotFound = { 
+                                android.widget.Toast.makeText(
+                                    context,
+                                    "Product not found with barcode: $manualBarcode",
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         )
                     }
                 },

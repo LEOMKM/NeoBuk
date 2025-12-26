@@ -17,7 +17,9 @@ data class ReportSummary(
     @SerialName("sales_count") val salesCount: Long = 0,
     @SerialName("avg_sale_value") val avgSaleValue: Double = 0.0,
     @SerialName("total_expenses") val totalExpenses: Double = 0.0,
-    @SerialName("net_profit") val netProfit: Double = 0.0
+    @SerialName("gross_profit") val grossProfit: Double = 0.0,
+    @SerialName("net_profit") val netProfit: Double = 0.0,
+    @SerialName("net_profit_margin") val netProfitMargin: Double = 0.0
 )
 
 @Serializable

@@ -185,7 +185,7 @@ fun ReceiptScreen(
                         )
                     }
                     
-                    if (data.customerName != null && data.paymentMethod.contains("M-PESA", ignoreCase = true)) {
+                    if (!data.customerName.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -439,7 +439,7 @@ object ReceiptUtils {
         canvas.drawText(data.businessName, 595f - margin, y, rightTextPaint)
         y += 20
         
-        if (data.customerName != null && data.paymentMethod.contains("M-PESA", ignoreCase = true)) {
+        if (!data.customerName.isNullOrBlank()) {
             canvas.drawText("Customer", margin, y, grayPaint)
             canvas.drawText(data.customerName, 595f - margin, y, rightTextPaint)
             y += 20

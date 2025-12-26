@@ -14,6 +14,7 @@ import java.time.ZoneId
 data class DashboardMetrics(
     @SerialName("today_sales") val todaySales: Double,
     @SerialName("today_expenses") val todayExpenses: Double,
+    @SerialName("gross_profit") val grossProfit: Double,
     @SerialName("today_profit") val todayProfit: Double,
     @SerialName("sales_growth") val salesGrowth: String,
     @SerialName("net_profit_margin") val netProfitMargin: Double

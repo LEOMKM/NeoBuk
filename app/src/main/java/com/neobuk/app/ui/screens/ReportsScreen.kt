@@ -56,8 +56,12 @@ data class ReportKPI(
     val title: String,
     val value: String,
     val subtitle: String,
-    val changePercent: Double = 0.0, // Hard to calculate without prev period, ignore for now
-    val isPositive: Boolean = true
+    val margin: Double? = null,
+    val isPositive: Boolean = true,
+    val icon: ImageVector? = null,
+    val iconColor: Color = Color.Gray,
+    val iconBg: Color = Color.Gray.copy(alpha = 0.1f),
+    val showInfo: Boolean = false
 )
 
 data class UI_PaymentMethodData(
@@ -90,14 +94,17 @@ fun ReportsScreen(
     val salesTrendRaw by reportsViewModel.salesTrend.collectAsState()
     val selectedFilter by reportsViewModel.selectedFilter.collectAsState()
     val isLoading by reportsViewModel.isLoading.collectAsState()
+    
+    var showGrossProfitInfo by remember { mutableStateOf(false) }
 
     // Map Data to UI
     val kpis = remember(summary) {
         listOf(
-            ReportKPI("KES", String.format("%,.0f", summary.totalSales), "Total Sales"),
-            ReportKPI("", "${summary.salesCount}", "Sales Count"),
-            ReportKPI("KES", String.format("%,.0f", summary.avgSaleValue), "Avg. Sale"),
-            ReportKPI("KES", String.format("%,.0f", summary.netProfit), "Net Profit")
+            ReportKPI("KES", String.format("%,.0f", summary.totalSales), "Total Sales", icon = Icons.Outlined.ShoppingBag, iconColor = NeoBukTeal, iconBg = NeoBukCyan.copy(alpha = 0.2f)),
+            ReportKPI("KES", String.format("%,.0f", summary.totalExpenses), "Expenses", icon = Icons.Outlined.AttachMoney, iconColor = NeoBukWarning, iconBg = NeoBukWarning.copy(alpha = 0.15f)),
+            ReportKPI("KES", String.format("%,.0f", summary.grossProfit), "Gross Profit", icon = Icons.Outlined.Timeline, iconColor = NeoBukSuccess, iconBg = NeoBukSuccess.copy(alpha = 0.15f), showInfo = true),
+            ReportKPI("KES", String.format("%,.0f", summary.netProfit), "Net Profit", margin = summary.netProfitMargin, isPositive = summary.netProfit >= 0, icon = Icons.Outlined.TrendingUp, iconColor = if (summary.netProfit >= 0) NeoBukSuccess else NeoBukError, iconBg = if (summary.netProfit >= 0) NeoBukSuccess.copy(alpha = 0.15f) else NeoBukError.copy(alpha = 0.15f)),
+            ReportKPI("", "${summary.salesCount}", "Sales Count", icon = Icons.Outlined.ReceiptLong, iconColor = NeoBukTeal, iconBg = NeoBukTeal.copy(alpha = 0.1f))
         )
     }
 
@@ -127,6 +134,19 @@ fun ReportsScreen(
                 .background(MaterialTheme.colorScheme.background),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
+            // 0. Info Dialog
+            item {
+                if (showGrossProfitInfo) {
+                    AlertDialog(
+                        onDismissRequest = { showGrossProfitInfo = false },
+                        title = { Text("Gross Profit") },
+                        text = { Text("Gross Profit is calculated as your Sales minus the Buying Price (cost) of the items sold.\n\nGP = Selling Price - Buying Price") },
+                        confirmButton = {
+                            TextButton(onClick = { showGrossProfitInfo = false }) { Text("Got it") }
+                        }
+                    )
+                }
+            }
             // 1. Header
             item {
                 Column(
@@ -214,14 +234,27 @@ fun ReportsScreen(
                     item {
                         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                KPICard(kpi = kpis[0], modifier = Modifier.weight(1f))
+                                KPICard(kpi = kpis[0], modifier = Modifier.weight(1f)) // Total Sales
+                                KPICard(kpi = kpis[1], modifier = Modifier.weight(1f)) // Expenses
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                KPICard(kpi = kpis[2], modifier = Modifier.weight(1f), onInfoClick = { showGrossProfitInfo = true }) // Gross Profit
                                 KPICard(kpi = kpis[3], modifier = Modifier.weight(1f)) // Net Profit
                             }
                             Spacer(modifier = Modifier.height(12.dp))
                             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                KPICard(kpi = kpis[1], modifier = Modifier.weight(1f))
-                                KPICard(kpi = kpis[2], modifier = Modifier.weight(1f))
+                                KPICard(kpi = kpis[4], modifier = Modifier.weight(1f)) // Sales Count
+                                Box(modifier = Modifier.weight(1f))
                             }
+                            
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Gross Profit = Sales - Cost of items. Net Profit = Gross Profit - Expenses.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                fontSize = 11.sp
+                            )
                         }
                     }
 
@@ -339,23 +372,51 @@ fun ReportFilterChip(
 }
 
 @Composable
-fun KPICard(kpi: ReportKPI, modifier: Modifier = Modifier) {
+fun KPICard(kpi: ReportKPI, modifier: Modifier = Modifier, onInfoClick: (() -> Unit)? = null) {
     Card(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (kpi.icon != null) {
+                    Box(modifier = Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)).background(kpi.iconBg), contentAlignment = Alignment.Center) {
+                        Icon(kpi.icon, null, tint = kpi.iconColor, modifier = Modifier.size(18.dp))
+                    }
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(kpi.subtitle, style = AppTextStyles.secondary, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+                
+                if (kpi.showInfo) {
+                    Icon(
+                        Icons.Outlined.Info,
+                        null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                        modifier = Modifier.size(16.dp).clickable { onInfoClick?.invoke() }
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
             Text(
                 text = if (kpi.title.isNotEmpty()) "${kpi.title} ${kpi.value}" else kpi.value,
-                style = AppTextStyles.amountLarge.copy(fontSize = 20.sp),
-                color = MaterialTheme.colorScheme.onSurface,
+                style = AppTextStyles.amountLarge.copy(fontSize = 18.sp),
+                color = if (kpi.subtitle == "Net Profit") (if (kpi.isPositive) NeoBukSuccess else NeoBukError) else MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(kpi.subtitle, style = AppTextStyles.secondary, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            
+            if (kpi.margin != null) {
+                Text(
+                    text = String.format("%.1f%% Margin", kpi.margin),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (kpi.isPositive) NeoBukSuccess else NeoBukError,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

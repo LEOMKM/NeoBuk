@@ -71,37 +71,34 @@ class ReportsViewModel(
 
             val (start, end) = calculateDateRange(_selectedFilter.value)
 
-            // Launch all fetches in parallel usually, but sequential is fine for simplicity here
-            // actually separate launches are better for parallel
-            
-            launch {
-                reportsRepository.getReportSummary(businessId, start, end).onSuccess {
-                    _summary.value = it
+            // Launch all fetches in parallel and wait for all to complete
+            kotlinx.coroutines.coroutineScope {
+                launch {
+                    reportsRepository.getReportSummary(businessId, start, end).onSuccess {
+                        _summary.value = it
+                    }
                 }
-            }
-            
-            launch {
-                reportsRepository.getTopSellingProducts(businessId, start, end).onSuccess {
-                    _topProducts.value = it
+                
+                launch {
+                    reportsRepository.getTopSellingProducts(businessId, start, end).onSuccess {
+                        _topProducts.value = it
+                    }
                 }
-            }
-            
-            launch {
-                reportsRepository.getSalesByPaymentMethod(businessId, start, end).onSuccess {
-                    _paymentMethods.value = it
+                
+                launch {
+                    reportsRepository.getSalesByPaymentMethod(businessId, start, end).onSuccess {
+                        _paymentMethods.value = it
+                    }
                 }
-            }
-            
-            launch {
-                reportsRepository.getSalesTrend(businessId, start, end).onSuccess {
-                    _salesTrend.value = it
+                
+                launch {
+                    reportsRepository.getSalesTrend(businessId, start, end).onSuccess {
+                        _salesTrend.value = it
+                    }
                 }
             }
 
-            // A bit of a hack to turn off loading after slight delay or we track all jobs.
-            // For now, let's just let the UI show whatever comes in.
-            // Ideally use async/awaitAll but fine for now.
-             _isLoading.value = false
+            _isLoading.value = false
         }
     }
 

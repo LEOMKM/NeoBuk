@@ -12,6 +12,11 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 // ============================================
 // DTOs for Supabase
@@ -180,28 +185,77 @@ class SalesRepository(private val supabaseClient: SupabaseClient) {
     suspend fun fetchTodaySales(businessId: String): List<Sale> {
         return try {
             _isLoading.value = true
-            val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                .format(java.util.Date())
+            
+            // Calculate today range in UTC correctly
+            val now = LocalDateTime.now()
+            val zone = ZoneId.systemDefault()
+            val startOfDay = now.with(LocalTime.MIN).atZone(zone).toInstant().toEpochMilli()
+            val endOfDay = now.with(LocalTime.MAX).atZone(zone).toInstant().toEpochMilli()
+
+            val isoStart = formatIsoDate(startOfDay)
+            val isoEnd = formatIsoDate(endOfDay)
+            
+            android.util.Log.d("SalesRepository", "Fetching today's sales for range: $isoStart to $isoEnd, business: $businessId")
             
             val result = database["sales"]
                 .select {
                     filter {
                         eq("business_id", businessId)
-                        gte("sale_date", "${today}T00:00:00")
-                        lte("sale_date", "${today}T23:59:59")
+                        gte("created_at", isoStart)
+                        lte("created_at", isoEnd)
                     }
-                    order("sale_date", Order.DESCENDING)
+                    order("created_at", Order.DESCENDING)
                 }
                 .decodeList<SaleDTO>()
+            
+            android.util.Log.d("SalesRepository", "Found ${result.size} sales for today")
             
             val sales = result.map { it.toSale() }
             _todaySales.value = sales
             sales
         } catch (e: Exception) {
+            android.util.Log.e("SalesRepository", "Error fetching today's sales: ${e.message}", e)
             emptyList()
         } finally {
             _isLoading.value = false
         }
+    }
+
+    suspend fun fetchSalesForRange(businessId: String, startTimestamp: Long, endTimestamp: Long): List<Sale> {
+        return try {
+            _isLoading.value = true
+            val isoStart = formatIsoDate(startTimestamp)
+            val isoEnd = formatIsoDate(endTimestamp)
+            
+            android.util.Log.d("SalesRepository", "Fetching sales for range: $isoStart to $isoEnd")
+            
+            val result = database["sales"]
+                .select {
+                    filter {
+                        eq("business_id", businessId)
+                        gte("created_at", isoStart)
+                        lte("created_at", isoEnd)
+                    }
+                    order("created_at", Order.DESCENDING)
+                }
+                .decodeList<SaleDTO>()
+            
+            android.util.Log.d("SalesRepository", "Found ${result.size} sales for range")
+            
+            val sales = result.map { it.toSale() }
+            _sales.value = sales
+            sales
+        } catch (e: Exception) {
+            android.util.Log.e("SalesRepository", "Error fetching range sales: ${e.message}", e)
+            emptyList()
+        } finally {
+            _isLoading.value = false
+        }
+    }
+
+    private fun formatIsoDate(timestamp: Long): String {
+        return DateTimeFormatter.ISO_INSTANT
+            .format(Instant.ofEpochMilli(timestamp))
     }
     
     suspend fun fetchSaleWithItems(saleId: String): Sale? {
@@ -333,7 +387,8 @@ class SalesRepository(private val supabaseClient: SupabaseClient) {
             amountPaid = paid,
             changeGiven = change,
             customerName = customerName,
-            customerPhone = customerPhone
+            customerPhone = customerPhone,
+            saleDate = Instant.now().toString()
         )
         
         val saleResult = database["sales"]
@@ -487,7 +542,11 @@ class SalesRepository(private val supabaseClient: SupabaseClient) {
     private fun parseTimestamp(timestamp: String?): Long {
         return try {
             timestamp?.let {
-                kotlinx.datetime.Instant.parse(it).toEpochMilliseconds()
+                // Handle formats like "2024-12-27 01:23:45+00" or ISO "2024-12-27T01:23:45Z"
+                val isoFormatted = if (it.contains(" ") && !it.contains("T")) {
+                    it.replace(" ", "T")
+                } else it
+                kotlinx.datetime.Instant.parse(isoFormatted).toEpochMilliseconds()
             } ?: System.currentTimeMillis()
         } catch (e: Exception) {
             System.currentTimeMillis()

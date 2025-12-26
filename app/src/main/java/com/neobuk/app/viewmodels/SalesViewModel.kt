@@ -11,6 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.temporal.TemporalAdjusters
 
 /**
  * ViewModel for Sales functionality
@@ -62,6 +66,28 @@ class SalesViewModel(
     
     fun refreshData() {
         loadData()
+    }
+
+    fun loadSalesForFilter(filter: String) {
+        val businessId = currentBusinessId ?: return
+        viewModelScope.launch {
+            val now = LocalDateTime.now()
+            val zone = ZoneId.systemDefault()
+            val endTs = now.atZone(zone).toInstant().toEpochMilli()
+
+            when (filter) {
+                "Today" -> salesRepository.fetchTodaySales(businessId)
+                "This Week" -> {
+                    val startTs = now.minusDays(7).with(LocalTime.MIN).atZone(zone).toInstant().toEpochMilli()
+                    salesRepository.fetchSalesForRange(businessId, startTs, endTs)
+                }
+                "This Month" -> {
+                    val startTs = now.with(TemporalAdjusters.firstDayOfMonth()).with(LocalTime.MIN).atZone(zone).toInstant().toEpochMilli()
+                    salesRepository.fetchSalesForRange(businessId, startTs, endTs)
+                }
+                else -> salesRepository.fetchSales(businessId)
+            }
+        }
     }
     
     // ============================================
@@ -254,6 +280,46 @@ class SalesViewModel(
     
     fun getSalesByPaymentMethod(): Map<String, Double> {
         return salesRepository.getSalesByPaymentMethod()
+    }
+    
+    /**
+     * Get hourly sales data for chart (4-hour intervals: 8AM, 12PM, 4PM, 8PM)
+     * Returns list of sales totals for each interval
+     */
+    fun getHourlySalesData(): List<Double> {
+        val hourlySales = mutableListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) // 7 intervals (approx 4-hour each)
+        
+        val calendar = java.util.Calendar.getInstance()
+        val todayStart = calendar.apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        
+        // Group sales into intervals
+        todaySales.value.forEach { sale ->
+            val hour = java.util.Calendar.getInstance().apply {
+                timeInMillis = sale.saleDate
+            }.get(java.util.Calendar.HOUR_OF_DAY)
+            
+            val intervalIndex = when (hour) {
+                in 6..9 -> 0    // 6AM-10AM
+                in 10..11 -> 1  // 10AM-12PM  
+                in 12..15 -> 2  // 12PM-4PM
+                in 16..17 -> 3  // 4PM-6PM
+                in 18..19 -> 4  // 6PM-8PM
+                in 20..21 -> 5  // 8PM-10PM
+                in 22..23, in 0..5 -> 6  // 10PM-6AM
+                else -> 2
+            }
+            
+            if (intervalIndex in hourlySales.indices) {
+                hourlySales[intervalIndex] += sale.totalAmount
+            }
+        }
+        
+        return hourlySales
     }
     
     // Calculated properties

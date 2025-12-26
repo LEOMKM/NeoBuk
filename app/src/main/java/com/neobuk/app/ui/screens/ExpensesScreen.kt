@@ -25,99 +25,51 @@ import com.neobuk.app.ui.theme.NeoBukCyan
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
 import com.neobuk.app.ui.theme.AppTextStyles
-import java.util.UUID
-
-// Data Classes
-data class Expense(
-    val id: String = UUID.randomUUID().toString(),
-    val title: String,
-    val category: ExpenseCategory,
-    val amount: Double,
-    val date: String,
-    val description: String = "",
-    val paymentMethod: String = "Cash",
-    val receiptUrl: String? = null
-)
-
-enum class ExpenseCategory(val displayName: String, val icon: ImageVector, val color: Color) {
-    UTILITIES("Utilities", Icons.Outlined.Bolt, Color(0xFFF59E0B)),
-    RENT("Rent", Icons.Outlined.Home, Color(0xFF6366F1)),
-    SUPPLIES("Supplies", Icons.Outlined.ShoppingCart, Color(0xFF10B981)),
-    TRANSPORT("Transport", Icons.Outlined.LocalShipping, Color(0xFF3B82F6)),
-    SALARY("Salary", Icons.Outlined.People, Color(0xFFEC4899)),
-    MAINTENANCE("Maintenance", Icons.Outlined.Build, Color(0xFF8B5CF6)),
-    OTHER("Other", Icons.Outlined.MoreHoriz, Color(0xFF6B7280))
-}
+import com.neobuk.app.data.repositories.Expense
+import com.neobuk.app.data.repositories.ExpenseCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpensesScreen() {
+fun ExpensesScreen(
+    expensesViewModel: com.neobuk.app.viewmodels.ExpensesViewModel = org.koin.androidx.compose.koinViewModel(),
+    authViewModel: com.neobuk.app.viewmodels.AuthViewModel = org.koin.androidx.compose.koinViewModel()
+) {
     var showAddExpenseSheet by remember { mutableStateOf(false) }
     var selectedExpense by remember { mutableStateOf<Expense?>(null) }
     var selectedFilter by remember { mutableStateOf("All") }
+    var showAllExpenses by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Mock Data
-    val expenses = remember {
-        listOf(
-            Expense(
-                title = "Electricity Bill",
-                category = ExpenseCategory.UTILITIES,
-                amount = 4500.0,
-                date = "Dec 20, 2024",
-                description = "Monthly KPLC bill",
-                paymentMethod = "M-PESA"
-            ),
-            Expense(
-                title = "Shop Rent",
-                category = ExpenseCategory.RENT,
-                amount = 25000.0,
-                date = "Dec 15, 2024",
-                description = "December rent payment",
-                paymentMethod = "Bank Transfer"
-            ),
-            Expense(
-                title = "Cleaning Supplies",
-                category = ExpenseCategory.SUPPLIES,
-                amount = 1200.0,
-                date = "Dec 18, 2024",
-                description = "Detergent, mops, brushes",
-                paymentMethod = "Cash"
-            ),
-            Expense(
-                title = "Delivery Fuel",
-                category = ExpenseCategory.TRANSPORT,
-                amount = 2500.0,
-                date = "Dec 19, 2024",
-                description = "Bike fuel for deliveries",
-                paymentMethod = "M-PESA"
-            ),
-            Expense(
-                title = "Staff Salary - John",
-                category = ExpenseCategory.SALARY,
-                amount = 15000.0,
-                date = "Dec 14, 2024",
-                description = "December salary payment",
-                paymentMethod = "Bank Transfer"
-            ),
-            Expense(
-                title = "Refrigerator Repair",
-                category = ExpenseCategory.MAINTENANCE,
-                amount = 3500.0,
-                date = "Dec 12, 2024",
-                description = "Compressor replacement",
-                paymentMethod = "Cash"
-            )
-        )
+    // Observe state
+    val currentBusiness by authViewModel.currentBusiness.collectAsState()
+    val expenses by expensesViewModel.expenses.collectAsState()
+    val categories by expensesViewModel.categories.collectAsState()
+    val isLoading by expensesViewModel.isLoading.collectAsState()
+    
+    // Initialize data when business is available
+    LaunchedEffect(currentBusiness) {
+        currentBusiness?.let { business ->
+            expensesViewModel.setBusinessId(business.id)
+        }
     }
 
-    // Calculate stats
+    // Calculate stats from real data
     val totalExpenses = expenses.sumOf { it.amount }
-    val thisMonthExpenses = expenses.sumOf { it.amount } // Simplified for mock
-    val categoryBreakdown = expenses.groupBy { it.category }
-        .mapValues { it.value.sumOf { exp -> exp.amount } }
-        .toList()
-        .sortedByDescending { it.second }
+    val thisMonthExpenses = remember(expenses) {
+        val startOfMonth = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.DAY_OF_MONTH, 1)
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+        }.timeInMillis
+        expenses.filter { it.expenseDate >= startOfMonth }.sumOf { it.amount }
+    }
+    val categoryBreakdown = remember(expenses) {
+        expenses.groupBy { it.categoryName }
+            .mapValues { it.value.sumOf { exp -> exp.amount } }
+            .toList()
+            .sortedByDescending { it.second }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -241,14 +193,12 @@ fun ExpensesScreen() {
                         onClick = { selectedFilter = "All" }
                     )
                 }
-                ExpenseCategory.values().forEach { category ->
-                    item {
-                        ExpenseFilterChip(
-                            text = category.displayName,
-                            selected = selectedFilter == category.displayName,
-                            onClick = { selectedFilter = category.displayName }
-                        )
-                    }
+                items(categories) { category ->
+                    ExpenseFilterChip(
+                        text = category.name,
+                        selected = selectedFilter == category.name,
+                        onClick = { selectedFilter = category.name }
+                    )
                 }
             }
         }
@@ -269,7 +219,7 @@ fun ExpensesScreen() {
                     style = AppTextStyles.sectionTitle,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                TextButton(onClick = { /* View all expenses */ }) {
+                TextButton(onClick = { showAllExpenses = true }) {
                     Text("View All", style = AppTextStyles.buttonMedium, color = NeoBukTeal)
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
@@ -286,14 +236,41 @@ fun ExpensesScreen() {
         val filteredExpenses = if (selectedFilter == "All") {
             expenses
         } else {
-            expenses.filter { it.category.displayName == selectedFilter }
+            expenses.filter { it.categoryName == selectedFilter }
         }
 
-        items(filteredExpenses) { expense ->
-            ExpenseItem(
-                expense = expense,
-                onClick = { selectedExpense = expense }
-            )
+        // Loading state
+        if (isLoading && expenses.isEmpty()) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = NeoBukTeal)
+                }
+            }
+        } else if (filteredExpenses.isEmpty()) {
+            // Empty state
+            item {
+                com.neobuk.app.ui.components.EmptyState(
+                    title = if (selectedFilter == "All") "No Expenses Yet" else "No $selectedFilter Expenses",
+                    description = if (selectedFilter == "All") 
+                        "You haven't recorded any expenses yet. Start tracking your expenses to manage your finances better."
+                    else
+                        "No expenses found in this category. Try selecting a different category or record a new expense.",
+                    imageId = com.neobuk.app.R.drawable.empty_sales, // Reusing sales empty drawable
+                    buttonText = "Record First Expense",
+                    onButtonClick = { showAddExpenseSheet = true }
+                )
+            }
+        } else {
+            // Display expense items
+            items(filteredExpenses) { expense ->
+                ExpenseItem(
+                    expense = expense,
+                    onClick = { selectedExpense = expense }
+                )
+            }
         }
     }
 
@@ -306,7 +283,18 @@ fun ExpensesScreen() {
         ) {
             AddExpenseSheet(
                 onDismiss = { showAddExpenseSheet = false },
-                onSubmit = { /* Handle expense submission */ showAddExpenseSheet = false }
+                onSubmit = { expense ->
+                    // Create expense via ViewModel
+                    expensesViewModel.createExpense(
+                        title = expense.title,
+                        categoryId = expense.categoryId,
+                        amount = expense.amount,
+                        description = expense.description,
+                        paymentMethod = expense.paymentMethod
+                    )
+                    showAddExpenseSheet = false
+                },
+                categories = categories
             )
         }
     }
@@ -323,6 +311,20 @@ fun ExpensesScreen() {
                 onClose = { selectedExpense = null }
             )
         }
+    }
+    
+    // All Expenses Full Screen
+    if (showAllExpenses) {
+        AllExpensesScreen(
+            expenses = expenses,
+            categories = categories,
+            isLoading = isLoading,
+            onBack = { showAllExpenses = false },
+            onExpenseClick = { expense ->
+                selectedExpense = expense
+                showAllExpenses = false
+            }
+        )
     }
 }
 
@@ -387,10 +389,31 @@ fun ExpenseSummaryCard(
 
 @Composable
 fun CategoryBreakdownRow(
-    category: ExpenseCategory,
+    category: String,
     amount: Double,
     percentage: Int
 ) {
+    // Map category names to colors (simplified)
+    val categoryColor = when(category) {
+        "Utilities" -> Color(0xFFF59E0B)
+        "Rent" -> Color(0xFF6366F1)
+        "Supplies" -> Color(0xFF10B981)
+        "Transport" -> Color(0xFF3B82F6)
+        "Salary" -> Color(0xFFEC4899)
+        "Maintenance" -> Color(0xFF8B5CF6)
+        else -> Color(0xFF6B7280)
+    }
+    
+    val categoryIcon = when(category) {
+        "Utilities" -> Icons.Outlined.Bolt
+        "Rent" -> Icons.Outlined.Home
+        "Supplies" -> Icons.Outlined.ShoppingCart
+        "Transport" -> Icons.Outlined.LocalShipping
+        "Salary" -> Icons.Outlined.People
+        "Maintenance" -> Icons.Outlined.Build
+        else -> Icons.Outlined.MoreHoriz
+    }
+    
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -400,20 +423,20 @@ fun CategoryBreakdownRow(
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .background(category.color.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
+                    .background(categoryColor.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    category.icon,
+                    categoryIcon,
                     contentDescription = null,
-                    tint = category.color,
+                    tint = categoryColor,
                     modifier = Modifier.size(18.dp)
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = category.displayName,
+                    text = category,
                     style = AppTextStyles.bodyBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -464,6 +487,31 @@ fun ExpenseItem(
     expense: Expense,
     onClick: () -> Unit
 ) {
+    // Map category names to colors and icons
+    val categoryColor = when(expense.categoryName) {
+        "Utilities" -> Color(0xFFF59E0B)
+        "Rent" -> Color(0xFF6366F1)
+        "Supplies" -> Color(0xFF10B981)
+        "Transport" -> Color(0xFF3B82F6)
+        "Salary" -> Color(0xFFEC4899)
+        "Maintenance" -> Color(0xFF8B5CF6)
+        else -> Color(0xFF6B7280)
+    }
+    
+    val categoryIcon = when(expense.categoryName) {
+        "Utilities" -> Icons.Outlined.Bolt
+        "Rent" -> Icons.Outlined.Home
+        "Supplies" -> Icons.Outlined.ShoppingCart
+        "Transport" -> Icons.Outlined.LocalShipping
+        "Salary" -> Icons.Outlined.People
+        "Maintenance" -> Icons.Outlined.Build
+        else -> Icons.Outlined.MoreHoriz
+    }
+    
+    // Format date
+    val dateFormat = java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
+    val formattedDate = dateFormat.format(java.util.Date(expense.expenseDate))
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -484,13 +532,13 @@ fun ExpenseItem(
                 Box(
                     modifier = Modifier
                         .size(44.dp)
-                        .background(expense.category.color.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                        .background(categoryColor.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        expense.category.icon,
+                        categoryIcon,
                         contentDescription = null,
-                        tint = expense.category.color,
+                        tint = categoryColor,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -503,7 +551,7 @@ fun ExpenseItem(
                         maxLines = 1
                     )
                     Text(
-                        text = "${expense.category.displayName} • ${expense.date}",
+                        text = "${expense.categoryName} • $formattedDate",
                         style = AppTextStyles.secondary,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -546,11 +594,12 @@ fun ExpenseItem(
 @Composable
 fun AddExpenseSheet(
     onDismiss: () -> Unit,
-    onSubmit: (Expense) -> Unit
+    onSubmit: (Expense) -> Unit,
+    categories: List<ExpenseCategory> = emptyList()
 ) {
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf(ExpenseCategory.OTHER) }
+    var selectedCategory by remember { mutableStateOf<ExpenseCategory?>(categories.firstOrNull()) }
     var description by remember { mutableStateOf("") }
     var selectedPaymentMethod by remember { mutableStateOf("Cash") }
 
@@ -619,10 +668,10 @@ fun AddExpenseSheet(
         Text("Category", style = AppTextStyles.bodyBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(modifier = Modifier.height(8.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(ExpenseCategory.values().toList()) { category ->
+            items(categories) { category ->
                 CategoryChip(
                     category = category,
-                    selected = selectedCategory == category,
+                    selected = selectedCategory?.id == category.id,
                     onClick = { selectedCategory = category }
                 )
             }
@@ -683,22 +732,28 @@ fun AddExpenseSheet(
         // Submit Button
         Button(
             onClick = {
-                val expense = Expense(
-                    title = title,
-                    category = selectedCategory,
-                    amount = amount.toDoubleOrNull() ?: 0.0,
-                    date = "Dec 23, 2024",
-                    description = description,
-                    paymentMethod = selectedPaymentMethod
-                )
-                onSubmit(expense)
+                selectedCategory?.let { category ->
+                    val expense = Expense(
+                        id = "",  // Will be generated by backend
+                        categoryId = category.id,
+                        categoryName = category.name,
+                        title = title,
+                        amount = amount.toDoubleOrNull() ?: 0.0,
+                        description = description,
+                        paymentMethod = selectedPaymentMethod,
+                        receiptUrl = null,
+                        expenseDate = System.currentTimeMillis(),
+                        createdAt = System.currentTimeMillis()
+                    )
+                    onSubmit(expense)
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
-            enabled = title.isNotBlank() && amount.isNotBlank()
+            enabled = title.isNotBlank() && amount.isNotBlank() && selectedCategory != null
         ) {
             Text("Add Expense", style = AppTextStyles.buttonLarge)
         }
@@ -711,10 +766,31 @@ fun CategoryChip(
     selected: Boolean,
     onClick: () -> Unit
 ) {
+    // Map category names to colors and icons
+    val categoryColor = when(category.name) {
+        "Utilities" -> Color(0xFFF59E0B)
+        "Rent" -> Color(0xFF6366F1)
+        "Supplies" -> Color(0xFF10B981)
+        "Transport" -> Color(0xFF3B82F6)
+        "Salary" -> Color(0xFFEC4899)
+        "Maintenance" -> Color(0xFF8B5CF6)
+        else -> Color(0xFF6B7280)
+    }
+    
+    val categoryIcon = when(category.name) {
+        "Utilities" -> Icons.Outlined.Bolt
+        "Rent" -> Icons.Outlined.Home
+        "Supplies" -> Icons.Outlined.ShoppingCart
+        "Transport" -> Icons.Outlined.LocalShipping
+        "Salary" -> Icons.Outlined.People
+        "Maintenance" -> Icons.Outlined.Build
+        else -> Icons.Outlined.MoreHoriz
+    }
+    
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = if (selected) category.color.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant,
-        border = if (selected) androidx.compose.foundation.BorderStroke(1.dp, category.color) else null,
+        color = if (selected) categoryColor.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant,
+        border = if (selected) androidx.compose.foundation.BorderStroke(1.dp, categoryColor) else null,
         modifier = Modifier
             .height(40.dp)
             .clickable(onClick = onClick)
@@ -724,16 +800,16 @@ fun CategoryChip(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                category.icon,
+                categoryIcon,
                 contentDescription = null,
-                tint = if (selected) category.color else Tokens.TextMuted,
+                tint = if (selected) categoryColor else Tokens.TextMuted,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = category.displayName,
+                text = category.name,
                 style = AppTextStyles.labelLarge,
-                color = if (selected) category.color else MaterialTheme.colorScheme.onSurface
+                color = if (selected) categoryColor else MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -795,8 +871,8 @@ fun ExpenseDetailSheet(
 
         // Details Grid
         DetailRow("Title", expense.title)
-        DetailRow("Category", expense.category.displayName)
-        DetailRow("Date", expense.date)
+        DetailRow("Category", expense.categoryName)
+        DetailRow("Date", java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault()).format(java.util.Date(expense.expenseDate)))
         DetailRow("Payment Method", expense.paymentMethod)
         if (expense.description.isNotBlank()) {
             DetailRow("Description", expense.description)
@@ -845,5 +921,159 @@ private fun DetailRow(label: String, value: String) {
     ) {
         Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
         Text(value, fontWeight = FontWeight.Medium, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+@Composable
+fun AllExpensesScreen(
+    expenses: List<Expense>,
+    categories: List<ExpenseCategory>,
+    isLoading: Boolean,
+    onBack: () -> Unit,
+    onExpenseClick: (Expense) -> Unit
+) {
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedCategoryFilter by remember { mutableStateOf("All") }
+
+    val filteredExpenses = expenses.filter { expense ->
+        val matchesSearch = expense.title.contains(searchQuery, ignoreCase = true) ||
+                expense.categoryName.contains(searchQuery, ignoreCase = true) ||
+                expense.description.contains(searchQuery, ignoreCase = true)
+        val matchesCategory = selectedCategoryFilter == "All" || expense.categoryName == selectedCategoryFilter
+        matchesSearch && matchesCategory
+    }
+
+    Scaffold(
+        topBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                    Text(
+                        text = "All Expenses",
+                        style = AppTextStyles.pageTitle,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // Search Bar
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    placeholder = { Text("Search expenses...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    trailingIcon = if (searchQuery.isNotEmpty()) {
+                        {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(Icons.Default.Close, contentDescription = "Clear")
+                            }
+                        }
+                    } else null,
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = NeoBukTeal,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                    )
+                )
+
+                // Category Filter
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp)
+                ) {
+                    item {
+                        FilterChip(
+                            selected = selectedCategoryFilter == "All",
+                            onClick = { selectedCategoryFilter = "All" },
+                            label = { Text("All") }
+                        )
+                    }
+                    items(categories) { category ->
+                        FilterChip(
+                            selected = selectedCategoryFilter == category.name,
+                            onClick = { selectedCategoryFilter = category.name },
+                            label = { Text(category.name) }
+                        )
+                    }
+                }
+                
+                Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            }
+        }
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
+            if (isLoading && expenses.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = NeoBukTeal)
+                    }
+                }
+            } else if (filteredExpenses.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 100.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                Icons.Outlined.ReceiptLong,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = Tokens.TextMuted.copy(alpha = 0.3f)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                "No expenses found",
+                                style = AppTextStyles.sectionTitle,
+                                color = Tokens.TextMuted
+                            )
+                            if (searchQuery.isNotEmpty() || selectedCategoryFilter != "All") {
+                                Text(
+                                    "Try adjusting your filters",
+                                    style = AppTextStyles.body,
+                                    color = Tokens.TextMuted
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                items(filteredExpenses) { expense ->
+                    ExpenseItem(
+                        expense = expense,
+                        onClick = { onExpenseClick(expense) }
+                    )
+                }
+            }
+        }
     }
 }
