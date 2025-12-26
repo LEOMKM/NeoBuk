@@ -227,18 +227,21 @@ fun ReportsScreen(
 
                     // 3. Sales Trends Chart
                     item {
-                        if (salesTrendRaw.isNotEmpty()) {
-                            Card(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(0.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("Sales Trends", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                    Spacer(modifier = Modifier.height(16.dp))
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(0.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text("Sales Trends", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                if (salesTrendRaw.isNotEmpty()) {
                                     SalesTrendChart(data = salesTrendData, modifier = Modifier.fillMaxWidth().height(180.dp))
-                                    // Simple X-Axis: Show start and end date of range?
+                                } else {
+                                    Box(modifier = Modifier.fillMaxWidth().height(180.dp), contentAlignment = Alignment.Center) {
+                                        Text("No sales trends data available", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
                                 }
                             }
                         }
@@ -247,17 +250,17 @@ fun ReportsScreen(
                     item { Spacer(modifier = Modifier.height(24.dp)) }
 
                     // 4. Payment Methods
-                    if (paymentMethods.isNotEmpty()) {
-                        item {
-                            Card(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(0.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("Sales by Payment Method", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                    Spacer(modifier = Modifier.height(16.dp))
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(0.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text("Sales by Payment Method", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                if (paymentMethods.isNotEmpty()) {
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -271,27 +274,35 @@ fun ReportsScreen(
                                             }
                                         }
                                     }
+                                } else {
+                                    Box(modifier = Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center) {
+                                        Text("No payment method data available", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
                                 }
                             }
                         }
-                        item { Spacer(modifier = Modifier.height(24.dp)) }
                     }
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
 
                     // 5. Top Products
-                    if (topProductsRaw.isNotEmpty()) {
-                        item {
-                            Card(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(0.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("Best Sellers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                    Spacer(modifier = Modifier.height(16.dp))
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(0.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text("Best Sellers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                if (topProductsRaw.isNotEmpty()) {
                                     topProductsRaw.forEachIndexed { index, product ->
                                         TopProductItem(product = product, rank = index + 1)
                                         if (index < topProductsRaw.size - 1) Spacer(modifier = Modifier.height(16.dp))
+                                    }
+                                } else {
+                                    Box(modifier = Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
+                                        Text("No top products data available", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
                                 }
                             }
