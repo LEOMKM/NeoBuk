@@ -239,7 +239,13 @@ fun ProductsScreen(
             // 5. Product Grid or Empty State
             item {
                 if (products.isEmpty()) {
-                   EmptyInventoryState(onAddProduct = onAddProduct)
+                   com.neobuk.app.ui.components.EmptyState(
+                       title = "Your inventory is empty",
+                       description = "Start by adding your first product to track stock and sales.",
+                       imageId = com.neobuk.app.R.drawable.empty_inventory,
+                       buttonText = "Add First Product",
+                       onButtonClick = onAddProduct
+                   )
                 } else {
                     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                         val rows = products.chunked(2)
@@ -266,46 +272,6 @@ fun ProductsScreen(
     }
 }
 
-@Composable
-fun EmptyInventoryState(onAddProduct: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 48.dp, horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(id = com.neobuk.app.R.drawable.empty_inventory),
-            contentDescription = "Empty Inventory",
-            modifier = Modifier.size(200.dp),
-            contentScale = ContentScale.Fit
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "Your inventory is empty",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface 
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Start by adding your first product to track stock and sales.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(
-            onClick = onAddProduct,
-            colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
-        ) {
-            Icon(Icons.Default.Add, null, tint = Color.White)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Add First Product", color = Color.White)
-        }
-    }
-}
 
 @Composable
 fun FilterChip(text: String, selected: Boolean, onClick: () -> Unit) {

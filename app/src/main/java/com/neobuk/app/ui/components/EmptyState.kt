@@ -29,11 +29,13 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        val isDark = androidx.compose.foundation.isSystemInDarkTheme()
         Image(
             painter = painterResource(id = imageId),
             contentDescription = null,
             modifier = Modifier.size(200.dp),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Fit,
+            colorFilter = if (isDark) androidx.compose.ui.graphics.ColorFilter.tint(MaterialTheme.colorScheme.onSurface) else null
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
