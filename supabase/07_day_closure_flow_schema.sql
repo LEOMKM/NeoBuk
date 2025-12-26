@@ -36,11 +36,15 @@ CREATE INDEX IF NOT EXISTS idx_day_closures_business_date ON public.day_closures
 -- 3. RLS
 ALTER TABLE public.day_closures ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own day closures" ON public.day_closures;
+
 CREATE POLICY "Users can view own day closures" 
     ON public.day_closures FOR SELECT 
     USING (business_id IN (
         SELECT id FROM public.businesses WHERE owner_user_id = auth.uid()
     ));
+
+DROP POLICY IF EXISTS "Users can create day closures" ON public.day_closures;
 
 CREATE POLICY "Users can create day closures" 
     ON public.day_closures FOR INSERT 
