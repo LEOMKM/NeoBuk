@@ -20,6 +20,7 @@ val NeoBukTextSecondary = Color(0xFF334155) // Text Secondary (Slate 700 for bet
 val NeoBukSuccess = Color(0xFF059669)       // Muted Emerald - Success/Sync
 val NeoBukWarning = Color(0xFFD97706)       // Muted Amber - Pending/Warnings
 val NeoBukError = Color(0xFFDC2626)         // Muted Red - Error default
+val NeoBukProfit = Color(0xFF16A34A)        // Green 600 - Profit Line
 
 // Dark Mode Colors
 val NeoBukDarkBackground = Color(0xFF111827) // Gray 900
@@ -27,4 +28,3 @@ val NeoBukDarkSurface = Color(0xFF1F2937)    // Gray 800
 val NeoBukDarkTextPrimary = Color(0xFFFFFFFF) // Pure White
 val NeoBukDarkTextSecondary = Color(0xFFE5E7EB) // Gray 200 - High visibility gray
 val NeoBukDarkTeal = Color(0xFF14B8A6)    // Brighter Teal for Dark Mode
-

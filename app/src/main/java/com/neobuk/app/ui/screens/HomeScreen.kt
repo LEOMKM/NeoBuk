@@ -684,7 +684,7 @@ fun WeeklyPerformanceCard(
                         
                         // Draw Point
                         drawCircle(
-                            color = NeoBukWarning,
+                            color = NeoBukProfit,
                             radius = 3.dp.toPx(),
                             center = Offset(centerX, pointY)
                         )
@@ -703,7 +703,7 @@ fun WeeklyPerformanceCard(
                     // Stroke the Profit Path
                     drawPath(
                         path = profitPath,
-                        color = NeoBukWarning,
+                        color = NeoBukProfit,
                         style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
                     )
                 }
@@ -715,7 +715,7 @@ fun WeeklyPerformanceCard(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 LegendItem("Sales", NeoBukTeal)
                 Spacer(modifier = Modifier.width(16.dp))
-                LegendItem("Profit", NeoBukWarning)
+                LegendItem("Profit", NeoBukProfit)
             }
         }
     }
