@@ -334,9 +334,8 @@ fun KPICard(kpi: ReportKPI, modifier: Modifier = Modifier) {
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            if (kpi.title.isNotEmpty()) Text(kpi.title, style = AppTextStyles.secondary, color = Color.Gray)
             Text(
-                text = kpi.value,
+                text = if (kpi.title.isNotEmpty()) "${kpi.title} ${kpi.value}" else kpi.value,
                 style = AppTextStyles.amountLarge.copy(fontSize = 20.sp),
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
