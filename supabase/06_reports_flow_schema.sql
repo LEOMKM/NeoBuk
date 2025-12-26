@@ -170,22 +170,24 @@ BEGIN
     FROM (
         -- POS Sales
         SELECT 
-            (COALESCE(sale_date, created_at) AT TIME ZONE 'UTC' AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, 
+            (COALESCE(sale_date, created_at) AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, 
             total_amount as amount
         FROM sales
         WHERE business_id = p_business_id
-        AND COALESCE(sale_date, created_at) BETWEEN p_start_date AND p_end_date
+        AND (COALESCE(sale_date, created_at) AT TIME ZONE 'Africa/Nairobi')::DATE >= (p_start_date AT TIME ZONE 'Africa/Nairobi')::DATE
+        AND (COALESCE(sale_date, created_at) AT TIME ZONE 'Africa/Nairobi')::DATE <= (p_end_date AT TIME ZONE 'Africa/Nairobi')::DATE
         AND payment_status IN ('PAID', 'PARTIAL')
         
         UNION ALL
         
         -- Service Revenue
         SELECT 
-            (date_offered AT TIME ZONE 'UTC' AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, 
+            (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE as d_date, 
             service_price as amount
         FROM service_records
         WHERE business_id = p_business_id
-        AND date_offered BETWEEN p_start_date AND p_end_date
+        AND (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE >= (p_start_date AT TIME ZONE 'Africa/Nairobi')::DATE
+        AND (date_offered AT TIME ZONE 'Africa/Nairobi')::DATE <= (p_end_date AT TIME ZONE 'Africa/Nairobi')::DATE
     ) combined_sales
     GROUP BY d_date
     ORDER BY d_date;

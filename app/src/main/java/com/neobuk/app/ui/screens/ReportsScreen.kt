@@ -49,6 +49,7 @@ import com.neobuk.app.viewmodels.AuthViewModel
 import com.neobuk.app.data.repositories.ReportSummary
 import com.neobuk.app.data.repositories.TopProductReportItem
 import com.neobuk.app.data.repositories.PaymentMethodReportItem
+import com.neobuk.app.ui.components.MetricDetailSheet
 
 
 // UI Helper Data Classes
@@ -134,17 +135,21 @@ fun ReportsScreen(
                 .background(MaterialTheme.colorScheme.background),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            // 0. Info Dialog
+            // 0. Info Bottom Sheet
             item {
                 if (showGrossProfitInfo) {
-                    AlertDialog(
+                    ModalBottomSheet(
                         onDismissRequest = { showGrossProfitInfo = false },
-                        title = { Text("Gross Profit") },
-                        text = { Text("Gross Profit is calculated as your Sales minus the Buying Price (cost) of the items sold.\n\nGP = Selling Price - Buying Price") },
-                        confirmButton = {
-                            TextButton(onClick = { showGrossProfitInfo = false }) { Text("Got it") }
-                        }
-                    )
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                    ) {
+                        MetricDetailSheet(
+                            title = "Gross Profit",
+                            description = "Gross Profit is calculated as your Sales minus the Buying Price (cost) of the items sold.",
+                            formula = "GP = Selling Price - Buying Price",
+                            onDismiss = { showGrossProfitInfo = false }
+                        )
+                    }
                 }
             }
             // 1. Header

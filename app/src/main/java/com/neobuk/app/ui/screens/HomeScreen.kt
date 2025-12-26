@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.neobuk.app.data.models.SubscriptionStatus
 import com.neobuk.app.data.repositories.DashboardRepository
 import com.neobuk.app.data.repositories.DayClosure
+import com.neobuk.app.ui.components.MetricDetailSheet
 import com.neobuk.app.ui.components.TrialEndedModal
 import com.neobuk.app.ui.components.TrialGracePeriodBanner
 import com.neobuk.app.ui.theme.*
@@ -129,16 +130,20 @@ fun HomeScreen(
         )
     }
     
-    // Gross Profit Info Dialog
+    // Gross Profit Info Bottom Sheet
     if (showGrossProfitInfo) {
-        AlertDialog(
+        ModalBottomSheet(
             onDismissRequest = { showGrossProfitInfo = false },
-            title = { Text("Gross Profit") },
-            text = { Text("Gross Profit is calculated as your Sales minus the Buying Price (cost) of the items sold.\n\nGP = Selling Price - Buying Price") },
-            confirmButton = {
-                TextButton(onClick = { showGrossProfitInfo = false }) { Text("Got it") }
-            }
-        )
+            containerColor = MaterialTheme.colorScheme.surface,
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ) {
+            MetricDetailSheet(
+                title = "Gross Profit",
+                description = "Gross Profit is calculated as your Sales minus the Buying Price (cost) of the items sold.",
+                formula = "GP = Selling Price - Buying Price",
+                onDismiss = { showGrossProfitInfo = false }
+            )
+        }
     }
     
     // Warning Dialog for Pending Tasks
@@ -628,6 +633,7 @@ fun MetricCard(
         }
     }
 }
+
 
 @Composable
 fun WeeklyPerformanceCard(
