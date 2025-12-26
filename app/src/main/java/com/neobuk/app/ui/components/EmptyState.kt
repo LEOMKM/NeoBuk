@@ -49,7 +49,8 @@ fun EmptyState(
             contentDescription = null,
             modifier = Modifier.size(200.dp),
             contentScale = ContentScale.Fit,
-            colorFilter = colorFilter
+            colorFilter = colorFilter,
+            alpha = if (isDark) 0.6f else 1.0f
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(

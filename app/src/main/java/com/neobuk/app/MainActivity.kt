@@ -125,6 +125,7 @@ import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 import com.neobuk.app.viewmodels.AuthViewModel
+import com.neobuk.app.viewmodels.ProductsViewModel
 import com.neobuk.app.viewmodels.AuthState as AuthViewModelState
 
 // Define keys for navigation or state
@@ -250,6 +251,7 @@ fun NeoBukApp(
     businessId: String?,
     onLogout: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
     
     // Intercept back press
@@ -268,8 +270,8 @@ fun NeoBukApp(
     val scope = rememberCoroutineScope()
 
     // ViewModels
-    // ViewModels
     val inventoryViewModel: InventoryViewModel = koinViewModel()
+    val productsViewModel: ProductsViewModel = koinViewModel()
     val tasksViewModel: TasksViewModel = koinViewModel()
     val subscriptionViewModel: SubscriptionViewModel = viewModel()
     val servicesViewModel: ServicesViewModel = koinViewModel()
@@ -278,11 +280,11 @@ fun NeoBukApp(
     val pendingTasksCount by tasksViewModel.pendingTaskCount.collectAsState()
     
     // Initialize ServicesViewModel with business ID
-    // Initialize ServicesViewModel with business ID
     LaunchedEffect(businessId) {
         businessId?.let { 
             servicesViewModel.setBusinessId(it)
             inventoryViewModel.setBusinessId(it)
+            productsViewModel.setBusinessId(it)
             tasksViewModel.setBusinessId(it)
         }
     }
@@ -647,22 +649,43 @@ fun NeoBukApp(
                              },
                              onSubmit = { draft ->
                                  guard {
-                                     // Convert Draft to Product
-                                     val newProduct = Product(
+                                     // Generate barcode if empty
+                                     val finalBarcode = if (draft.barcode.isBlank()) {
+                                         "PRD-${System.currentTimeMillis()}"
+                                     } else {
+                                         draft.barcode
+                                     }
+                                     
+                                     // Use ProductsViewModel with image support
+                                     productsViewModel.createProductWithImage(
+                                         context = context,
                                          name = draft.name,
                                          description = draft.description,
-                                         categoryId = draft.category,
-                                         barcode = draft.barcode,
+                                         barcode = finalBarcode,
                                          unit = draft.unit,
                                          costPrice = draft.costPrice,
                                          sellingPrice = draft.sellingPrice,
-                                         quantity = draft.quantity.toDouble()
+                                         quantity = draft.quantity.toDouble(),
+                                         imageUri = draft.imageUri,
+                                         onSuccess = {
+                                             android.widget.Toast.makeText(
+                                                 context,
+                                                 "Product added successfully!",
+                                                 android.widget.Toast.LENGTH_SHORT
+                                             ).show()
+                                             
+                                             scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                                 if (!sheetState.isVisible) showBottomSheet = false
+                                             }
+                                         },
+                                         onError = { error ->
+                                             android.widget.Toast.makeText(
+                                                 context,
+                                                 "Failed to add product: $error",
+                                                 android.widget.Toast.LENGTH_LONG
+                                             ).show()
+                                         }
                                      )
-                                     inventoryViewModel.addProduct(newProduct)
-                                     
-                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                         if (!sheetState.isVisible) showBottomSheet = false
-                                     }
                                  }
                              }
                          )

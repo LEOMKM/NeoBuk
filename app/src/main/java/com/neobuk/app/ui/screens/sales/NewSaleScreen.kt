@@ -547,6 +547,64 @@ fun CartAndCheckoutSection(
                         }
                     }
                 }
+                
+                // Profit & Margin Section
+                if (cartItems.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    // Calculate total cost and profit
+                    val totalCost = cartItems.sumOf { it.unitCost * it.quantity }
+                    val totalRevenue = cartTotal
+                    val totalProfit = totalRevenue - totalCost
+                    val profitMargin = if (totalRevenue > 0) (totalProfit / totalRevenue) * 100 else 0.0
+                    
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (totalProfit >= 0) 
+                                Color(0xFF10B981).copy(alpha = 0.1f) 
+                            else 
+                                Color(0xFFEF4444).copy(alpha = 0.1f)
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    "Profit",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    "KES ${String.format("%,.0f", totalProfit)}",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (totalProfit >= 0) Color(0xFF10B981) else Color(0xFFEF4444)
+                                )
+                            }
+                            
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(
+                                    "Margin",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    "${String.format("%.1f", profitMargin)}%",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (totalProfit >= 0) Color(0xFF10B981) else Color(0xFFEF4444)
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))

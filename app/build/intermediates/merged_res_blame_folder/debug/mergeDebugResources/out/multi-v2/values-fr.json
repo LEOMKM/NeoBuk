@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.neobuk.app-mergeDebugResources-60:/values-fr/values-fr.xml",
+            "outputFile": "com.neobuk.app-mergeDebugResources-61:/values-fr/values-fr.xml",
             "map": [
                 {
                     "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/res/values-fr/values-fr.xml",

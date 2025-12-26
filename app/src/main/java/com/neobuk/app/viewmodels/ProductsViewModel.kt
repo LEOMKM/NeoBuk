@@ -2,15 +2,20 @@ package com.neobuk.app.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.content.Context
+import android.net.Uri
 import com.neobuk.app.data.repositories.Product
 import com.neobuk.app.data.repositories.ProductCategory
 import com.neobuk.app.data.repositories.ProductsRepository
 import com.neobuk.app.data.repositories.StockMovement
 import com.neobuk.app.data.models.StockMovementReason
+import com.neobuk.app.utils.ImageCompressor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * ViewModel for Products/Inventory functionality
@@ -125,6 +130,90 @@ class ProductsViewModel(
                 onSuccess = { onSuccess() },
                 onFailure = { onError(it.message ?: "Failed to create product") }
             )
+        }
+    }
+    
+    /**
+     * Creates a product with image upload
+     * Compresses the image and uploads to Supabase Storage before creating the product
+     */
+    fun createProductWithImage(
+        context: Context,
+        name: String,
+        description: String = "",
+        categoryId: String? = null,
+        barcode: String? = null,
+        sku: String? = null,
+        unit: String = "pcs",
+        costPrice: Double = 0.0,
+        sellingPrice: Double,
+        quantity: Double = 0.0,
+        lowStockThreshold: Double = 5.0,
+        trackInventory: Boolean = true,
+        imageUri: Uri? = null,
+        onSuccess: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        val businessId = currentBusinessId ?: run {
+            onError("No business selected")
+            return
+        }
+        
+        viewModelScope.launch {
+            try {
+                // Upload image if provided
+                val imageUrl = imageUri?.let { uri ->
+                    android.util.Log.d("ProductsViewModel", "Starting image compression for URI: $uri")
+                    
+                    // Compress image on IO dispatcher
+                    val compressedFile = withContext(Dispatchers.IO) {
+                        ImageCompressor.compressImage(context, uri)
+                    }
+                    
+                    if (compressedFile == null) {
+                        android.util.Log.e("ProductsViewModel", "Image compression failed")
+                        onError("Failed to compress image. Please try a different image.")
+                        return@launch
+                    }
+                    
+                    android.util.Log.d("ProductsViewModel", "Image compressed successfully. Size: ${compressedFile.length() / 1024}KB")
+                    
+                    // Upload to Supabase
+                    android.util.Log.d("ProductsViewModel", "Starting upload to Supabase...")
+                    val uploadResult = productsRepository.uploadProductImage(businessId, compressedFile)
+                    
+                    // Clean up compressed file
+                    compressedFile.delete()
+                    
+                    uploadResult.getOrElse {
+                        android.util.Log.e("ProductsViewModel", "Upload failed: ${it.message}")
+                        onError(it.message ?: "Failed to upload image")
+                        return@launch
+                    }
+                }
+                
+                // Create product with image URL
+                productsRepository.createProduct(
+                    businessId = businessId,
+                    name = name,
+                    description = description,
+                    categoryId = categoryId,
+                    barcode = barcode,
+                    sku = sku,
+                    unit = unit,
+                    costPrice = costPrice,
+                    sellingPrice = sellingPrice,
+                    quantity = quantity,
+                    lowStockThreshold = lowStockThreshold,
+                    trackInventory = trackInventory,
+                    imageUrl = imageUrl
+                ).fold(
+                    onSuccess = { onSuccess() },
+                    onFailure = { onError(it.message ?: "Failed to create product") }
+                )
+            } catch (e: Exception) {
+                onError("Error: ${e.message}")
+            }
         }
     }
     

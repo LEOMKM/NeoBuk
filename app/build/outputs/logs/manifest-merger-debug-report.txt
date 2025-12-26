@@ -1,20 +1,20 @@
 -- Merging decision tree log ---
 provider#androidx.core.content.FileProvider
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:27:9-35:20
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:43:9-51:20
 	android:grantUriPermissions
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:31:13-47
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:47:13-47
 	android:authorities
 		INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:29:13-60
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:45:13-60
 	android:exported
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:30:13-37
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:46:13-37
 	android:name
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:28:13-62
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:44:13-62
 manifest
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-38:12
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-38:12
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-38:12
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-38:12
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-54:12
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-54:12
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-54:12
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:1-54:12
 MERGED from [androidx.media3:media3-common:1.9.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/b6717280d9732d6c2935e26268185902/transformed/media3-common-1.9.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.media3:media3-common-ktx:1.9.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/04e25fb37d8a5bb495570670ef28b996/transformed/media3-common-ktx-1.9.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common:2.7.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/818d9a339eba42493d50a46457b3d2dc/transformed/navigation-common-2.7.7/AndroidManifest.xml:17:1-22:12
@@ -24,6 +24,10 @@ MERGED from [androidx.navigation:navigation-runtime-ktx:2.7.7] /Users/leonard.mu
 MERGED from [androidx.navigation:navigation-compose:2.7.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c709370e0d7ca90a73e8fcf4a5613fc1/transformed/navigation-compose-2.7.7/AndroidManifest.xml:2:1-7:12
 MERGED from [io.insert-koin:koin-androidx-compose:3.5.3] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/d88f22f1bdfd6b7ad4b49013cb2cc04c/transformed/koin-androidx-compose-3.5.3/AndroidManifest.xml:2:1-9:12
 MERGED from [io.insert-koin:koin-android:3.5.3] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/5d48d77f26e664d16cc8c9b1acd7a79a/transformed/koin-android-3.5.3/AndroidManifest.xml:2:1-11:12
+MERGED from [io.coil-kt:coil-compose:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/399c20246112a15aedf1186c14ab8334/transformed/coil-compose-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [io.coil-kt:coil-compose-base:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fe671a853535dca47641f983169c0a8f/transformed/coil-compose-base-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [io.coil-kt:coil:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/9c98d2aba34496b729d67444f937a903/transformed/coil-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [io.coil-kt:coil-base:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/12842221ef8ae0ccb2a267546ad1a694/transformed/coil-base-2.7.0/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a9cc2bbfb9ee472d193cddb198d0a0cc/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.appcompat:appcompat:1.6.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d0d3167941c57e1251110d98cf8e851/transformed/appcompat-1.6.1/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.fragment:fragment:1.6.2] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/2cb5dc50b7da92da6c076fd302b2dc76/transformed/fragment-1.6.2/AndroidManifest.xml:17:1-22:12
@@ -32,11 +36,11 @@ MERGED from [androidx.activity:activity:1.9.1] /Users/leonard.mutugi/.gradle/cac
 MERGED from [androidx.activity:activity-ktx:1.9.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/9d35dcd35ecdf64bbd238626abdc80e9/transformed/activity-ktx-1.9.1/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.material3:material3-android:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/d1811e061cdba2eea6014e95056c2066/transformed/material3-release/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.compose.material:material-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a75b53aaa69f0fee1a67f457584c4afa/transformed/material-release/AndroidManifest.xml:2:1-7:12
-MERGED from [androidx.compose.material:material-ripple-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/cb2c6f04ba19393f9dea1c399ed6cf8e/transformed/material-ripple-release/AndroidManifest.xml:2:1-7:12
-MERGED from [androidx.compose.foundation:foundation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c935ef4aad6f7eca97292e5c0f7f612c/transformed/foundation-release/AndroidManifest.xml:2:1-7:12
-MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a4f757c2a8ab283c86822ce033424689/transformed/foundation-layout-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.animation:animation-core-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/f86a7f18f399338078eba0093fc42b37/transformed/animation-core-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-ripple-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/cb2c6f04ba19393f9dea1c399ed6cf8e/transformed/material-ripple-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.animation:animation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/b8abda846b1192ab0529ef47d9b3f381/transformed/animation-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a4f757c2a8ab283c86822ce033424689/transformed/foundation-layout-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c935ef4aad6f7eca97292e5c0f7f612c/transformed/foundation-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.ui:ui-tooling-data-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/97f8ea90cff113a337f97ee6c548ce41/transformed/ui-tooling-data-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.ui:ui-unit-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/ba92b724df5f9799c2f941445e1452b6/transformed/ui-unit-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.ui:ui-geometry-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/2f81f633b55465e69f64cddab9bdaa4b/transformed/ui-geometry-release/AndroidManifest.xml:2:1-7:12
@@ -47,10 +51,12 @@ MERGED from [androidx.compose.ui:ui-graphics-android:1.7.0] /Users/leonard.mutug
 MERGED from [androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:17:1-28:12
 MERGED from [androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:17:1-28:12
 MERGED from [androidx.activity:activity-compose:1.9.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91beea10d620f075451fc8bacff880d5/transformed/activity-compose-1.9.1/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/0adae5687922e6c497eebcfe6c4404a3/transformed/accompanist-drawablepainter-0.32.0/AndroidManifest.xml:17:1-23:12
 MERGED from [androidx.compose.material:material-icons-extended-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/40236bf0f568ca2c6446b4941dd61092/transformed/material-icons-extended-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.material:material-icons-core-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/82119ac6d1bb7ffdf9cb44e029710ff0/transformed/material-icons-core-release/AndroidManifest.xml:2:1-7:12
 MERGED from [io.github.jan-tennert.supabase:realtime-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fc48a359378a3e391d2c0e9d85e93a0d/transformed/realtime-kt-debug/AndroidManifest.xml:2:1-7:12
 MERGED from [io.github.jan-tennert.supabase:postgrest-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/4420ba20eb93c0e844aeb15c1ed09751/transformed/postgrest-kt-debug/AndroidManifest.xml:2:1-7:12
+MERGED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:2:1-20:12
 MERGED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:2:1-20:12
 MERGED from [io.github.jan-tennert.supabase:supabase-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/90818c47dbf471ed9967be40e989ea35/transformed/supabase-kt-debug/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/0c848b76a9318d3880b391d0bf6c7214/transformed/emoji2-views-helper-1.3.0/AndroidManifest.xml:2:1-7:12
@@ -88,6 +94,7 @@ MERGED from [androidx.compose.runtime:runtime-saveable-android:1.7.1] /Users/leo
 MERGED from [androidx.compose.runtime:runtime-android:1.7.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/10d9a76e56eef6937879731b8c02b6c4/transformed/runtime-release/AndroidManifest.xml:2:1-7:12
 MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/027ccf199801dd27f02368373c947cec/transformed/multiplatform-settings-no-arg-debug/AndroidManifest.xml:17:1-35:12
 MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/78707af5540cc7a37c08f080389d640c/transformed/multiplatform-settings-coroutines-debug/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/8979941223e19c90ba7e3704bce3ebc0/transformed/exifinterface-1.3.7/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/90786f57c58b7385fd224cc636b5611e/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:17:1-55:12
 MERGED from [androidx.startup:startup-runtime:1.2.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/432ed80ce61ca68f54045166ef10029a/transformed/startup-runtime-1.2.0/AndroidManifest.xml:17:1-31:12
@@ -106,25 +113,45 @@ MERGED from [androidx.annotation:annotation-experimental:1.4.1] /Users/leonard.m
 		INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml
 	xmlns:android
 		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:2:11-69
+queries
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:5:5-9:15
+intent#action:name:android.media.action.IMAGE_CAPTURE
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:6:9-8:18
+action#android.media.action.IMAGE_CAPTURE
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:7:13-73
+	android:name
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:7:21-70
 uses-permission#android.permission.INTERNET
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:5:5-67
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:13:5-67
 	android:name
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:5:22-64
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:13:22-64
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:6:5-79
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:14:5-79
 MERGED from [androidx.media3:media3-common:1.9.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/b6717280d9732d6c2935e26268185902/transformed/media3-common-1.9.0/AndroidManifest.xml:22:5-79
 MERGED from [androidx.media3:media3-common:1.9.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/b6717280d9732d6c2935e26268185902/transformed/media3-common-1.9.0/AndroidManifest.xml:22:5-79
 	android:name
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:6:22-76
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:14:22-76
+uses-permission#android.permission.CAMERA
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:17:5-65
+	android:name
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:17:22-62
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:20:5-21:38
+	android:maxSdkVersion
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:21:9-35
+	android:name
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:20:22-77
 application
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:8:5-36:19
-INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:8:5-36:19
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:24:5-52:19
+INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:24:5-52:19
 MERGED from [io.insert-koin:koin-android:3.5.3] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/5d48d77f26e664d16cc8c9b1acd7a79a/transformed/koin-android-3.5.3/AndroidManifest.xml:9:5-20
 MERGED from [io.insert-koin:koin-android:3.5.3] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/5d48d77f26e664d16cc8c9b1acd7a79a/transformed/koin-android-3.5.3/AndroidManifest.xml:9:5-20
 MERGED from [androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:22:5-26:19
+MERGED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:8:5-18:19
+MERGED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:8:5-18:19
 MERGED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:8:5-18:19
 MERGED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:8:5-18:19
 MERGED from [androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:23:5-33:19
@@ -146,45 +173,45 @@ MERGED from [androidx.startup:startup-runtime:1.2.0] /Users/leonard.mutugi/.grad
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:14:9-35
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:30:9-35
 	android:label
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:12:9-41
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:28:9-41
 	android:roundIcon
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:13:9-45
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:29:9-45
 	android:icon
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:11:9-40
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:27:9-40
 	android:allowBackup
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:10:9-35
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:26:9-35
 	android:theme
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:15:9-44
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:31:9-44
 	android:name
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:9:9-42
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:25:9-42
 activity#com.neobuk.app.MainActivity
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:16:9-25:20
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:32:9-41:20
 	android:label
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:19:13-45
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:35:13-45
 	android:exported
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:18:13-36
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:34:13-36
 	android:theme
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:20:13-55
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:36:13-55
 	android:name
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:17:13-41
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:33:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:21:13-24:29
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:37:13-40:29
 action#android.intent.action.MAIN
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:22:17-69
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:38:17-69
 	android:name
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:22:25-66
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:38:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:23:17-77
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:39:17-77
 	android:name
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:23:27-74
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:39:27-74
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:32:13-34:58
+ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:48:13-50:58
 	android:resource
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:34:17-55
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:50:17-55
 	android:name
-		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:33:17-67
+		ADDED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:49:17-67
 uses-sdk
 INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml
@@ -207,6 +234,14 @@ MERGED from [io.insert-koin:koin-androidx-compose:3.5.3] /Users/leonard.mutugi/.
 MERGED from [io.insert-koin:koin-androidx-compose:3.5.3] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/d88f22f1bdfd6b7ad4b49013cb2cc04c/transformed/koin-androidx-compose-3.5.3/AndroidManifest.xml:5:5-7:41
 MERGED from [io.insert-koin:koin-android:3.5.3] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/5d48d77f26e664d16cc8c9b1acd7a79a/transformed/koin-android-3.5.3/AndroidManifest.xml:5:5-7:41
 MERGED from [io.insert-koin:koin-android:3.5.3] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/5d48d77f26e664d16cc8c9b1acd7a79a/transformed/koin-android-3.5.3/AndroidManifest.xml:5:5-7:41
+MERGED from [io.coil-kt:coil-compose:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/399c20246112a15aedf1186c14ab8334/transformed/coil-compose-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-compose:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/399c20246112a15aedf1186c14ab8334/transformed/coil-compose-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-compose-base:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fe671a853535dca47641f983169c0a8f/transformed/coil-compose-base-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-compose-base:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fe671a853535dca47641f983169c0a8f/transformed/coil-compose-base-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/9c98d2aba34496b729d67444f937a903/transformed/coil-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/9c98d2aba34496b729d67444f937a903/transformed/coil-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-base:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/12842221ef8ae0ccb2a267546ad1a694/transformed/coil-base-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [io.coil-kt:coil-base:2.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/12842221ef8ae0ccb2a267546ad1a694/transformed/coil-base-2.7.0/AndroidManifest.xml:5:5-44
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a9cc2bbfb9ee472d193cddb198d0a0cc/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:20:5-44
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a9cc2bbfb9ee472d193cddb198d0a0cc/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:20:5-44
 MERGED from [androidx.appcompat:appcompat:1.6.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d0d3167941c57e1251110d98cf8e851/transformed/appcompat-1.6.1/AndroidManifest.xml:20:5-44
@@ -223,16 +258,16 @@ MERGED from [androidx.compose.material3:material3-android:1.3.0] /Users/leonard.
 MERGED from [androidx.compose.material3:material3-android:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/d1811e061cdba2eea6014e95056c2066/transformed/material3-release/AndroidManifest.xml:20:5-44
 MERGED from [androidx.compose.material:material-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a75b53aaa69f0fee1a67f457584c4afa/transformed/material-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a75b53aaa69f0fee1a67f457584c4afa/transformed/material-release/AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.material:material-ripple-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/cb2c6f04ba19393f9dea1c399ed6cf8e/transformed/material-ripple-release/AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.material:material-ripple-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/cb2c6f04ba19393f9dea1c399ed6cf8e/transformed/material-ripple-release/AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.foundation:foundation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c935ef4aad6f7eca97292e5c0f7f612c/transformed/foundation-release/AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.foundation:foundation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c935ef4aad6f7eca97292e5c0f7f612c/transformed/foundation-release/AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a4f757c2a8ab283c86822ce033424689/transformed/foundation-layout-release/AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a4f757c2a8ab283c86822ce033424689/transformed/foundation-layout-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.animation:animation-core-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/f86a7f18f399338078eba0093fc42b37/transformed/animation-core-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.animation:animation-core-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/f86a7f18f399338078eba0093fc42b37/transformed/animation-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/cb2c6f04ba19393f9dea1c399ed6cf8e/transformed/material-ripple-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/cb2c6f04ba19393f9dea1c399ed6cf8e/transformed/material-ripple-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.animation:animation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/b8abda846b1192ab0529ef47d9b3f381/transformed/animation-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.animation:animation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/b8abda846b1192ab0529ef47d9b3f381/transformed/animation-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a4f757c2a8ab283c86822ce033424689/transformed/foundation-layout-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/a4f757c2a8ab283c86822ce033424689/transformed/foundation-layout-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c935ef4aad6f7eca97292e5c0f7f612c/transformed/foundation-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c935ef4aad6f7eca97292e5c0f7f612c/transformed/foundation-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.ui:ui-tooling-data-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/97f8ea90cff113a337f97ee6c548ce41/transformed/ui-tooling-data-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.ui:ui-tooling-data-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/97f8ea90cff113a337f97ee6c548ce41/transformed/ui-tooling-data-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.ui:ui-unit-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/ba92b724df5f9799c2f941445e1452b6/transformed/ui-unit-release/AndroidManifest.xml:5:5-44
@@ -253,6 +288,8 @@ MERGED from [androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi
 MERGED from [androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:20:5-44
 MERGED from [androidx.activity:activity-compose:1.9.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91beea10d620f075451fc8bacff880d5/transformed/activity-compose-1.9.1/AndroidManifest.xml:5:5-44
 MERGED from [androidx.activity:activity-compose:1.9.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91beea10d620f075451fc8bacff880d5/transformed/activity-compose-1.9.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/0adae5687922e6c497eebcfe6c4404a3/transformed/accompanist-drawablepainter-0.32.0/AndroidManifest.xml:21:5-44
+MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/0adae5687922e6c497eebcfe6c4404a3/transformed/accompanist-drawablepainter-0.32.0/AndroidManifest.xml:21:5-44
 MERGED from [androidx.compose.material:material-icons-extended-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/40236bf0f568ca2c6446b4941dd61092/transformed/material-icons-extended-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-icons-extended-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/40236bf0f568ca2c6446b4941dd61092/transformed/material-icons-extended-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-icons-core-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/82119ac6d1bb7ffdf9cb44e029710ff0/transformed/material-icons-core-release/AndroidManifest.xml:5:5-44
@@ -261,6 +298,8 @@ MERGED from [io.github.jan-tennert.supabase:realtime-kt-android-debug:3.1.0] /Us
 MERGED from [io.github.jan-tennert.supabase:realtime-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fc48a359378a3e391d2c0e9d85e93a0d/transformed/realtime-kt-debug/AndroidManifest.xml:5:5-44
 MERGED from [io.github.jan-tennert.supabase:postgrest-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/4420ba20eb93c0e844aeb15c1ed09751/transformed/postgrest-kt-debug/AndroidManifest.xml:5:5-44
 MERGED from [io.github.jan-tennert.supabase:postgrest-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/4420ba20eb93c0e844aeb15c1ed09751/transformed/postgrest-kt-debug/AndroidManifest.xml:5:5-44
+MERGED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:6:5-44
+MERGED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:6:5-44
 MERGED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:6:5-44
 MERGED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:6:5-44
 MERGED from [io.github.jan-tennert.supabase:supabase-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/90818c47dbf471ed9967be40e989ea35/transformed/supabase-kt-debug/AndroidManifest.xml:5:5-44
@@ -335,6 +374,8 @@ MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /U
 MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/027ccf199801dd27f02368373c947cec/transformed/multiplatform-settings-no-arg-debug/AndroidManifest.xml:21:5-44
 MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/78707af5540cc7a37c08f080389d640c/transformed/multiplatform-settings-coroutines-debug/AndroidManifest.xml:5:5-44
 MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/78707af5540cc7a37c08f080389d640c/transformed/multiplatform-settings-coroutines-debug/AndroidManifest.xml:5:5-44
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/8979941223e19c90ba7e3704bce3ebc0/transformed/exifinterface-1.3.7/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.exifinterface:exifinterface:1.3.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/8979941223e19c90ba7e3704bce3ebc0/transformed/exifinterface-1.3.7/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/90786f57c58b7385fd224cc636b5611e/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/90786f57c58b7385fd224cc636b5611e/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:21:5-44
@@ -372,7 +413,9 @@ ADDED from [androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/
 	android:name
 		ADDED from [androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
 provider#androidx.startup.InitializationProvider
-ADDED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:9:9-17:20
+ADDED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:9:9-17:20
+MERGED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:9:9-17:20
+MERGED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:9:9-17:20
 MERGED from [androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
 MERGED from [androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
 MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91ebb6f4cd2963d2f83ffae2513f39ad/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:24:9-32:20
@@ -384,13 +427,19 @@ MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mu
 MERGED from [androidx.startup:startup-runtime:1.2.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/432ed80ce61ca68f54045166ef10029a/transformed/startup-runtime-1.2.0/AndroidManifest.xml:24:9-28:34
 MERGED from [androidx.startup:startup-runtime:1.2.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/432ed80ce61ca68f54045166ef10029a/transformed/startup-runtime-1.2.0/AndroidManifest.xml:24:9-28:34
 	tools:node
-		ADDED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:13:13-31
+		ADDED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:13:13-31
 	android:authorities
-		ADDED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:11:13-68
+		ADDED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:11:13-68
 	android:exported
-		ADDED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:12:13-37
+		ADDED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:12:13-37
 	android:name
-		ADDED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:10:13-67
+		ADDED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:10:13-67
+meta-data#io.github.jan.supabase.storage.SupabaseInitializer
+ADDED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:14:13-16:52
+	android:value
+		ADDED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:16:17-49
+	android:name
+		ADDED from [io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:15:17-82
 meta-data#io.github.jan.supabase.auth.SupabaseInitializer
 ADDED from [io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:14:13-16:52
 	android:value

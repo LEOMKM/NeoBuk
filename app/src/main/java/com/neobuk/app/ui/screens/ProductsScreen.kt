@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
 import com.neobuk.app.ui.theme.AppTextStyles
@@ -342,21 +343,42 @@ fun ProductCard(product: Product) {
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            // Image Placeholder
+            // Product Image
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
+                    .clip(RoundedCornerShape(8.dp))
             ) {
-                // Placeholder Image
-                Icon(Icons.Outlined.Inventory2, null, tint = Tokens.TextMuted.copy(alpha = 0.3f), modifier = Modifier.size(48.dp))
+                if (product.imageUrl != null) {
+                    // Show actual product image
+                    AsyncImage(
+                        model = product.imageUrl,
+                        contentDescription = product.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    // Show placeholder
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Outlined.Inventory2,
+                            null,
+                            tint = Tokens.TextMuted.copy(alpha = 0.3f),
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+                }
                 
-                // Kebab Menu
+                // Kebab Menu (overlaid on top)
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
                     IconButton(onClick = { }, modifier = Modifier.size(24.dp).padding(4.dp)) {
-                        Icon(Icons.Default.MoreVert, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.MoreVert, null, tint = Color.White, modifier = Modifier.size(16.dp))
                     }
                 }
             }

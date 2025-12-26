@@ -12,6 +12,7 @@ data class Product(
     val costPrice: Double,
     val sellingPrice: Double,
     val quantity: Double = 0.0,
+    val imageUrl: String? = null,
     val createdAt: Long = System.currentTimeMillis()
 )
 

@@ -3,6 +3,7 @@ package com.neobuk.app.data.repositories
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,6 +11,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import java.io.File
 
 // ============================================
 // DTOs for Supabase
@@ -42,6 +44,7 @@ data class ProductDTO(
     @SerialName("low_stock_threshold") val lowStockThreshold: Double = 5.0,
     @SerialName("track_inventory") val trackInventory: Boolean = true,
     @SerialName("is_active") val isActive: Boolean = true,
+    @SerialName("image_url") val imageUrl: String? = null,
     @SerialName("created_at") val createdAt: String? = null,
     @SerialName("updated_at") val updatedAt: String? = null
 )
@@ -87,6 +90,7 @@ data class Product(
     val lowStockThreshold: Double = 5.0,
     val trackInventory: Boolean = true,
     val isActive: Boolean = true,
+    val imageUrl: String? = null,
     val createdAt: Long = System.currentTimeMillis()
 ) {
     val isLowStock: Boolean get() = quantity <= lowStockThreshold
@@ -224,7 +228,8 @@ class ProductsRepository(private val supabaseClient: SupabaseClient) {
         sellingPrice: Double,
         quantity: Double = 0.0,
         lowStockThreshold: Double = 5.0,
-        trackInventory: Boolean = true
+        trackInventory: Boolean = true,
+        imageUrl: String? = null
     ): Result<Product> {
         return try {
             _isLoading.value = true
@@ -240,7 +245,8 @@ class ProductsRepository(private val supabaseClient: SupabaseClient) {
                 sellingPrice = sellingPrice,
                 quantity = quantity,
                 lowStockThreshold = lowStockThreshold,
-                trackInventory = trackInventory
+                trackInventory = trackInventory,
+                imageUrl = imageUrl
             )
             
             val result = database["products"]
@@ -427,6 +433,50 @@ class ProductsRepository(private val supabaseClient: SupabaseClient) {
         }
     }
     
+    
+    // ============================================
+    // IMAGE UPLOAD
+    // ============================================
+    
+    /**
+     * Uploads a product image to Supabase Storage
+     * 
+     * @param businessId The business ID for organizing images
+     * @param imageFile The compressed image file to upload
+     * @return Result with the public URL of the uploaded image, or error
+     */
+    suspend fun uploadProductImage(businessId: String, imageFile: File): Result<String> {
+        return try {
+            val storage = supabaseClient.storage
+            val bucket = storage.from("product-images")
+            
+            // Create a unique filename
+            val filename = "${businessId}/${System.currentTimeMillis()}_${imageFile.name}"
+            
+            // Upload the file
+            bucket.upload(filename, imageFile.readBytes()) {
+                upsert = false
+            }
+            
+            // Get the public URL
+            val publicUrl = bucket.publicUrl(filename)
+            
+            Result.success(publicUrl)
+        } catch (e: Exception) {
+            // Provide specific error messages
+            val errorMessage = when {
+                e.message?.contains("not found", ignoreCase = true) == true -> 
+                    "Storage bucket 'product-images' not found. Please create it in Supabase Dashboard."
+                e.message?.contains("permission", ignoreCase = true) == true -> 
+                    "Permission denied. Please check bucket policies in Supabase."
+                e.message?.contains("network", ignoreCase = true) == true -> 
+                    "Network error. Please check your internet connection."
+                else -> "Upload failed: ${e.message}"
+            }
+            Result.failure(Exception(errorMessage))
+        }
+    }
+    
     // ============================================
     // ANALYTICS
     // ============================================
@@ -486,6 +536,7 @@ class ProductsRepository(private val supabaseClient: SupabaseClient) {
             lowStockThreshold = this.lowStockThreshold,
             trackInventory = this.trackInventory,
             isActive = this.isActive,
+            imageUrl = this.imageUrl,
             createdAt = parseTimestamp(this.createdAt)
         )
     }

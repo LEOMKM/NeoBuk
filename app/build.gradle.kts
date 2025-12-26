@@ -80,6 +80,11 @@ dependencies {
     // Navigation - Stable
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.media3:media3-common-ktx:1.9.0")
+    
+    // Image handling
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
 
     // Debugging
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -98,6 +103,7 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.github.jan-tennert.supabase:realtime-kt")
+    implementation("io.github.jan-tennert.supabase:storage-kt")
 
     // Ktor Client (required by Supabase 3.x)
     // Using CIO engine (pure Kotlin)

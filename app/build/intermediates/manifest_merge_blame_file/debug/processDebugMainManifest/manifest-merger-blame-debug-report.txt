@@ -8,174 +8,205 @@
 8        android:minSdkVersion="24"
 9        android:targetSdkVersion="35" />
 10
-11    <!-- Network permissions for Supabase -->
-12    <uses-permission android:name="android.permission.INTERNET" />
-12-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:5:5-67
-12-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:5:22-64
-13    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-13-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:6:5-79
-13-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:6:22-76
-14
-15    <permission
-15-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
-16        android:name="com.neobuk.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-16-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
-17        android:protectionLevel="signature" />
-17-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
-18
-19    <uses-permission android:name="com.neobuk.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-19-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
-19-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
-20
-21    <application
-21-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:8:5-36:19
-22        android:name="com.neobuk.app.NeoBukApplication"
-22-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:9:9-42
-23        android:allowBackup="true"
-23-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:10:9-35
-24        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-24-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
-25        android:debuggable="true"
-26        android:extractNativeLibs="false"
-27        android:icon="@drawable/newbuk"
-27-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:11:9-40
-28        android:label="@string/app_name"
-28-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:12:9-41
-29        android:roundIcon="@drawable/newbuk"
-29-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:13:9-45
-30        android:supportsRtl="true"
-30-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:14:9-35
-31        android:theme="@style/Theme.NeoBuk" >
-31-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:15:9-44
-32        <activity
-32-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:16:9-25:20
-33            android:name="com.neobuk.app.MainActivity"
-33-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:17:13-41
-34            android:exported="true"
-34-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:18:13-36
-35            android:label="@string/app_name"
-35-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:19:13-45
-36            android:theme="@style/Theme.NeoBuk.Splash" >
-36-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:20:13-55
-37            <intent-filter>
-37-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:21:13-24:29
-38                <action android:name="android.intent.action.MAIN" />
-38-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:22:17-69
-38-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:22:25-66
-39
-40                <category android:name="android.intent.category.LAUNCHER" />
-40-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:23:17-77
-40-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:23:27-74
-41            </intent-filter>
-42        </activity>
-43
-44        <provider
-45            android:name="androidx.core.content.FileProvider"
-45-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:28:13-62
-46            android:authorities="com.neobuk.app.provider"
-46-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:29:13-60
-47            android:exported="false"
-47-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:30:13-37
-48            android:grantUriPermissions="true" >
-48-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:31:13-47
-49            <meta-data
-49-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:32:13-34:58
-50                android:name="android.support.FILE_PROVIDER_PATHS"
-50-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:33:17-67
-51                android:resource="@xml/provider_paths" />
-51-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:34:17-55
-52        </provider>
-53
-54        <activity
-54-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:23:9-25:39
-55            android:name="androidx.activity.ComponentActivity"
-55-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:24:13-63
-56            android:exported="true" />
-56-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:25:13-36
-57        <activity
-57-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
-58            android:name="androidx.compose.ui.tooling.PreviewActivity"
-58-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
-59            android:exported="true" />
-59-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
-60
-61        <provider
-61-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:9:9-17:20
-62            android:name="androidx.startup.InitializationProvider"
-62-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:10:13-67
-63            android:authorities="com.neobuk.app.androidx-startup"
-63-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:11:13-68
-64            android:exported="false" >
-64-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:12:13-37
+11    <!-- Queries for package visibility (Android 11+) -->
+12    <queries>
+12-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:5:5-9:15
+13        <intent>
+13-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:6:9-8:18
+14            <action android:name="android.media.action.IMAGE_CAPTURE" />
+14-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:7:13-73
+14-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:7:21-70
+15        </intent>
+16    </queries>
+17
+18    <!-- Network permissions for Supabase -->
+19    <uses-permission android:name="android.permission.INTERNET" />
+19-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:13:5-67
+19-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:13:22-64
+20    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+20-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:14:5-79
+20-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:14:22-76
+21
+22    <!-- Camera permission for capturing product images -->
+23    <uses-permission android:name="android.permission.CAMERA" />
+23-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:17:5-65
+23-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:17:22-62
+24
+25    <!-- Required for accessing images on API 29 and below -->
+26    <uses-permission
+26-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:20:5-21:38
+27        android:name="android.permission.READ_EXTERNAL_STORAGE"
+27-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:20:22-77
+28        android:maxSdkVersion="32" />
+28-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:21:9-35
+29
+30    <permission
+30-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+31        android:name="com.neobuk.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+31-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+32        android:protectionLevel="signature" />
+32-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+33
+34    <uses-permission android:name="com.neobuk.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+34-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+34-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+35
+36    <application
+36-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:24:5-52:19
+37        android:name="com.neobuk.app.NeoBukApplication"
+37-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:25:9-42
+38        android:allowBackup="true"
+38-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:26:9-35
+39        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+39-->[androidx.core:core:1.13.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/79daa0bd70b8462285be90bd2e5109e7/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+40        android:debuggable="true"
+41        android:extractNativeLibs="false"
+42        android:icon="@drawable/newbuk"
+42-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:27:9-40
+43        android:label="@string/app_name"
+43-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:28:9-41
+44        android:roundIcon="@drawable/newbuk"
+44-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:29:9-45
+45        android:supportsRtl="true"
+45-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:30:9-35
+46        android:testOnly="true"
+47        android:theme="@style/Theme.NeoBuk" >
+47-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:31:9-44
+48        <activity
+48-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:32:9-41:20
+49            android:name="com.neobuk.app.MainActivity"
+49-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:33:13-41
+50            android:exported="true"
+50-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:34:13-36
+51            android:label="@string/app_name"
+51-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:35:13-45
+52            android:theme="@style/Theme.NeoBuk.Splash" >
+52-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:36:13-55
+53            <intent-filter>
+53-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:37:13-40:29
+54                <action android:name="android.intent.action.MAIN" />
+54-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:38:17-69
+54-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:38:25-66
+55
+56                <category android:name="android.intent.category.LAUNCHER" />
+56-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:39:17-77
+56-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:39:27-74
+57            </intent-filter>
+58        </activity>
+59
+60        <provider
+61            android:name="androidx.core.content.FileProvider"
+61-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:44:13-62
+62            android:authorities="com.neobuk.app.provider"
+62-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:45:13-60
+63            android:exported="false"
+63-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:46:13-37
+64            android:grantUriPermissions="true" >
+64-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:47:13-47
 65            <meta-data
-65-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:14:13-16:52
-66                android:name="io.github.jan.supabase.auth.SupabaseInitializer"
-66-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:15:17-79
-67                android:value="androidx.startup" />
-67-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:16:17-49
-68            <meta-data
-68-->[androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
-69                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-69-->[androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
-70                android:value="androidx.startup" />
-70-->[androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
-71            <meta-data
-71-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91ebb6f4cd2963d2f83ffae2513f39ad/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:29:13-31:52
-72                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-72-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91ebb6f4cd2963d2f83ffae2513f39ad/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:30:17-78
-73                android:value="androidx.startup" />
-73-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91ebb6f4cd2963d2f83ffae2513f39ad/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:31:17-49
-74            <meta-data
-74-->[com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/027ccf199801dd27f02368373c947cec/transformed/multiplatform-settings-no-arg-debug/AndroidManifest.xml:29:13-31:52
-75                android:name="com.russhwolf.settings.SettingsInitializer"
-75-->[com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/027ccf199801dd27f02368373c947cec/transformed/multiplatform-settings-no-arg-debug/AndroidManifest.xml:30:17-74
-76                android:value="androidx.startup" />
-76-->[com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/027ccf199801dd27f02368373c947cec/transformed/multiplatform-settings-no-arg-debug/AndroidManifest.xml:31:17-49
-77            <meta-data
-77-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
-78                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-78-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
-79                android:value="androidx.startup" />
-79-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
-80        </provider>
-81
-82        <receiver
-82-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
-83            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-83-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
-84            android:directBootAware="false"
-84-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
-85            android:enabled="true"
-85-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
-86            android:exported="true"
-86-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
-87            android:permission="android.permission.DUMP" >
-87-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
-88            <intent-filter>
-88-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
-89                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-89-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
-89-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
-90            </intent-filter>
-91            <intent-filter>
-91-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
-92                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-92-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
-92-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
-93            </intent-filter>
-94            <intent-filter>
-94-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
-95                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-95-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
-95-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
-96            </intent-filter>
-97            <intent-filter>
-97-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
-98                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-98-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
-98-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
-99            </intent-filter>
-100        </receiver>
-101    </application>
-102
-103</manifest>
+65-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:48:13-50:58
+66                android:name="android.support.FILE_PROVIDER_PATHS"
+66-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:49:17-67
+67                android:resource="@xml/provider_paths" />
+67-->/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/AndroidManifest.xml:50:17-55
+68        </provider>
+69
+70        <activity
+70-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:23:9-25:39
+71            android:name="androidx.activity.ComponentActivity"
+71-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:24:13-63
+72            android:exported="true" />
+72-->[androidx.compose.ui:ui-test-manifest:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/81cfbb5718aeb31ce482928da7d56ada/transformed/ui-test-manifest-1.7.0/AndroidManifest.xml:25:13-36
+73        <activity
+73-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
+74            android:name="androidx.compose.ui.tooling.PreviewActivity"
+74-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
+75            android:exported="true" />
+75-->[androidx.compose.ui:ui-tooling-android:1.7.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c2f9fd6128be5f9e33cde0affc709146/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
+76
+77        <provider
+77-->[io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:9:9-17:20
+78            android:name="androidx.startup.InitializationProvider"
+78-->[io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:10:13-67
+79            android:authorities="com.neobuk.app.androidx-startup"
+79-->[io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:11:13-68
+80            android:exported="false" >
+80-->[io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:12:13-37
+81            <meta-data
+81-->[io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:14:13-16:52
+82                android:name="io.github.jan.supabase.storage.SupabaseInitializer"
+82-->[io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:15:17-82
+83                android:value="androidx.startup" />
+83-->[io.github.jan-tennert.supabase:storage-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d984ca56a570cc9f3d032b5702dca77/transformed/storage-kt-debug/AndroidManifest.xml:16:17-49
+84            <meta-data
+84-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:14:13-16:52
+85                android:name="io.github.jan.supabase.auth.SupabaseInitializer"
+85-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:15:17-79
+86                android:value="androidx.startup" />
+86-->[io.github.jan-tennert.supabase:auth-kt-android-debug:3.1.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/fad05719f26927d2adf859b5866da147/transformed/auth-kt-debug/AndroidManifest.xml:16:17-49
+87            <meta-data
+87-->[androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+88                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+88-->[androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+89                android:value="androidx.startup" />
+89-->[androidx.emoji2:emoji2:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/c6411e28a07ee30e5365a579d7a72671/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+90            <meta-data
+90-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91ebb6f4cd2963d2f83ffae2513f39ad/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:29:13-31:52
+91                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+91-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91ebb6f4cd2963d2f83ffae2513f39ad/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:30:17-78
+92                android:value="androidx.startup" />
+92-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/91ebb6f4cd2963d2f83ffae2513f39ad/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:31:17-49
+93            <meta-data
+93-->[com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/027ccf199801dd27f02368373c947cec/transformed/multiplatform-settings-no-arg-debug/AndroidManifest.xml:29:13-31:52
+94                android:name="com.russhwolf.settings.SettingsInitializer"
+94-->[com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/027ccf199801dd27f02368373c947cec/transformed/multiplatform-settings-no-arg-debug/AndroidManifest.xml:30:17-74
+95                android:value="androidx.startup" />
+95-->[com.russhwolf:multiplatform-settings-no-arg-android-debug:1.3.0] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/027ccf199801dd27f02368373c947cec/transformed/multiplatform-settings-no-arg-debug/AndroidManifest.xml:31:17-49
+96            <meta-data
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+97                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+98                android:value="androidx.startup" />
+98-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+99        </provider>
+100
+101        <receiver
+101-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+102            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+102-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+103            android:directBootAware="false"
+103-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+104            android:enabled="true"
+104-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+105            android:exported="true"
+105-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+106            android:permission="android.permission.DUMP" >
+106-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+107            <intent-filter>
+107-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+108                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+108-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+108-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+109            </intent-filter>
+110            <intent-filter>
+110-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+111                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+111-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+111-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+112            </intent-filter>
+113            <intent-filter>
+113-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+114                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+115            </intent-filter>
+116            <intent-filter>
+116-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+117                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+117-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+117-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/leonard.mutugi/.gradle/caches/8.9/transforms/bc71122093c881b653a73e6418b3e448/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+118            </intent-filter>
+119        </receiver>
+120    </application>
+121
+122</manifest>

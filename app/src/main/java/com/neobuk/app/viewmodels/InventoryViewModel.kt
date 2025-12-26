@@ -35,6 +35,7 @@ class InventoryViewModel(
                         costPrice = repoProduct.costPrice,
                         sellingPrice = repoProduct.sellingPrice,
                         quantity = repoProduct.quantity,
+                        imageUrl = repoProduct.imageUrl,
                         createdAt = 0L // Timestamp mismatch
                     )
                 } catch (e: Exception) {

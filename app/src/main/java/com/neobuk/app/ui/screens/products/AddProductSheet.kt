@@ -11,8 +11,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.*
@@ -20,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -27,11 +30,16 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
 import com.neobuk.app.ui.theme.NeoBukCyan
 import com.neobuk.app.ui.theme.Tokens
 import com.neobuk.app.ui.theme.AppTextStyles
@@ -67,6 +75,8 @@ fun AddProductContent(
     var quantity by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedUnit by remember { mutableStateOf("pcs") }
+    var unitDropdownExpanded by remember { mutableStateOf(false) }
+    val availableUnits = listOf("pcs", "pack", "box", "dozen", "bundle", "kg", "g", "ltr", "ml")
     var selectedCategory by remember { mutableStateOf("Grains") }
     var lowStockAlert by remember { mutableStateOf(true) }
     var lowStockThreshold by remember { mutableStateOf("10") }
@@ -80,6 +90,45 @@ fun AddProductContent(
         if (initialBarcode != null) {
             barcodeGenerated = true
             barcodeValue = initialBarcode
+        }
+    }
+    
+    // Image Selection State
+    val context = LocalContext.current
+    var selectedImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var showImagePicker by remember { mutableStateOf(false) }
+    var tempPhotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    
+    // Gallery Picker
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: android.net.Uri? ->
+        uri?.let { selectedImageUri = it }
+    }
+    
+    // Camera Launcher  
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            tempPhotoUri?.let { selectedImageUri = it }
+        }
+    }
+    
+    // Camera Permission Launcher
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Create temp file for camera
+            val photoFile = java.io.File(context.cacheDir, "temp_photo_${System.currentTimeMillis()}.jpg")
+            val photoUri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.provider",
+                photoFile
+            )
+            tempPhotoUri = photoUri
+            cameraLauncher.launch(photoUri)
         }
     }
 
@@ -146,29 +195,97 @@ fun AddProductContent(
                 .weight(1f)
                 .verticalScroll(scrollState)
         ) {
-            // Image Upload Placeholder
+            // Image Upload Section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                    .dashedBorder(1.dp, MaterialTheme.colorScheme.outline, 12.dp),
-                contentAlignment = Alignment.Center
+                    .height(if (selectedImageUri != null) 200.dp else 150.dp)
+                    .clip(RoundedCornerShape(12.dp))
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.CloudUpload, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(32.dp))
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        "Click to upload or drag and drop",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
+                if (selectedImageUri != null) {
+                    // Show selected image
+                    AsyncImage(
+                        model = selectedImageUri,
+                        contentDescription = "Product Image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
-                    Text(
-                        "PNG, JPG up to 5MB",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    // Close button to remove image
+                    IconButton(
+                        onClick = { selectedImageUri = null },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(50))
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Remove image",
+                            tint = Color.White
+                        )
+                    }
+                } else {
+                    // Show placeholder with options
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .dashedBorder(1.dp, MaterialTheme.colorScheme.outline, 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.CloudUpload,
+                                null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Text(
+                                "Add Product Image",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                // Camera Button
+                                OutlinedButton(
+                                    onClick = {
+                                        cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+                                    },
+                                    modifier = Modifier.height(36.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.CameraAlt,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                    Text("Camera", fontSize = 12.sp)
+                                }
+                                // Gallery Button
+                                OutlinedButton(
+                                    onClick = { galleryLauncher.launch("image/*") },
+                                    modifier = Modifier.height(36.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.PhotoLibrary,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                    Text("Gallery", fontSize = 12.sp)
+                                }
+                            }
+                        }
+                    }
                 }
             }
             
@@ -268,17 +385,37 @@ fun AddProductContent(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Column(modifier = Modifier.weight(1f)) {
                     InputFieldLabel("Unit")
-                    // Mock Dropdown
-                    Box(modifier = Modifier.fillMaxWidth()) {
+                    ExposedDropdownMenuBox(
+                        expanded = unitDropdownExpanded,
+                        onExpandedChange = { unitDropdownExpanded = it }
+                    ) {
                         OutlinedTextField(
                             value = selectedUnit,
                             onValueChange = {},
                             readOnly = true,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
                             shape = RoundedCornerShape(12.dp),
                             colors = inputColors(),
-                            trailingIcon = { Icon(painterResource(android.R.drawable.arrow_down_float), null) }
+                            trailingIcon = { 
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitDropdownExpanded) 
+                            }
                         )
+                        ExposedDropdownMenu(
+                            expanded = unitDropdownExpanded,
+                            onDismissRequest = { unitDropdownExpanded = false }
+                        ) {
+                            availableUnits.forEach { unit ->
+                                DropdownMenuItem(
+                                    text = { Text(unit) },
+                                    onClick = {
+                                        selectedUnit = unit
+                                        unitDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
@@ -348,7 +485,9 @@ fun AddProductContent(
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = { 
-                                barcodeValue = "5 012345 678900" // Mock Generation
+                                // Generate unique barcode based on timestamp
+                                val timestamp = System.currentTimeMillis()
+                                barcodeValue = "PRD-$timestamp"
                                 barcodeGenerated = true 
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -467,7 +606,8 @@ fun AddProductContent(
                     barcode = if (barcodeGenerated) barcodeValue else "GENERATED-${System.currentTimeMillis()}",
                     unit = selectedUnit,
                     category = selectedCategory,
-                    description = description
+                    description = description,
+                    imageUri = selectedImageUri
                 )
                 onSubmit(draft)
                 if (batchMode) {
@@ -476,6 +616,7 @@ fun AddProductContent(
                     quantity = ""
                     barcodeGenerated = false
                     barcodeValue = ""
+                    selectedImageUri = null
                 } else {
                     onDismiss()
                 }
@@ -539,5 +680,6 @@ data class ProductDraft(
     val barcode: String,
     val unit: String,
     val category: String,
-    val description: String
+    val description: String,
+    val imageUri: android.net.Uri? = null
 )
