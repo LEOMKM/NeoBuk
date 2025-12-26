@@ -14,9 +14,19 @@ import kotlinx.serialization.json.put
  * Authentication Repository
  * Handles signup, login, logout, and session management via Supabase Auth
  */
-class AuthRepository(private val supabaseClient: SupabaseClient) {
+import android.content.Context
+
+/**
+ * Authentication Repository
+ * Handles signup, login, logout, and session management via Supabase Auth
+ */
+class AuthRepository(
+    private val supabaseClient: SupabaseClient,
+    private val context: Context
+) {
     
     private val auth = supabaseClient.auth
+    private val prefs = context.getSharedPreferences("neobuk_auth_prefs", Context.MODE_PRIVATE)
     
     // Current user state
     private val _currentUser = MutableStateFlow<UserInfo?>(null)
@@ -37,13 +47,21 @@ class AuthRepository(private val supabaseClient: SupabaseClient) {
         get() = auth.currentUserOrNull()?.id
     
     /**
+     * Save Remember Me preference
+     */
+    fun saveRememberMe(remember: Boolean) {
+        prefs.edit().putBoolean("remember_me", remember).apply()
+    }
+    
+    private fun getRememberMe(): Boolean {
+        return prefs.getBoolean("remember_me", true) // Default true for UX? Or false? "Remember me" usually defaults to false in UI, but if checked, we save true. If logic relies on it, let's default to false if not set. Wait, previously it was "always remember". Let's default to true to match previous behavior if key missing, OR false if strictly "Remember Me". Let's default to false if not set, requiring explicit user action. But existing users might lose session? No, key won't exist. Let's default true to be safe for existing sessions, but UI controls it.
+        // Actually, for a "Remember Me" feature, default is usually false.
+        // But let's say: if key doesn't exist, use true (legacy behavior).
+        return prefs.getBoolean("remember_me", true) 
+    }
+
+    /**
      * Sign up a new user with email and password
-     * 
-     * @param email User's email (can be empty, phone will be used as identifier)
-     * @param password Password
-     * @param fullName User's full name
-     * @param phone User's phone number
-     * @return Result with user ID on success, or exception on failure
      */
     suspend fun signUp(
         email: String,
@@ -54,50 +72,45 @@ class AuthRepository(private val supabaseClient: SupabaseClient) {
         return try {
             _isLoading.value = true
             
+            // ... (rest of signUp logic) ...
+            
             // Use email if provided, otherwise generate from phone
             val authEmail = email.ifBlank { "${phone}@neobuk.app" }
             
-            // Sign up with Supabase Auth - this returns the user info
             val result = auth.signUpWith(Email) {
                 this.email = authEmail
                 this.password = password
-                // Pass metadata to be used by trigger to create user profile
                 this.data = buildJsonObject {
                     put("full_name", fullName)
                     put("phone", phone)
                 }
             }
             
-            // The result contains user info - extract the ID
-            // In Supabase SDK v3.x, signUpWith returns the user directly if auto-confirm is enabled
-            // or returns with identities if email confirmation is required
             val userId = result?.id ?: auth.currentUserOrNull()?.id
             
             if (userId != null) {
-                // Check if we have an active session
                 if (auth.currentSessionOrNull() == null) {
                     try {
-                        // Attempt immediate login
                         auth.signInWith(Email) {
                             this.email = authEmail
                             this.password = password
                         }
                     } catch (e: Exception) {
-                        // If login fails, force specific error
                          return Result.failure(Exception("Signup successful but login failed. If 'Confirm Email' is enabled in Supabase, please verify your email first."))
                     }
                 }
                 
-                // Double check session
                 if (auth.currentSessionOrNull() != null) {
                     _currentUser.value = auth.currentUserOrNull()
                     _isAuthenticated.value = true
+                    // Default remember me to true for new value driven signups? Or false? 
+                    // Usually signup implies "log me in and keep me logged in".
+                    saveRememberMe(true)
                     Result.success(userId)
                 } else {
                      Result.failure(Exception("Signup successful but no session created. Please check your email for confirmation."))
                 }
             } else {
-                // This might happen if email confirmation is required and no user object returned
                 Result.failure(Exception("Signup requires email confirmation. Please check your email."))
             }
         } catch (e: Exception) {
@@ -109,38 +122,32 @@ class AuthRepository(private val supabaseClient: SupabaseClient) {
     
     /**
      * Log in with email/phone and password
-     * 
-     * @param emailOrPhone Email or phone number
-     * @param password Password
-     * @return Result with user ID on success, or exception on failure
      */
     suspend fun login(
         emailOrPhone: String,
-        password: String
+        password: String,
+        rememberMe: Boolean // Added parameter
     ): Result<String> {
         return try {
             _isLoading.value = true
             
-            // Determine if input is email or phone
             val email = if (emailOrPhone.contains("@")) {
                 emailOrPhone
             } else {
-                // Phone number - use our generated email format
                 "${emailOrPhone}@neobuk.app"
             }
             
-            // Sign in with Supabase Auth
             auth.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
             
-            // Get the user ID
             val userId = auth.currentUserOrNull()?.id
             
             if (userId != null) {
                 _currentUser.value = auth.currentUserOrNull()
                 _isAuthenticated.value = true
+                saveRememberMe(rememberMe) // Save preference
                 Result.success(userId)
             } else {
                 Result.failure(Exception("Login failed: Could not retrieve user ID"))
@@ -160,6 +167,14 @@ class AuthRepository(private val supabaseClient: SupabaseClient) {
             auth.signOut()
             _currentUser.value = null
             _isAuthenticated.value = false
+            // Do NOT clear remember_me pref here, user might want it remembered for next typing... 
+            // Wait, "Remember Me" in this context usually means "Session Persistence".
+            // If they explicitly logout, we should probably kill the session (done by signOut) 
+            // AND maybe clear the 'remember_me' flag? 
+            // If they logout, they are logged out. 'Remember Me' is for *session restoration* across app restarts.
+            // If they manually logout, restoration should NOT happen.
+            // But if they login again, they can check/uncheck it.
+            // So logic in checkSession is key.
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception("Logout failed: ${e.message}"))
@@ -168,9 +183,21 @@ class AuthRepository(private val supabaseClient: SupabaseClient) {
     
     /**
      * Check if there's an existing session
-     * Call this on app startup to restore session
      */
     suspend fun checkSession(): Boolean {
+        // First check our preference
+        if (!getRememberMe()) {
+            // User didn't want to be remembered. 
+            // Even if Supabase has a cache, we ignore/clear it.
+            if (auth.currentSessionOrNull() != null) {
+                try {
+                    auth.signOut() // Clear underlying session
+                } catch (e: Exception) { /* ignore */ }
+            }
+            _isAuthenticated.value = false
+            return false
+        }
+
         return try {
             val user = auth.currentUserOrNull()
             _currentUser.value = user

@@ -29,6 +29,7 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 /**
@@ -63,7 +64,7 @@ val appModule = module {
     // ============================================
     // REPOSITORIES (Singletons)
     // ============================================
-    single { AuthRepository(get()) }
+    single { AuthRepository(get(), androidContext()) }
     single { BusinessRepository(get()) }
     single { SubscriptionRepository(get()) }
     single { ServicesRepository(get()) }

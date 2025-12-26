@@ -254,6 +254,7 @@ fun LoginScreen(
                             authViewModel.login(
                                 emailOrPhone = phoneOrEmail.trim(),
                                 password = password,
+                                rememberMe = rememberMe,
                                 onSuccess = { /* Handled by LaunchedEffect */ },
                                 onError = { /* Handled by LaunchedEffect */ }
                             )

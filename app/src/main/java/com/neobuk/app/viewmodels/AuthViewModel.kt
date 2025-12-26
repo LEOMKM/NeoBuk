@@ -128,13 +128,14 @@ class AuthViewModel(
     fun login(
         emailOrPhone: String,
         password: String,
+        rememberMe: Boolean = false,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             
-            val result = authRepository.login(emailOrPhone, password)
+            val result = authRepository.login(emailOrPhone, password, rememberMe)
             
             result.fold(
                 onSuccess = { userId ->
