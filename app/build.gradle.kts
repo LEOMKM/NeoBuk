@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -17,6 +19,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        
+        // Supabase configuration from gradle.properties
+        buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL") ?: ""}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${project.findProperty("SUPABASE_ANON_KEY") ?: ""}\"")
     }
 
     buildTypes {
@@ -30,21 +36,22 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true  // Enable BuildConfig generation
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
+    // Note: composeOptions with kotlinCompilerExtensionVersion is no longer needed
+    // in Kotlin 2.0+ as it's managed by the compose compiler plugin
 
     packaging {
         resources {
@@ -54,6 +61,9 @@ android {
 }
 
 dependencies {
+    // Desugaring for java.time on API < 26
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
     // Core Android dependencies - using STABLE versions
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
@@ -80,4 +90,32 @@ dependencies {
     
     // Splash Screen API (backwards compatible)
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // ============================================
+    // SUPABASE SDK (v3.1.0 - compatible with AGP 8.7.x)
+    // ============================================
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.0"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
+
+    // Ktor Client (required by Supabase 3.x)
+    // Using CIO engine (pure Kotlin)
+    implementation("io.ktor:ktor-client-cio:3.0.3")
+
+    // Kotlin Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    // DateTime (for Supabase timestamps)
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+
+    // ============================================
+    // KOIN - Dependency Injection
+    // ============================================
+    implementation(platform("io.insert-koin:koin-bom:3.5.3"))
+    implementation("io.insert-koin:koin-android")
+    implementation("io.insert-koin:koin-androidx-compose")
 }

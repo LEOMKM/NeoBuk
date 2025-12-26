@@ -8,6 +8,8 @@
         android:minSdkVersion="24"
         android:targetSdkVersion="35" />
 
+    <!-- Network permissions for Supabase -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <permission
@@ -17,6 +19,7 @@
     <uses-permission android:name="com.neobuk.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
+        android:name="com.neobuk.app.NeoBukApplication"
         android:allowBackup="true"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
@@ -61,10 +64,16 @@
             android:authorities="com.neobuk.app.androidx-startup"
             android:exported="false" >
             <meta-data
+                android:name="io.github.jan.supabase.auth.SupabaseInitializer"
+                android:value="androidx.startup" />
+            <meta-data
                 android:name="androidx.emoji2.text.EmojiCompatInitializer"
                 android:value="androidx.startup" />
             <meta-data
                 android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="com.russhwolf.settings.SettingsInitializer"
                 android:value="androidx.startup" />
             <meta-data
                 android:name="androidx.profileinstaller.ProfileInstallerInitializer"

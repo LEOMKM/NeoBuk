@@ -1,5 +1,6 @@
 package com.neobuk.app.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,8 +20,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.*
@@ -43,22 +42,40 @@ import com.neobuk.app.ui.screens.receipt.ReceiptUtils
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import org.koin.androidx.compose.koinViewModel
+import com.neobuk.app.viewmodels.SalesViewModel
+import com.neobuk.app.viewmodels.ProductsViewModel
+import com.neobuk.app.viewmodels.AuthViewModel
+import com.neobuk.app.data.repositories.Sale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SalesHistoryScreen() {
+fun SalesHistoryScreen(
+    salesViewModel: SalesViewModel = koinViewModel(),
+    productsViewModel: ProductsViewModel = koinViewModel(),
+    authViewModel: AuthViewModel = koinViewModel()
+) {
     var showDetailSheet by remember { mutableStateOf(false) }
     var showNewSaleSheet by remember { mutableStateOf(false) }
     var showReceiptView by remember { mutableStateOf(false) }
-    var selectedTransaction by remember { mutableStateOf<TransactionData?>(null) }
+    var selectedSale by remember { mutableStateOf<Sale?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val transactions = listOf(
-        TransactionData("Multiple Items (5)", "M-PESA", Color(0xFFE8F5E9), Color(0xFF2E7D32), "KES 2,450", "May 15, 2025 • 14:35", "Jane Wambui", "QK29X7A451"),
-        TransactionData("Sugar (5kg), Cooking Oil (2L)", "Cash", Color(0xFFE3F2FD), Color(0xFF1565C0), "KES 1,350", "May 15, 2025 • 13:22", "Walk-in Customer"),
-        TransactionData("Maize Flour (10kg)", "M-PESA", Color(0xFFE8F5E9), Color(0xFF2E7D32), "KES 1,200", "May 15, 2025 • 11:47", "Mama Njeri", "QK29X7B892"),
-        TransactionData("Tea Leaves (500g), Sugar...", "Cash", Color(0xFFE3F2FD), Color(0xFF1565C0), "KES 750", "May 15, 2025 • 10:15", "John Kamau")
-    )
+    // Observe Business State
+    val currentBusiness by authViewModel.currentBusiness.collectAsState()
+
+    // Observe Sales State
+    val sales by salesViewModel.sales.collectAsState()
+    val todaySales by salesViewModel.todaySales.collectAsState()
+    val isLoading by salesViewModel.isLoading.collectAsState()
+
+    // Initialize data when business is available
+    LaunchedEffect(currentBusiness) {
+        currentBusiness?.let { business ->
+            salesViewModel.setBusinessId(business.id)
+            productsViewModel.setBusinessId(business.id)
+        }
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
@@ -67,9 +84,6 @@ fun SalesHistoryScreen() {
         // 1. Header Section
         item {
             Column(modifier = Modifier.padding(16.dp)) {
-                // Header removed (moved to Toolbar)
-
-                
                 // Prominent New Sale Button
                 Button(
                     onClick = { showNewSaleSheet = true },
@@ -110,7 +124,7 @@ fun SalesHistoryScreen() {
 
         // 2. Summary Card with Chart
         item {
-            SummaryCard()
+            SummaryCard(salesViewModel)
         }
 
         // 3. Transactions Header & Search
@@ -149,26 +163,40 @@ fun SalesHistoryScreen() {
         }
 
         // 4. Transaction List
-        items(transactions) { trans ->
-            TransactionItem(
-                data = trans,
-                onClick = {
-                    selectedTransaction = trans
-                    showDetailSheet = true
+        if (isLoading && sales.isEmpty()) {
+            item {
+                Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = NeoBukTeal)
                 }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            }
+        } else if (sales.isEmpty()) {
+             item {
+                Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                    Text("No sales found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        } else {
+            items(sales) { sale ->
+                TransactionItem(
+                    sale = sale,
+                    onClick = {
+                        selectedSale = sale
+                        showDetailSheet = true
+                    }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 
-    if (showDetailSheet && selectedTransaction != null) {
+    if (showDetailSheet && selectedSale != null) {
         ModalBottomSheet(
             onDismissRequest = { showDetailSheet = false },
             sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.surface
         ) {
             SalesDetailSheet(
-                transaction = selectedTransaction!!,
+                sale = selectedSale!!,
                 onClose = { showDetailSheet = false },
                 onViewReceipt = {
                     showDetailSheet = false // Close sheet
@@ -187,30 +215,38 @@ fun SalesHistoryScreen() {
             modifier = Modifier.fillMaxHeight(0.95f)
         ) {
             NewSaleScreen(
+                salesViewModel = salesViewModel,
+                productsViewModel = productsViewModel,
                 onDismiss = { showNewSaleSheet = false },
-                onCompleteSale = { _, _, _ ->
+                onCompleteSale = {
+                    showNewSaleSheet = false
+                    // Optional: Show success message via Snackbar
                 }
             )
         }
     }
 
-    if (showReceiptView && selectedTransaction != null) {
-        // Mock mapping for demo purposes
-        val mockItems = listOf(
-            ReceiptItem("Maize Flour", 2, "120", "240"),
-            ReceiptItem("Sugar", 3, "150", "450"),
-            ReceiptItem("Cooking Oil", 2, "220", "440")
-        )
+    if (showReceiptView && selectedSale != null) {
+        // Map Sale to ReceiptData
+        val sale = selectedSale!!
+        val receiptItems = sale.items.map { 
+             ReceiptItem(
+                 name = it.displayName, 
+                 quantity = it.quantity.toInt(),
+                 price = String.format("%.0f", it.unitPrice),
+                 total = String.format("%.0f", it.totalPrice)
+             )
+        }
+        
         val receiptData = ReceiptData(
-            businessName = "Mama Njeri's Shop", // Pull from user pref in real app
-            receiptId = "SALE-${selectedTransaction!!.date.filter { it.isDigit() }.take(8)}-001",
-            date = selectedTransaction!!.date,
-            paymentMethod = selectedTransaction!!.paymentMethod,
-            customerName = selectedTransaction!!.customer,
-            totalAmount = selectedTransaction!!.amount,
-
-            items = mockItems,
-            paymentRef = selectedTransaction!!.paymentRef
+            businessName = "My Business", // Should be fetched from BusinessRepo
+            receiptId = sale.saleNumber,
+            date = formatDateTime(sale.saleDate),
+            paymentMethod = sale.paymentMethod,
+            customerName = sale.customerName ?: "Walk-in Customer",
+            totalAmount = "KES ${String.format("%,.0f", sale.totalAmount)}",
+            items = receiptItems,
+            paymentRef = sale.paymentReference
         )
 
         Dialog(
@@ -225,21 +261,15 @@ fun SalesHistoryScreen() {
     }
 }
 
-data class TransactionData(
-    val title: String,
-    val paymentMethod: String,
-    val paymentColor: Color,
-    val paymentTextColor: Color,
-    val amount: String,
-    val date: String,
-
-    val customer: String,
-    val paymentRef: String? = null
-)
+// Helper for date formatting
+fun formatDateTime(timestamp: Long): String {
+    val sdf = java.text.SimpleDateFormat("MMM dd, yyyy • HH:mm", java.util.Locale.getDefault())
+    return sdf.format(java.util.Date(timestamp))
+}
 
 @Composable
 fun SalesDetailSheet(
-    transaction: TransactionData, 
+    sale: Sale, 
     onClose: () -> Unit,
     onViewReceipt: () -> Unit = {}
 ) {
@@ -274,14 +304,14 @@ fun SalesDetailSheet(
         ) {
             Column {
                 Text("Sale ID", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("#SALE-20250515-001", style = AppTextStyles.bodyBold)
+                Text("#${sale.saleNumber}", style = AppTextStyles.bodyBold)
             }
             Box(
                 modifier = Modifier
                     .background(Color(0xFFE8F5E9), RoundedCornerShape(16.dp))
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             ) {
-                Text("Recorded", style = AppTextStyles.caption, color = Color(0xFF2E7D32))
+                Text(sale.paymentStatus.name, style = AppTextStyles.caption, color = Color(0xFF2E7D32))
             }
         }
         
@@ -294,11 +324,11 @@ fun SalesDetailSheet(
         ) {
             Column {
                 Text("Date & Time", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(transaction.date, style = AppTextStyles.body)
+                Text(formatDateTime(sale.saleDate), style = AppTextStyles.body)
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text("Payment Method", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(transaction.paymentMethod, style = AppTextStyles.body)
+                Text(sale.paymentMethod, style = AppTextStyles.body)
             }
         }
         
@@ -318,8 +348,10 @@ fun SalesDetailSheet(
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(transaction.customer, style = AppTextStyles.bodyBold)
-                Text("+254 712 345 678", style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(sale.customerName ?: "Walk-in Customer", style = AppTextStyles.bodyBold)
+                if (sale.customerPhone != null) {
+                    Text(sale.customerPhone, style = AppTextStyles.caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
         
@@ -327,34 +359,39 @@ fun SalesDetailSheet(
         Text("Items", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(modifier = Modifier.height(8.dp))
         
-        // Items List (Mock)
+        // Items List
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
                 .padding(16.dp)
         ) {
-            ItemRow("Maize Flour", "2 × KES 120", "KES 240")
-            Spacer(modifier = Modifier.height(12.dp))
-            ItemRow("Sugar", "3 × KES 150", "KES 450")
-            Spacer(modifier = Modifier.height(12.dp))
-            ItemRow("Cooking Oil", "2 × KES 220", "KES 440")
+            sale.items.forEach { item ->
+                ItemRow(
+                    name = item.displayName, 
+                    calc = "${item.quantity.toInt()} × KES ${String.format("%,.0f", item.unitPrice)}", 
+                    price = "KES ${String.format("%,.0f", item.totalPrice)}"
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
             
             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.3f))
             
             // Totals
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Subtotal", color = Color.Gray)
-                Text("KES 1,130", fontWeight = FontWeight.Bold)
+                Text("KES ${String.format("%,.0f", sale.subtotal)}", fontWeight = FontWeight.Bold)
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("VAT (16%)", color = Color.Gray)
-                Text("KES 0", fontWeight = FontWeight.Bold) // Simplified
+            if (sale.discountAmount > 0) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Discount", color = Color.Red)
+                    Text("- KES ${String.format("%,.0f", sale.discountAmount)}", fontWeight = FontWeight.Bold, color = Color.Red)
+                }
             }
             Spacer(modifier = Modifier.height(12.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Total", style = AppTextStyles.amountLarge)
-                Text(transaction.amount, style = AppTextStyles.amountLarge)
+                Text("KES ${String.format("%,.0f", sale.totalAmount)}", style = AppTextStyles.amountLarge)
             }
         }
         
@@ -377,7 +414,7 @@ fun SalesDetailSheet(
             Button(
                 onClick = {
                      // Quick Share Text
-                     ReceiptUtils.shareText(context, "Receipt for ${transaction.amount} from Mama Njeri's Shop. Paid via ${transaction.paymentMethod}.")
+                     ReceiptUtils.shareText(context, "Receipt for KES ${sale.totalAmount} from My Business. Paid via ${sale.paymentMethod}.")
                 },
                 modifier = Modifier.weight(1f).height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = NeoBukCyan)
@@ -442,8 +479,16 @@ fun FilterChipItem(text: String, selected: Boolean) {
 }
 
 @Composable
-fun SummaryCard() {
+fun SummaryCard(salesViewModel: SalesViewModel) {
     var chartVisible by remember { mutableStateOf(false) }
+    
+    val todaySalesTotal by remember(salesViewModel) { 
+        derivedStateOf { salesViewModel.getTodayTotalSales() } 
+    }
+    val todaySalesCount by remember(salesViewModel) {
+        derivedStateOf { salesViewModel.getTodaySalesCount() }
+    }
+    
     LaunchedEffect(Unit) {
         chartVisible = true
     }
@@ -458,7 +503,7 @@ fun SummaryCard() {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "KES 12,450",
+                text = "KES ${String.format("%,.0f", todaySalesTotal)}",
                 style = AppTextStyles.amountLarge
             )
             Text(
@@ -474,14 +519,15 @@ fun SummaryCard() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                MiniStatItem(Modifier.weight(1f), "KES 1,035", "Avg. Sale")
-                MiniStatItem(Modifier.weight(1f), "12", "Sales Count")
-                MiniStatItem(Modifier.weight(1f), "Maize Flour", "Top Product")
+                val avg = if (todaySalesCount > 0) todaySalesTotal / todaySalesCount else 0.0
+                MiniStatItem(Modifier.weight(1f), "KES ${String.format("%,.0f", avg)}", "Avg. Sale")
+                MiniStatItem(Modifier.weight(1f), "$todaySalesCount", "Sales Count")
+                MiniStatItem(Modifier.weight(1f), "N/A", "Top Product") // Placeholder
             }
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Chart Area (Visual Clone)
+            // Chart Area (Visual Clone - Mock Data for now)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -528,7 +574,7 @@ fun MiniStatItem(modifier: Modifier, value: String, label: String) {
 
 @Composable
 fun ChartBar(height: Float, label: String, isVisible: Boolean = true, index: Int = 0) {
-    val animatedHeight by androidx.compose.animation.core.animateFloatAsState(
+    val animatedHeight by animateFloatAsState(
         targetValue = if (isVisible) height else 0f,
         animationSpec = androidx.compose.animation.core.tween(
             durationMillis = 600,
@@ -562,9 +608,23 @@ fun ChartBar(height: Float, label: String, isVisible: Boolean = true, index: Int
 
 @Composable
 fun TransactionItem(
-    data: TransactionData,
+    sale: Sale,
     onClick: () -> Unit
 ) {
+    // Determine colors
+    val (paymentBg, paymentText) = when(sale.paymentMethod.uppercase()) {
+        "M-PESA" -> Color(0xFFE8F5E9) to Color(0xFF2E7D32)
+        "CASH" -> Color(0xFFE3F2FD) to Color(0xFF1565C0)
+        else -> Color(0xFFF3E5F5) to Color(0xFF7B1FA2)
+    }
+    
+    // Determine title (e.g., "Multiple Items (5)" or "Item Name")
+    val title = if (sale.itemCount > 1) {
+        "Multiple Items (${sale.itemCount})"
+    } else {
+        sale.items.firstOrNull()?.displayName ?: "Sale"
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -584,25 +644,25 @@ fun TransactionItem(
                 // Left side: Title + Pill
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = data.title.take(18) + if(data.title.length > 18) "..." else "",
+                        text = title.take(18) + if(title.length > 18) "..." else "",
                         style = AppTextStyles.bodyBold
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Box(
                         modifier = Modifier
-                            .background(data.paymentColor, RoundedCornerShape(4.dp))
+                            .background(paymentBg, RoundedCornerShape(4.dp))
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
-                            text = data.paymentMethod,
+                            text = sale.paymentMethod,
                             style = MaterialTheme.typography.labelSmall,
-                            color = data.paymentTextColor
+                            color = paymentText
                         )
                     }
                 }
                 // Right side: Amount
                 Text(
-                    text = data.amount,
+                    text = "KES ${String.format("%,.0f", sale.totalAmount)}",
                     style = AppTextStyles.price
                 )
             }
@@ -611,7 +671,7 @@ fun TransactionItem(
             
             // Date
             Text(
-                text = data.date,
+                text = formatDateTime(sale.saleDate),
                 style = AppTextStyles.secondary,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -628,7 +688,7 @@ fun TransactionItem(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = data.customer,
+                    text = sale.customerName ?: "Walk-in Customer",
                     style = AppTextStyles.secondary,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -684,174 +744,3 @@ fun TransactionItem(
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun NewSaleSheet(
-    onDismiss: () -> Unit,
-    onSubmit: () -> Unit
-) {
-    var customerName by remember { mutableStateOf("") }
-    var selectedPaymentMethod by remember { mutableStateOf("Cash") }
-    
-    // Mock cart items
-    val cartItems = remember {
-        listOf(
-            CartItem("Maize Flour", 2, 120.0),
-            CartItem("Sugar 1kg", 3, 150.0),
-            CartItem("Cooking Oil 2L", 1, 350.0)
-        )
-    }
-    val subtotal = cartItems.sumOf { it.quantity * it.price }
-    
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp)
-            .padding(bottom = 32.dp)
-    ) {
-        // Header
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "New Sale",
-                style = AppTextStyles.pageTitle
-            )
-            IconButton(onClick = onDismiss) {
-                Icon(Icons.Default.Close, contentDescription = "Close")
-            }
-        }
-        
-        HorizontalDivider(
-            color = Color.LightGray.copy(alpha = 0.2f),
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
-        
-        // Customer Name (Optional)
-        Text("Customer Name (Optional)", style = AppTextStyles.bodyBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = customerName,
-            onValueChange = { customerName = it },
-            placeholder = { Text("Walk-in Customer") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
-                focusedBorderColor = NeoBukTeal
-            )
-        )
-        
-        Spacer(modifier = Modifier.height(20.dp))
-        
-        // Cart Items
-        Text("Items", style = AppTextStyles.bodyBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                cartItems.forEach { item ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("${item.name} × ${item.quantity}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("KES ${String.format("%,.0f", item.quantity * item.price)}", fontWeight = FontWeight.Medium)
-                    }
-                    if (item != cartItems.last()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-                
-                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.3f))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Total", style = AppTextStyles.amountLarge)
-                    Text("KES ${String.format("%,.0f", subtotal)}", style = AppTextStyles.amountLarge, color = NeoBukTeal)
-                }
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        // Add Items Button
-        OutlinedButton(
-            onClick = { /* Open product scanner/selector */ },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, NeoBukTeal.copy(alpha = 0.5f))
-        ) {
-            Icon(Icons.Default.Add, null, tint = NeoBukTeal, modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Add / Scan Products", color = NeoBukTeal)
-        }
-        
-        Spacer(modifier = Modifier.height(20.dp))
-        
-        // Payment Method
-        Text("Payment Method", style = AppTextStyles.bodyBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("Cash", "M-PESA", "Card").forEach { method ->
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (selectedPaymentMethod == method) NeoBukTeal.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
-                    border = if (selectedPaymentMethod == method) 
-                        androidx.compose.foundation.BorderStroke(1.dp, NeoBukTeal) else null,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(44.dp)
-                        .clickable { selectedPaymentMethod = method }
-                ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            method,
-                            style = AppTextStyles.body,
-                            color = if (selectedPaymentMethod == method) NeoBukTeal else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Submit Button
-        Button(
-            onClick = onSubmit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
-            enabled = cartItems.isNotEmpty()
-        ) {
-            Icon(
-                Icons.Default.ShoppingCart,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = Color.White
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                "Complete Sale • KES ${String.format("%,.0f", subtotal)}",
-                style = AppTextStyles.buttonLarge
-            )
-        }
-    }
-}
-
-data class CartItem(
-    val name: String,
-    val quantity: Int,
-    val price: Double
-)

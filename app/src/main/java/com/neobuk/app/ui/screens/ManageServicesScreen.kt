@@ -29,6 +29,8 @@ import com.neobuk.app.data.models.ServiceProvider
 import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
+import com.neobuk.app.viewmodels.ServicesViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.util.*
 
 /**
@@ -38,18 +40,35 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageServicesScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    businessId: String? = null,
+    servicesViewModel: ServicesViewModel = koinViewModel()
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Services", "Staff")
+    
+    // Initialize with business ID
+    LaunchedEffect(businessId) {
+        businessId?.let { servicesViewModel.setBusinessId(it) }
+    }
+    
+    // Collect state from ViewModel
+    val services by servicesViewModel.serviceDefinitions.collectAsState()
+    val providers by servicesViewModel.serviceProviders.collectAsState()
+    val isLoading by servicesViewModel.isLoading.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Header removed (moved to Toolbar)
-
+        // Loading indicator
+        if (isLoading) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+                color = NeoBukTeal
+            )
+        }
 
         // Tabs
         TabRow(
@@ -80,29 +99,27 @@ fun ManageServicesScreen(
 
         // Content
         when (selectedTabIndex) {
-            0 -> ServicesContent()
-            1 -> StaffContent()
+            0 -> ServicesContent(
+                services = services,
+                servicesViewModel = servicesViewModel
+            )
+            1 -> StaffContent(
+                providers = providers,
+                servicesViewModel = servicesViewModel
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ServicesContent() {
+fun ServicesContent(
+    services: List<ServiceDefinition>,
+    servicesViewModel: ServicesViewModel
+) {
     var showAddSheet by remember { mutableStateOf(false) }
     var editingService by remember { mutableStateOf<ServiceDefinition?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    // Mock data
-    val services = remember {
-        mutableStateListOf(
-            ServiceDefinition("1", "Haircut", 500.0),
-            ServiceDefinition("2", "Beard Trim", 200.0),
-            ServiceDefinition("3", "Manicure", 800.0),
-            ServiceDefinition("4", "Pedicure", 1000.0),
-            ServiceDefinition("5", "Full Grooming", 1500.0)
-        )
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -142,21 +159,21 @@ fun ServicesContent() {
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f) // Ensure it takes available space
+                modifier = Modifier.weight(1f)
             ) {
                 items(services) { service ->
                     ServiceCard(
                         service = service,
                         onEdit = { editingService = service },
                         onToggleActive = {
-                            val index = services.indexOf(service)
-                            if (index >= 0) {
-                                services[index] = service.copy(isActive = !service.isActive)
-                            }
+                            servicesViewModel.toggleServiceDefinitionActive(
+                                serviceId = service.id,
+                                isActive = !service.isActive
+                            )
                         }
                     )
                 }
-                item { Spacer(modifier = Modifier.height(80.dp)) } // Bottom padding for FAB
+                item { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
 
@@ -185,17 +202,30 @@ fun ServicesContent() {
         ) {
             AddEditServiceSheet(
                 existingService = editingService,
-                onSave = { service ->
+                onSave = { name, basePrice, commissionOverride ->
                     if (editingService != null) {
-                        val index = services.indexOfFirst { it.id == service.id }
-                        if (index >= 0) {
-                            services[index] = service
-                        }
+                        servicesViewModel.updateServiceDefinition(
+                            service = editingService!!.copy(
+                                name = name,
+                                basePrice = basePrice,
+                                commissionOverride = commissionOverride
+                            ),
+                            onSuccess = {
+                                showAddSheet = false
+                                editingService = null
+                            }
+                        )
                     } else {
-                        services.add(0, service)
+                        servicesViewModel.createServiceDefinition(
+                            name = name,
+                            basePrice = basePrice,
+                            commissionOverride = commissionOverride,
+                            onSuccess = {
+                                showAddSheet = false
+                                editingService = null
+                            }
+                        )
                     }
-                    showAddSheet = false
-                    editingService = null
                 },
                 onDismiss = {
                     showAddSheet = false
@@ -208,20 +238,13 @@ fun ServicesContent() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StaffContent() {
+fun StaffContent(
+    providers: List<ServiceProvider>,
+    servicesViewModel: ServicesViewModel
+) {
     var showAddSheet by remember { mutableStateOf(false) }
     var editingProvider by remember { mutableStateOf<ServiceProvider?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    // Mock data
-    val providers = remember {
-        mutableStateListOf(
-            ServiceProvider(id = "1", fullName = "John Mwangi", role = "Barber", commissionRate = 30.0),
-            ServiceProvider(id = "2", fullName = "Mary Wanjiku", role = "Stylist", commissionRate = 25.0),
-            ServiceProvider(id = "3", fullName = "Peter Ochieng", role = "Barber", commissionRate = 35.0),
-            ServiceProvider(id = "4", fullName = "Grace Akinyi", role = "Manicurist", commissionRate = 40.0, isActive = false)
-        )
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -263,15 +286,15 @@ fun StaffContent() {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                items(providers) { provider ->
+            items(providers) { provider ->
                     StaffCard(
                         provider = provider,
                         onEdit = { editingProvider = provider },
                         onToggleActive = {
-                            val index = providers.indexOf(provider)
-                            if (index >= 0) {
-                                providers[index] = provider.copy(isActive = !provider.isActive)
-                            }
+                            servicesViewModel.toggleServiceProviderActive(
+                                providerId = provider.id,
+                                isActive = !provider.isActive
+                            )
                         }
                     )
                 }
@@ -304,17 +327,34 @@ fun StaffContent() {
         ) {
             AddEditStaffSheet(
                 existingProvider = editingProvider,
-                onSave = { provider ->
+                onSave = { fullName, role, commissionType, commissionRate, flatFee ->
                     if (editingProvider != null) {
-                        val index = providers.indexOfFirst { it.id == provider.id }
-                        if (index >= 0) {
-                            providers[index] = provider
-                        }
+                        servicesViewModel.updateServiceProvider(
+                            provider = editingProvider!!.copy(
+                                fullName = fullName,
+                                role = role,
+                                commissionType = commissionType,
+                                commissionRate = commissionRate,
+                                flatFee = flatFee
+                            ),
+                            onSuccess = {
+                                showAddSheet = false
+                                editingProvider = null
+                            }
+                        )
                     } else {
-                        providers.add(0, provider)
+                        servicesViewModel.createServiceProvider(
+                            fullName = fullName,
+                            role = role,
+                            commissionType = commissionType,
+                            commissionRate = commissionRate,
+                            flatFee = flatFee,
+                            onSuccess = {
+                                showAddSheet = false
+                                editingProvider = null
+                            }
+                        )
                     }
-                    showAddSheet = false
-                    editingProvider = null
                 },
                 onDismiss = {
                     showAddSheet = false
@@ -518,7 +558,7 @@ private fun StaffCard(
 @Composable
 private fun AddEditServiceSheet(
     existingService: ServiceDefinition?,
-    onSave: (ServiceDefinition) -> Unit,
+    onSave: (name: String, basePrice: Double, commissionOverride: Double?) -> Unit,
     onDismiss: () -> Unit
 ) {
     var name by remember { mutableStateOf(existingService?.name ?: "") }
@@ -643,14 +683,11 @@ private fun AddEditServiceSheet(
 
             Button(
                 onClick = {
-                    val service = ServiceDefinition(
-                        id = existingService?.id ?: UUID.randomUUID().toString(),
-                        name = name.trim(),
-                        basePrice = basePrice.toDoubleOrNull() ?: 0.0,
-                        commissionOverride = commissionOverride.toDoubleOrNull(),
-                        isActive = existingService?.isActive ?: true
+                    onSave(
+                        name.trim(),
+                        basePrice.toDoubleOrNull() ?: 0.0,
+                        commissionOverride.toDoubleOrNull()
                     )
-                    onSave(service)
                 },
                 modifier = Modifier
                     .weight(1f)
@@ -670,7 +707,7 @@ private fun AddEditServiceSheet(
 @Composable
 private fun AddEditStaffSheet(
     existingProvider: ServiceProvider?,
-    onSave: (ServiceProvider) -> Unit,
+    onSave: (fullName: String, role: String, commissionType: CommissionType, commissionRate: Double, flatFee: Double) -> Unit,
     onDismiss: () -> Unit
 ) {
     var fullName by remember { mutableStateOf(existingProvider?.fullName ?: "") }
@@ -794,15 +831,13 @@ private fun AddEditStaffSheet(
 
             Button(
                 onClick = {
-                    val provider = ServiceProvider(
-                        id = existingProvider?.id ?: UUID.randomUUID().toString(),
-                        fullName = fullName.trim(),
-                        role = role.trim(),
-                        commissionType = CommissionType.PERCENTAGE, // Defaulting as simplified
-                        commissionRate = commissionRate.toDoubleOrNull() ?: 0.0,
-                        isActive = existingProvider?.isActive ?: true
+                    onSave(
+                        fullName.trim(),
+                        role.trim(),
+                        CommissionType.PERCENTAGE, // Defaulting as simplified
+                        commissionRate.toDoubleOrNull() ?: 0.0,
+                        0.0 // flatFee - could be exposed in UI later
                     )
-                    onSave(provider)
                 },
                 modifier = Modifier
                     .weight(1f)

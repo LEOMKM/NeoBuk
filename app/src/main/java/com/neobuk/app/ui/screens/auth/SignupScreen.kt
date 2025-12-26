@@ -37,6 +37,8 @@ import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
 import com.neobuk.app.ui.components.PlanSelectionList
+import com.neobuk.app.viewmodels.AuthViewModel
+import com.neobuk.app.viewmodels.SignupState
 import java.util.Date
 
 enum class SignupStep {
@@ -72,12 +74,49 @@ data class SignupFormData(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SignupScreen(
+    authViewModel: AuthViewModel,
     onSignupSuccess: (String) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
     var step by remember { mutableStateOf(SignupStep.ACCOUNT_BASICS) }
     var formData by remember { mutableStateOf(SignupFormData()) }
-    var isProcessing by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    
+    // Observe signup state
+    val signupState by authViewModel.signupState.collectAsState()
+    
+    // Handle signup state changes
+    LaunchedEffect(signupState) {
+        when (signupState) {
+            is SignupState.Loading -> {
+                isLoading = true
+                errorMessage = null
+            }
+            is SignupState.AccountCreated -> {
+                isLoading = false
+                // Account created, move to business setup
+                step = SignupStep.BUSINESS_SETUP
+            }
+            is SignupState.BusinessCreated -> {
+                isLoading = false
+                // Business created, move to subscription
+                step = SignupStep.SUBSCRIPTION_PLAN
+            }
+            is SignupState.Complete -> {
+                isLoading = false
+                // All done, show success
+                step = SignupStep.SUCCESS
+            }
+            is SignupState.Error -> {
+                isLoading = false
+                errorMessage = (signupState as SignupState.Error).message
+            }
+            else -> {
+                isLoading = false
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -95,15 +134,16 @@ fun SignupScreen(
             
             // Header with Back Button (except on Step 1 and Success)
             Box(modifier = Modifier.fillMaxWidth()) {
-                if (step != SignupStep.ACCOUNT_BASICS && step != SignupStep.SUCCESS) {
+                if (step != SignupStep.ACCOUNT_BASICS && step != SignupStep.SUCCESS && !isLoading) {
                     IconButton(
                         onClick = {
-                            // Go back logic
+                            errorMessage = null
+                            // Go back to previous step (now allowed since we don't submit until the end)
                             step = when (step) {
                                 SignupStep.BUSINESS_SETUP -> SignupStep.ACCOUNT_BASICS
                                 SignupStep.SUBSCRIPTION_PLAN -> SignupStep.BUSINESS_SETUP
                                 SignupStep.PAYMENT -> SignupStep.SUBSCRIPTION_PLAN
-                                else -> SignupStep.ACCOUNT_BASICS
+                                else -> step
                             }
                         },
                         modifier = Modifier.align(Alignment.CenterStart)
@@ -128,7 +168,7 @@ fun SignupScreen(
                             val color = if (isActive) NeoBukTeal else MaterialTheme.colorScheme.outlineVariant
                             Box(
                                 modifier = Modifier
-                                    .width(if (isCurrent) 24.dp else 12.dp) // highlight current step
+                                    .width(if (isCurrent) 24.dp else 12.dp)
                                     .fillMaxHeight()
                                     .background(color, CircleShape)
                             )
@@ -144,16 +184,33 @@ fun SignupScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+            
+            // Error Message Card
+            errorMessage?.let { error ->
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = AppTextStyles.body,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             AnimatedContent(
                 targetState = step,
                 transitionSpec = {
                     if (targetState.ordinal > initialState.ordinal) {
-                        // Forward: Slide in from Right, Out to Left
                         (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
                             slideOutHorizontally { width -> -width } + fadeOut())
                     } else {
-                         // Backward: Slide in from Left, Out to Right
                         (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(
                             slideOutHorizontally { width -> width } + fadeOut())
                     }
@@ -171,23 +228,46 @@ fun SignupScreen(
                             SignupStep.ACCOUNT_BASICS -> AccountBasicsStep(
                                 formData = formData,
                                 onUpdate = { formData = it },
-                                onNext = { step = SignupStep.BUSINESS_SETUP },
+                                isLoading = isLoading,
+                                onNext = {
+                                    // Just move to next step - no API call yet
+                                    errorMessage = null
+                                    step = SignupStep.BUSINESS_SETUP
+                                },
                                 onLoginClick = onNavigateToLogin
                             )
                             SignupStep.BUSINESS_SETUP -> BusinessSetupStep(
                                 formData = formData,
                                 onUpdate = { formData = it },
-                                onNext = { step = SignupStep.SUBSCRIPTION_PLAN }
+                                isLoading = isLoading,
+                                onNext = {
+                                    // Just move to next step - no API call yet
+                                    errorMessage = null
+                                    step = SignupStep.SUBSCRIPTION_PLAN
+                                }
                             )
                             SignupStep.SUBSCRIPTION_PLAN -> SubscriptionPlanStep(
                                 formData = formData,
                                 onUpdate = { formData = it },
+                                isLoading = isLoading,
                                 onNext = {
+                                    errorMessage = null
                                     if (formData.selectedPlan == PlanType.FREE_TRIAL) {
-                                        // Skip payment for free trial -> Success
-                                        // Here we would typically hit the API to create subscription
-                                        step = SignupStep.SUCCESS
+                                        // Submit ALL data now (account + business + trial subscription)
+                                        authViewModel.signupComplete(
+                                            fullName = formData.fullName.trim(),
+                                            phone = formData.phoneNumber.trim(),
+                                            email = formData.email.trim(),
+                                            password = formData.password,
+                                            businessName = formData.businessName.trim(),
+                                            category = formData.businessCategory!!,
+                                            subtype = formData.businessSubtype,
+                                            planType = PlanType.FREE_TRIAL,
+                                            onSuccess = { /* Handled by LaunchedEffect */ },
+                                            onError = { /* Handled by LaunchedEffect */ }
+                                        )
                                     } else {
+                                        // Go to payment step first
                                         step = SignupStep.PAYMENT
                                     }
                                 }
@@ -195,8 +275,21 @@ fun SignupScreen(
                             SignupStep.PAYMENT -> PaymentStep(
                                 formData = formData,
                                 onUpdate = { formData = it },
+                                isLoading = isLoading,
                                 onPaymentSuccess = {
-                                    step = SignupStep.SUCCESS
+                                    // Submit ALL data now (account + business + paid subscription)
+                                    authViewModel.signupComplete(
+                                        fullName = formData.fullName.trim(),
+                                        phone = formData.phoneNumber.trim(),
+                                        email = formData.email.trim(),
+                                        password = formData.password,
+                                        businessName = formData.businessName.trim(),
+                                        category = formData.businessCategory!!,
+                                        subtype = formData.businessSubtype,
+                                        planType = formData.selectedPlan ?: PlanType.MONTHLY,
+                                        onSuccess = { /* Handled by LaunchedEffect */ },
+                                        onError = { /* Handled by LaunchedEffect */ }
+                                    )
                                 }
                             )
                             SignupStep.SUCCESS -> SuccessStep(
@@ -219,13 +312,14 @@ fun SignupScreen(
 fun AccountBasicsStep(
     formData: SignupFormData,
     onUpdate: (SignupFormData) -> Unit,
+    isLoading: Boolean = false,
     onNext: () -> Unit,
     onLoginClick: () -> Unit
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     val isValid = formData.fullName.isNotBlank() && 
                   formData.phoneNumber.isNotBlank() && 
-                  formData.password.isNotBlank() && 
+                  formData.password.length >= 6 && 
                   formData.password == formData.confirmPassword &&
                   formData.termsAccepted
 
@@ -239,7 +333,8 @@ fun AccountBasicsStep(
             label = "Full Name",
             value = formData.fullName,
             onValueChange = { onUpdate(formData.copy(fullName = it)) },
-            placeholder = "e.g. John Doe"
+            placeholder = "e.g. John Doe",
+            enabled = !isLoading
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -248,7 +343,8 @@ fun AccountBasicsStep(
             value = formData.phoneNumber,
             onValueChange = { onUpdate(formData.copy(phoneNumber = it)) },
             placeholder = "e.g. 0712345678",
-            keyboardType = KeyboardType.Phone
+            keyboardType = KeyboardType.Phone,
+            enabled = !isLoading
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -257,17 +353,19 @@ fun AccountBasicsStep(
             value = formData.email,
             onValueChange = { onUpdate(formData.copy(email = it)) },
             placeholder = "e.g. john@example.com",
-            keyboardType = KeyboardType.Email
+            keyboardType = KeyboardType.Email,
+            enabled = !isLoading
         )
         Spacer(modifier = Modifier.height(16.dp))
 
         // Password
         PasswordInput(
-            label = "Password",
+            label = "Password (min 6 characters)",
             value = formData.password,
             onValueChange = { onUpdate(formData.copy(password = it)) },
             visible = passwordVisible,
-            onToggleVisibility = { passwordVisible = !passwordVisible }
+            onToggleVisibility = { passwordVisible = !passwordVisible },
+            enabled = !isLoading
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -277,7 +375,8 @@ fun AccountBasicsStep(
             onValueChange = { onUpdate(formData.copy(confirmPassword = it)) },
             visible = passwordVisible,
             onToggleVisibility = { passwordVisible = !passwordVisible },
-            isError = formData.confirmPassword.isNotEmpty() && formData.password != formData.confirmPassword
+            isError = formData.confirmPassword.isNotEmpty() && formData.password != formData.confirmPassword,
+            enabled = !isLoading
         )
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -285,12 +384,15 @@ fun AccountBasicsStep(
         // Terms
         Row(
             verticalAlignment = Alignment.CenterVertically, 
-            modifier = Modifier.fillMaxWidth().clickable { onUpdate(formData.copy(termsAccepted = !formData.termsAccepted)) }
+            modifier = Modifier.fillMaxWidth().clickable(enabled = !isLoading) { 
+                onUpdate(formData.copy(termsAccepted = !formData.termsAccepted)) 
+            }
         ) {
             Checkbox(
                 checked = formData.termsAccepted,
                 onCheckedChange = { onUpdate(formData.copy(termsAccepted = it)) },
-                colors = CheckboxDefaults.colors(checkedColor = NeoBukTeal)
+                colors = CheckboxDefaults.colors(checkedColor = NeoBukTeal),
+                enabled = !isLoading
             )
             Text(
                 "I accept the Terms & Conditions",
@@ -306,9 +408,17 @@ fun AccountBasicsStep(
             modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
-            enabled = isValid
+            enabled = isValid && !isLoading
         ) {
-            Text("Next", style = AppTextStyles.buttonLarge)
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Create Account", style = AppTextStyles.buttonLarge)
+            }
         }
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -318,7 +428,7 @@ fun AccountBasicsStep(
                 "Sign In", 
                 style = AppTextStyles.bodyBold, 
                 color = NeoBukTeal, 
-                modifier = Modifier.clickable { onLoginClick() }
+                modifier = Modifier.clickable(enabled = !isLoading) { onLoginClick() }
             )
         }
     }
@@ -332,6 +442,7 @@ fun AccountBasicsStep(
 fun BusinessSetupStep(
     formData: SignupFormData,
     onUpdate: (SignupFormData) -> Unit,
+    isLoading: Boolean = false,
     onNext: () -> Unit
 ) {
     val isValid = formData.businessName.isNotBlank() && formData.businessCategory != null && formData.businessSubtype.isNotBlank()
@@ -349,7 +460,8 @@ fun BusinessSetupStep(
             label = "Business Name",
             value = formData.businessName,
             onValueChange = { onUpdate(formData.copy(businessName = it)) },
-            placeholder = "e.g. Mama Njeri Salon"
+            placeholder = "e.g. Mama Njeri Salon",
+            enabled = !isLoading
         )
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -358,20 +470,18 @@ fun BusinessSetupStep(
         Spacer(modifier = Modifier.height(8.dp))
         
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            // Services Option
             SelectionCardSmall(
                 title = "Services",
                 icon = "✂️",
                 selected = formData.businessCategory == BusinessCategory.SERVICES,
-                onClick = { onUpdate(formData.copy(businessCategory = BusinessCategory.SERVICES, businessSubtype = "")) },
+                onClick = { if (!isLoading) onUpdate(formData.copy(businessCategory = BusinessCategory.SERVICES, businessSubtype = "")) },
                 modifier = Modifier.weight(1f)
             )
-            // Products Option
             SelectionCardSmall(
                 title = "Products",
                 icon = "🛒",
                 selected = formData.businessCategory == BusinessCategory.PRODUCTS,
-                onClick = { onUpdate(formData.copy(businessCategory = BusinessCategory.PRODUCTS, businessSubtype = "")) },
+                onClick = { if (!isLoading) onUpdate(formData.copy(businessCategory = BusinessCategory.PRODUCTS, businessSubtype = "")) },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -385,7 +495,6 @@ fun BusinessSetupStep(
             )
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Subtypes Chips
             val subtypes = if (formData.businessCategory == BusinessCategory.SERVICES) serviceTypes else productTypes
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -396,15 +505,15 @@ fun BusinessSetupStep(
                     val isSelected = formData.businessSubtype == type
                     FilterChip(
                         selected = isSelected,
-                        onClick = { onUpdate(formData.copy(businessSubtype = type)) },
+                        onClick = { if (!isLoading) onUpdate(formData.copy(businessSubtype = type)) },
                         label = { Text(type) },
+                        enabled = !isLoading,
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = NeoBukTeal,
                             selectedLabelColor = Color.White
                         )
                     )
                 }
-                // Custom handling could be added
             }
         }
 
@@ -415,9 +524,17 @@ fun BusinessSetupStep(
             modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
-            enabled = isValid
+            enabled = isValid && !isLoading
         ) {
-            Text("Next", style = AppTextStyles.buttonLarge)
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Create Business", style = AppTextStyles.buttonLarge)
+            }
         }
     }
 }
@@ -455,6 +572,7 @@ fun SelectionCardSmall(
 fun SubscriptionPlanStep(
     formData: SignupFormData,
     onUpdate: (SignupFormData) -> Unit,
+    isLoading: Boolean = false,
     onNext: () -> Unit
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -475,15 +593,23 @@ fun SubscriptionPlanStep(
             modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
-            enabled = formData.selectedPlan != null
+            enabled = formData.selectedPlan != null && !isLoading
         ) {
-            val buttonText = when(formData.selectedPlan) {
-                PlanType.FREE_TRIAL -> "Start Free Trial"
-                PlanType.MONTHLY -> "Subscribe Monthly"
-                PlanType.YEARLY -> "Subscribe Yearly"
-                else -> "Continue"
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                val buttonText = when(formData.selectedPlan) {
+                    PlanType.FREE_TRIAL -> "Start Free Trial"
+                    PlanType.MONTHLY -> "Subscribe Monthly"
+                    PlanType.YEARLY -> "Subscribe Yearly"
+                    else -> "Continue"
+                }
+                Text(buttonText, style = AppTextStyles.buttonLarge)
             }
-            Text(buttonText, style = AppTextStyles.buttonLarge)
         }
     }
 }
@@ -496,6 +622,7 @@ fun SubscriptionPlanStep(
 fun PaymentStep(
     formData: SignupFormData,
     onUpdate: (SignupFormData) -> Unit,
+    isLoading: Boolean = false,
     onPaymentSuccess: () -> Unit
 ) {
     var isProcessing by remember { mutableStateOf(false) }
@@ -622,7 +749,7 @@ fun SuccessStep(onContinue: () -> Unit) {
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal)
         ) {
-            Text("Go to Home", style = AppTextStyles.buttonLarge)
+            Text("Go to Login", style = AppTextStyles.buttonLarge)
             Spacer(modifier = Modifier.width(8.dp))
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
         }
@@ -639,7 +766,8 @@ fun SignupInput(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    enabled: Boolean = true
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -659,6 +787,7 @@ fun SignupInput(
                 cursorColor = NeoBukTeal
             ),
             singleLine = true,
+            enabled = enabled,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) }
         )
@@ -672,7 +801,8 @@ fun PasswordInput(
     onValueChange: (String) -> Unit,
     visible: Boolean,
     onToggleVisibility: () -> Unit,
-    isError: Boolean = false
+    isError: Boolean = false,
+    enabled: Boolean = true
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
          Text(
@@ -692,9 +822,10 @@ fun PasswordInput(
                 cursorColor = NeoBukTeal
             ),
             singleLine = true,
+            enabled = enabled,
             visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                IconButton(onClick = onToggleVisibility) {
+                IconButton(onClick = onToggleVisibility, enabled = enabled) {
                     Icon(
                         imageVector = if (visible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = "Toggle Password Visibility",

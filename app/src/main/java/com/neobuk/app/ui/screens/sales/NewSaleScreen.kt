@@ -26,62 +26,38 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.neobuk.app.data.repositories.CartItem
+import com.neobuk.app.data.repositories.Product
 import com.neobuk.app.ui.theme.NeoBukCyan
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
 import com.neobuk.app.ui.theme.AppTextStyles
-
-// Data Classes
-data class SaleCartItem(
-    val productId: String,
-    val name: String,
-    val quantity: Int,
-    val unitPrice: Double
-) {
-    val totalPrice: Double get() = quantity * unitPrice
-}
-
-data class SaleProduct(
-    val id: String,
-    val name: String,
-    val price: Double,
-    val stock: Int,
-    val unit: String,
-    val barcode: String
-)
+import com.neobuk.app.viewmodels.ProductsViewModel
+import com.neobuk.app.viewmodels.SalesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewSaleScreen(
+    salesViewModel: SalesViewModel,
+    productsViewModel: ProductsViewModel,
     onDismiss: () -> Unit,
-    onCompleteSale: (List<SaleCartItem>, String, String) -> Unit
+    onCompleteSale: () -> Unit
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var customerName by remember { mutableStateOf("") }
     var selectedPaymentMethod by remember { mutableStateOf("Cash") }
     
-    // Cart State
-    val cartItems = remember { mutableStateListOf<SaleCartItem>() }
-    val cartTotal = cartItems.sumOf { it.totalPrice }
-
-    // Mock Products for browsing
-    val availableProducts = remember {
-        listOf(
-            SaleProduct("1", "Maize Flour 2kg", 120.0, 45, "pcs", "5012345678900"),
-            SaleProduct("2", "Sugar 1kg", 150.0, 32, "pcs", "5012345678901"),
-            SaleProduct("3", "Cooking Oil 2L", 350.0, 18, "btl", "5012345678902"),
-            SaleProduct("4", "Tea Leaves 500g", 180.0, 24, "pkt", "5012345678903"),
-            SaleProduct("5", "Milk 500ml", 65.0, 50, "pcs", "5012345678904"),
-            SaleProduct("6", "Bread 400g", 55.0, 20, "pcs", "5012345678905"),
-            SaleProduct("7", "Rice 2kg", 280.0, 15, "pcs", "5012345678906"),
-            SaleProduct("8", "Salt 1kg", 45.0, 40, "pcs", "5012345678907")
-        )
-    }
+    // Create Sale State - observe from ViewModel
+    val cartItems by salesViewModel.cartItems.collectAsState()
+    val cartTotal by salesViewModel.cartTotal.collectAsState()
+    
+    // Product Data
+    val availableProducts by productsViewModel.products.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Header
         Row(
@@ -103,7 +79,7 @@ fun NewSaleScreen(
         // Tab Row
         TabRow(
             selectedTabIndex = selectedTab,
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.background,
             contentColor = NeoBukTeal,
             indicator = { tabPositions ->
                 TabRowDefaults.Indicator(
@@ -155,32 +131,15 @@ fun NewSaleScreen(
         ) {
             when (selectedTab) {
                 0 -> ScanTab(
-                    onProductScanned = { barcode ->
-                        // Find product by barcode
-                        val product = availableProducts.find { it.barcode == barcode }
-                        if (product != null) {
-                            // Check if already in cart
-                            val existingIndex = cartItems.indexOfFirst { it.productId == product.id }
-                            if (existingIndex >= 0) {
-                                val existing = cartItems[existingIndex]
-                                cartItems[existingIndex] = existing.copy(quantity = existing.quantity + 1)
-                            } else {
-                                cartItems.add(SaleCartItem(product.id, product.name, 1, product.price))
-                            }
-                        }
+                    productsViewModel = productsViewModel,
+                    onProductFound = { product ->
+                        salesViewModel.addProductToCart(product)
                     }
                 )
                 1 -> BrowseTab(
                     products = availableProducts,
                     onProductSelected = { product ->
-                        // Check if already in cart
-                        val existingIndex = cartItems.indexOfFirst { it.productId == product.id }
-                        if (existingIndex >= 0) {
-                            val existing = cartItems[existingIndex]
-                            cartItems[existingIndex] = existing.copy(quantity = existing.quantity + 1)
-                        } else {
-                            cartItems.add(SaleCartItem(product.id, product.name, 1, product.price))
-                        }
+                        salesViewModel.addProductToCart(product)
                     }
                 )
             }
@@ -195,15 +154,20 @@ fun NewSaleScreen(
             selectedPaymentMethod = selectedPaymentMethod,
             onPaymentMethodChange = { selectedPaymentMethod = it },
             onUpdateQuantity = { index, newQty ->
-                if (newQty <= 0) {
-                    cartItems.removeAt(index)
-                } else {
-                    cartItems[index] = cartItems[index].copy(quantity = newQty)
-                }
+                salesViewModel.updateCartItemQuantity(index, newQty.toDouble())
             },
-            onRemoveItem = { index -> cartItems.removeAt(index) },
+            onRemoveItem = { index -> salesViewModel.removeCartItem(index) },
             onCompleteSale = {
-                onCompleteSale(cartItems.toList(), customerName, selectedPaymentMethod)
+                salesViewModel.checkout(
+                    paymentMethod = selectedPaymentMethod,
+                    customerName = customerName.ifBlank { "Walk-in Customer" },
+                    onSuccess = {
+                        onCompleteSale()
+                    },
+                    onError = {
+                        // Handle error (show Snackbar, etc - can be done via ViewModel error state in parent)
+                    }
+                )
             }
         )
     }
@@ -211,10 +175,14 @@ fun NewSaleScreen(
 
 @Composable
 fun ScanTab(
-    onProductScanned: (String) -> Unit
+    productsViewModel: ProductsViewModel,
+    onProductFound: (Product) -> Unit
 ) {
     var manualBarcode by remember { mutableStateOf("") }
-
+    // In a real app, integrate CameraX here for scanning
+    
+    // For now, simulate scanning by searching by barcode manually mostly
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -273,15 +241,8 @@ fun ScanTab(
                     .padding(bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(
-                    onClick = { onProductScanned("5012345678900") }, // Maize Flour
-                    colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal.copy(alpha = 0.9f)),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Icon(Icons.Default.FlashOn, null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Simulate Scan", fontSize = 12.sp)
-                }
+               // No mocked button needed if we use manual entry, but keeping for dev feel if needed
+               // Or we can add a "Scan Random Product" for demo
             }
         }
 
@@ -309,7 +270,7 @@ fun ScanTab(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.LightGray,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                     focusedBorderColor = NeoBukTeal
                 )
             )
@@ -319,8 +280,14 @@ fun ScanTab(
             Button(
                 onClick = {
                     if (manualBarcode.isNotBlank()) {
-                        onProductScanned(manualBarcode)
-                        manualBarcode = ""
+                        productsViewModel.findProductByBarcode(
+                            barcode = manualBarcode,
+                            onFound = { 
+                                onProductFound(it)
+                                manualBarcode = "" 
+                            },
+                            onNotFound = { /* Show error */ }
+                        )
                     }
                 },
                 shape = RoundedCornerShape(12.dp),
@@ -335,13 +302,14 @@ fun ScanTab(
 
 @Composable
 fun BrowseTab(
-    products: List<SaleProduct>,
-    onProductSelected: (SaleProduct) -> Unit
+    products: List<Product>,
+    onProductSelected: (Product) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredProducts = products.filter {
-        it.name.contains(searchQuery, ignoreCase = true)
+        it.name.contains(searchQuery, ignoreCase = true) || 
+        (it.barcode?.contains(searchQuery) == true)
     }
 
     Column(
@@ -359,10 +327,10 @@ fun BrowseTab(
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color.LightGray,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                 focusedBorderColor = NeoBukTeal,
-                unfocusedContainerColor = Color(0xFFF8FAFC),
-                focusedContainerColor = Color(0xFFF8FAFC)
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         )
 
@@ -384,14 +352,14 @@ fun BrowseTab(
 
 @Composable
 fun ProductSelectCard(
-    product: SaleProduct,
+    product: Product,
     onSelect: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onSelect),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
@@ -424,19 +392,19 @@ fun ProductSelectCard(
                     Text(
                         product.name,
                         fontWeight = FontWeight.SemiBold,
-                        color = Tokens.TextDark
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Row {
                         Text(
-                            "KES ${String.format("%,.0f", product.price)}",
+                            "KES ${String.format("%,.0f", product.sellingPrice)}",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = NeoBukTeal
                         )
                         Text(
-                            " • ${product.stock} in stock",
+                            " • ${product.quantity.toInt()} in stock",
                             fontSize = 12.sp,
-                            color = if (product.stock < 10) Color(0xFFEF4444) else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (product.isLowStock) Color(0xFFEF4444) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -457,7 +425,7 @@ fun ProductSelectCard(
 
 @Composable
 fun CartAndCheckoutSection(
-    cartItems: List<SaleCartItem>,
+    cartItems: List<CartItem>,
     cartTotal: Double,
     customerName: String,
     onCustomerNameChange: (String) -> Unit,
@@ -472,7 +440,7 @@ fun CartAndCheckoutSection(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -493,7 +461,7 @@ fun CartAndCheckoutSection(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "Cart (${cartItems.sumOf { it.quantity }} items)",
+                        "Cart (${cartItems.size} items)",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
@@ -531,7 +499,7 @@ fun CartAndCheckoutSection(
 
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 12.dp),
-                    color = Color.LightGray.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
 
                 // Customer Name
@@ -544,10 +512,10 @@ fun CartAndCheckoutSection(
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Outlined.Person, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color.LightGray,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                         focusedBorderColor = NeoBukTeal,
-                        unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface
                     )
                 )
 
@@ -560,9 +528,9 @@ fun CartAndCheckoutSection(
                             shape = RoundedCornerShape(8.dp),
                             color = if (selectedPaymentMethod == method) {
                                 if (method == "Credit") Color(0xFFF59E0B) else NeoBukTeal
-                            } else Color.White,
+                            } else MaterialTheme.colorScheme.surface,
                             border = if (selectedPaymentMethod != method)
-                                androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray) else null,
+                                androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(40.dp)
@@ -573,7 +541,7 @@ fun CartAndCheckoutSection(
                                     method,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = if (selectedPaymentMethod == method) Color.White else Color.DarkGray
+                                    color = if (selectedPaymentMethod == method) Color.White else MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -609,21 +577,21 @@ fun CartAndCheckoutSection(
 
 @Composable
 fun CartItemRow(
-    item: SaleCartItem,
+    item: CartItem,
     onQuantityChange: (Int) -> Unit,
     onRemove: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Product Name
         Text(
-            item.name,
+            item.displayName,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
             modifier = Modifier.weight(1f)
@@ -635,16 +603,21 @@ fun CartItemRow(
             horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             IconButton(
-                onClick = { onQuantityChange(item.quantity - 1) },
+                onClick = { onQuantityChange(item.quantity.toInt() - 1) },
                 modifier = Modifier
                     .size(32.dp)
-                    .background(Color(0xFFEEEEEE), RoundedCornerShape(6.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest, RoundedCornerShape(6.dp))
             ) {
                 Icon(Icons.Default.Remove, null, modifier = Modifier.size(16.dp))
             }
 
+            Text(
+                text = "${item.quantity.toInt()}",
+                fontWeight = FontWeight.Bold
+            )
+
             IconButton(
-                onClick = { onQuantityChange(item.quantity + 1) },
+                onClick = { onQuantityChange(item.quantity.toInt() + 1) },
                 modifier = Modifier
                     .size(32.dp)
                     .background(NeoBukTeal, RoundedCornerShape(6.dp))

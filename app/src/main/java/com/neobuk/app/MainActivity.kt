@@ -52,6 +52,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -81,6 +82,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.material3.HorizontalDivider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import com.neobuk.app.data.models.Product
 import com.neobuk.app.data.models.StockMovementReason
 import com.neobuk.app.data.models.SubscriptionStatus
@@ -115,11 +117,15 @@ import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.NeoBukTheme
 import com.neobuk.app.ui.theme.AppTextStyles
 import com.neobuk.app.viewmodels.InventoryViewModel
+import com.neobuk.app.viewmodels.ServicesViewModel
 import com.neobuk.app.viewmodels.SubscriptionViewModel
 import com.neobuk.app.viewmodels.TasksViewModel
 import kotlinx.coroutines.launch
 import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+
+import com.neobuk.app.viewmodels.AuthViewModel
+import com.neobuk.app.viewmodels.AuthState as AuthViewModelState
 
 // Define keys for navigation or state
 enum class AuthState {
@@ -151,12 +157,33 @@ fun MainNavigation() {
     val sharedPreferences = remember { context.getSharedPreferences("neobuk_prefs", android.content.Context.MODE_PRIVATE) }
     val hasCompletedOnboarding = remember { sharedPreferences.getBoolean("onboarding_complete", false) }
     
-    // Initialize state based on preference
+    // AuthViewModel for real Supabase authentication (injected by Koin)
+    val authViewModel: AuthViewModel = koinViewModel()
+    val authViewModelState by authViewModel.authState.collectAsState()
+    
+    // Initialize state based on preference and existing session
     var authState by remember { 
         mutableStateOf(if (hasCompletedOnboarding) AuthState.LOGIN else AuthState.ONBOARDING) 
     }
     
-    var businessName by remember { mutableStateOf("Kasarani Shop") }
+    // Check for existing session on startup
+    LaunchedEffect(authViewModelState) {
+        when (authViewModelState) {
+            is AuthViewModelState.Authenticated -> {
+                authState = AuthState.AUTHENTICATED
+            }
+            is AuthViewModelState.LoggedOut -> {
+                if (authState == AuthState.AUTHENTICATED) {
+                    authState = AuthState.LOGIN
+                }
+            }
+            else -> { /* Initial or Loading - do nothing */ }
+        }
+    }
+    
+    // Get business name from ViewModel if available
+    val currentBusiness by authViewModel.currentBusiness.collectAsState()
+    val businessName = currentBusiness?.businessName ?: "My Business"
 
     when (authState) {
         AuthState.ONBOARDING -> {
@@ -170,16 +197,21 @@ fun MainNavigation() {
         }
         AuthState.LOGIN -> {
             LoginScreen(
+                authViewModel = authViewModel,
                 onLoginSuccess = { authState = AuthState.AUTHENTICATED },
-                onNavigateToSignup = { authState = AuthState.SIGNUP }
+                onNavigateToSignup = { 
+                    authViewModel.resetSignupState()
+                    authState = AuthState.SIGNUP 
+                }
             )
         }
 
         AuthState.SIGNUP -> {
             SignupScreen(
+                authViewModel = authViewModel,
                 onSignupSuccess = { name -> 
-                    businessName = name
-                    authState = AuthState.AUTHENTICATED 
+                    // After signup, redirect to login (user may need to confirm email)
+                    authState = AuthState.LOGIN 
                 },
                 onNavigateToLogin = { authState = AuthState.LOGIN }
             )
@@ -188,7 +220,12 @@ fun MainNavigation() {
         AuthState.AUTHENTICATED -> {
             NeoBukApp(
                 businessName = businessName,
-                onLogout = { authState = AuthState.LOGIN }
+                businessId = currentBusiness?.id,
+                onLogout = { 
+                    authViewModel.logout {
+                        authState = AuthState.LOGIN
+                    }
+                }
             )
         }
     }
@@ -209,6 +246,7 @@ sealed class SheetScreen {
 @Composable
 fun NeoBukApp(
     businessName: String,
+    businessId: String?,
     onLogout: () -> Unit
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -230,12 +268,23 @@ fun NeoBukApp(
 
     // ViewModels
     // ViewModels
-    val inventoryViewModel: InventoryViewModel = viewModel()
-    val tasksViewModel: TasksViewModel = viewModel()
+    val inventoryViewModel: InventoryViewModel = koinViewModel()
+    val tasksViewModel: TasksViewModel = koinViewModel()
     val subscriptionViewModel: SubscriptionViewModel = viewModel()
+    val servicesViewModel: ServicesViewModel = koinViewModel()
     val subscriptionStatus by subscriptionViewModel.status.collectAsState()
     val subscription by subscriptionViewModel.subscription.collectAsState()
     val pendingTasksCount by tasksViewModel.pendingTaskCount.collectAsState()
+    
+    // Initialize ServicesViewModel with business ID
+    // Initialize ServicesViewModel with business ID
+    LaunchedEffect(businessId) {
+        businessId?.let { 
+            servicesViewModel.setBusinessId(it)
+            inventoryViewModel.setBusinessId(it)
+            tasksViewModel.setBusinessId(it)
+        }
+    }
 
     // Subtitle Logic: "Today..." OR "Trial..."
     val toolbarSubtitle = remember(subscription, subscriptionStatus) {
@@ -509,8 +558,7 @@ fun NeoBukApp(
                             currentSheetScreen = SheetScreen.NetProfitInfo
                             showBottomSheet = true
                         },
-                        onViewTasks = { selectedTab = 9 },
-                        pendingTasksCount = pendingTasksCount
+                        onViewTasks = { selectedTab = 9 }
                     )
                     1 -> ProductsScreen(
                         viewModel = inventoryViewModel,
@@ -530,7 +578,11 @@ fun NeoBukApp(
                     )
                     5 -> ExpensesScreen() // Accessible from Home but not in bottom nav
                     6 -> SalesHistoryScreen()
-                    7 -> ManageServicesScreen(onBack = { selectedTab = 4 }) // Manage Services
+                    7 -> ManageServicesScreen(
+                        businessId = businessId,
+                        servicesViewModel = servicesViewModel,
+                        onBack = { selectedTab = 4 }
+                    ) // Manage Services
                     8 -> SubscriptionScreen(onBack = { selectedTab = 4 }, viewModel = subscriptionViewModel)
                     9 -> TasksScreen(onBack = { selectedTab = 0 }, viewModel = inventoryViewModel, tasksViewModel = tasksViewModel)
                 }

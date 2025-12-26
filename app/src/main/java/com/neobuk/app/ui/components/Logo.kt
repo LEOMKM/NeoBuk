@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 fun NeoBukLogoLarge() {
     Text(
         text = "NeoBuk",
-        style = MaterialTheme.typography.displayMedium.copy(
+        style = MaterialTheme.typography.headlineLarge.copy(
             brush = Brush.linearGradient(
                 colors = listOf(
                     MaterialTheme.colorScheme.primary,

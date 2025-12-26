@@ -26,42 +26,31 @@ import com.neobuk.app.data.models.ServiceRecord
 import com.neobuk.app.ui.theme.NeoBukTeal
 import com.neobuk.app.ui.theme.Tokens
 import com.neobuk.app.ui.theme.AppTextStyles
+import com.neobuk.app.viewmodels.ServicesViewModel
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
+import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ServicesScreen() {
+fun ServicesScreen(
+    businessId: String? = null,
+    servicesViewModel: ServicesViewModel = koinViewModel()
+) {
     var showRecordServiceSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     
-    // Mock data - in production, this would come from ViewModel
-    val services = remember {
-        mutableStateListOf(
-            ServiceDefinition("1", "Haircut", 500.0),
-            ServiceDefinition("2", "Beard Trim", 200.0),
-            ServiceDefinition("3", "Manicure", 800.0),
-            ServiceDefinition("4", "Pedicure", 1000.0),
-            ServiceDefinition("5", "Full Grooming", 1500.0)
-        )
-    }
+    // Collect state from ViewModel
+    val services by servicesViewModel.serviceDefinitions.collectAsState()
+    val providers by servicesViewModel.serviceProviders.collectAsState()
+    val serviceHistory by servicesViewModel.serviceRecords.collectAsState()
+    val isLoading by servicesViewModel.isLoading.collectAsState()
     
-    val providers = remember {
-        listOf(
-            ServiceProvider(id = "1", fullName = "John Mwangi", commissionRate = 30.0),
-            ServiceProvider(id = "2", fullName = "Mary Wanjiku", commissionRate = 25.0),
-            ServiceProvider(id = "3", fullName = "Peter Ochieng", commissionRate = 35.0)
-        )
-    }
-    
-    val serviceHistory = remember {
-        mutableStateListOf(
-            ServiceRecord.create(services[0], providers[0]),
-            ServiceRecord.create(services[1], providers[1]),
-            ServiceRecord.create(services[2], providers[2])
-        )
+    // Initialize with business ID
+    LaunchedEffect(businessId) {
+        businessId?.let { servicesViewModel.setBusinessId(it) }
     }
 
     Column(
@@ -76,7 +65,14 @@ fun ServicesScreen() {
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-
+            // Loading indicator
+            if (isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = NeoBukTeal
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             // Record Service Button
             Button(
@@ -85,7 +81,8 @@ fun ServicesScreen() {
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal)
+                colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
+                enabled = services.any { it.isActive } && providers.any { it.isActive }
             ) {
                 Icon(Icons.Default.Add, null, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
@@ -106,10 +103,15 @@ fun ServicesScreen() {
         ) {
             RecordServiceSheet(
                 services = services.filter { it.isActive },
-                providers = providers,
-                onSave = { record ->
-                    serviceHistory.add(0, record)
-                    showRecordServiceSheet = false
+                providers = providers.filter { it.isActive },
+                onSave = { service, provider, priceOverride ->
+                    servicesViewModel.recordService(
+                        service = service,
+                        provider = provider,
+                        priceOverride = priceOverride,
+                        onSuccess = { showRecordServiceSheet = false },
+                        onError = { /* Could show a snackbar */ }
+                    )
                 },
                 onDismiss = { showRecordServiceSheet = false }
             )
@@ -329,7 +331,7 @@ private fun ServiceDefinitionCard(
 private fun RecordServiceSheet(
     services: List<ServiceDefinition>,
     providers: List<ServiceProvider>,
-    onSave: (ServiceRecord) -> Unit,
+    onSave: (service: ServiceDefinition, provider: ServiceProvider, priceOverride: Double?) -> Unit,
     onDismiss: () -> Unit
 ) {
     var currentStep by remember { mutableIntStateOf(0) }
@@ -483,12 +485,11 @@ private fun RecordServiceSheet(
                         0 -> if (selectedService != null) currentStep++
                         1 -> if (selectedProvider != null) currentStep++
                         2 -> {
-                            val record = ServiceRecord.create(
-                                service = selectedService!!,
-                                provider = selectedProvider!!,
-                                priceOverride = customPrice.toDoubleOrNull()
+                            onSave(
+                                selectedService!!,
+                                selectedProvider!!,
+                                customPrice.toDoubleOrNull()
                             )
-                            onSave(record)
                         }
                     }
                 },

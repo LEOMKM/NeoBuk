@@ -1,74 +1,52 @@
 {
     "logs": [
         {
-            "outputFile": "com.neobuk.app-mergeDebugResources-52:/values-night-v8/values-night-v8.xml",
+            "outputFile": "com.neobuk.app-mergeDebugResources-60:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values-night/themes.xml",
+                    "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/3d0d3167941c57e1251110d98cf8e851/transformed/appcompat-1.6.1/res/values-night-v8/values-night-v8.xml",
                     "from": {
-                        "startLines": "-1,9",
-                        "startColumns": "-1,4",
-                        "startOffsets": "-1,390",
-                        "endLines": "-1,13",
-                        "endColumns": "-1,12",
-                        "endOffsets": "-1,697"
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,125,209,293,389,491,593,687",
+                        "endColumns": "69,83,83,95,101,101,93,88",
+                        "endOffsets": "120,204,288,384,486,588,682,771"
                     },
                     "to": {
-                        "startLines": "3,7",
-                        "startColumns": "4,4",
-                        "startOffsets": "141,390",
-                        "endLines": "6,11",
-                        "endColumns": "12,12",
-                        "endOffsets": "385,697"
+                        "startLines": "3,4,5,6,7,8,9,19",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "141,211,295,379,475,577,679,1334",
+                        "endColumns": "69,83,83,95,101,101,93,88",
+                        "endOffsets": "206,290,374,470,572,674,768,1418"
                     }
                 },
                 {
-                    "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/929cfe657c6c6b19cad249cafc18d884/transformed/core-splashscreen-1.0.1/res/values-night-v8/values-night-v8.xml",
+                    "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/ca2e5d4452508406d2800ab8ba0de197/transformed/core-splashscreen-1.0.1/res/values-night-v8/values-night-v8.xml",
                     "from": {
-                        "startLines": "-1",
-                        "startColumns": "-1",
-                        "startOffsets": "-1"
-                    },
-                    "to": {
                         "startLines": "2",
                         "startColumns": "4",
                         "startOffsets": "55",
                         "endColumns": "85",
                         "endOffsets": "136"
                     }
-                }
-            ]
-        },
-        {
-            "outputFile": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-mergeDebugResources-52:/values-night-v8/values-night-v8.xml",
-            "map": [
+                },
                 {
                     "source": "/Users/leonard.mutugi/CodzureGroup/NeoBuk/app/src/main/res/values-night/themes.xml",
                     "from": {
                         "startLines": "3,9",
                         "startColumns": "4,4",
                         "startOffsets": "95,390",
-                        "endLines": "6,18",
+                        "endLines": "6,13",
                         "endColumns": "12,12",
-                        "endOffsets": "339,977"
+                        "endOffsets": "339,697"
                     },
                     "to": {
-                        "startLines": "3,7",
+                        "startLines": "10,14",
                         "startColumns": "4,4",
-                        "startOffsets": "141,390",
-                        "endLines": "6,16",
+                        "startOffsets": "773,1022",
+                        "endLines": "13,18",
                         "endColumns": "12,12",
-                        "endOffsets": "385,830"
-                    }
-                },
-                {
-                    "source": "/Users/leonard.mutugi/.gradle/caches/8.9/transforms/929cfe657c6c6b19cad249cafc18d884/transformed/core-splashscreen-1.0.1/res/values-night-v8/values-night-v8.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "85",
-                        "endOffsets": "136"
+                        "endOffsets": "1017,1329"
                     }
                 }
             ]
