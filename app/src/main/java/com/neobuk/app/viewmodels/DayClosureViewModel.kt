@@ -74,9 +74,20 @@ class DayClosureViewModel(
                     onSuccess(it)
                 }
                 .onFailure {
-                    onError(it.message ?: "Failed to close day")
+                    onError(sanitizeErrorMessage(it))
                 }
             _isLoading.value = false
+        }
+    }
+
+    private fun sanitizeErrorMessage(error: Throwable): String {
+        val message = error.message ?: "Failed to close day"
+        // Supabase RestException often includes URL and Headers in the message
+        // Example: "Day is already closed for this date.\nURL: https://..."
+        return if (message.contains("URL:")) {
+            message.substringBefore("URL:").trim()
+        } else {
+            message
         }
     }
 }
