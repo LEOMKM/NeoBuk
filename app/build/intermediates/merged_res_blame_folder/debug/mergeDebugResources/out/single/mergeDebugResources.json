@@ -12,19 +12,31 @@
         "source": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-main-64:/drawable/icon3.jpeg"
     },
     {
+        "merged": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-debug-62:/drawable_empty_inventory.png.flat",
+        "source": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-main-64:/drawable/empty_inventory.png"
+    },
+    {
         "merged": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-debug-62:/drawable_newbuk.png.flat",
         "source": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-main-64:/drawable/newbuk.png"
+    },
+    {
+        "merged": "com.neobuk.app-debug-62:/drawable_empty_services.png.flat",
+        "source": "com.neobuk.app-main-64:/drawable/empty_services.png"
     },
     {
         "merged": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-debug-62:/xml_provider_paths.xml.flat",
         "source": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-main-64:/xml/provider_paths.xml"
     },
     {
-        "merged": "com.neobuk.app-debug-62:/drawable_empty_inventory.png.flat",
-        "source": "com.neobuk.app-main-64:/drawable/empty_inventory.png"
-    },
-    {
         "merged": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-debug-62:/drawable_splash_icon.xml.flat",
         "source": "/Users/leonard.mutugi/.gradle/daemon/8.9/com.neobuk.app-main-64:/drawable/splash_icon.xml"
+    },
+    {
+        "merged": "com.neobuk.app-debug-62:/drawable_empty_sales.png.flat",
+        "source": "com.neobuk.app-main-64:/drawable/empty_sales.png"
+    },
+    {
+        "merged": "com.neobuk.app-debug-62:/drawable_empty_reports.png.flat",
+        "source": "com.neobuk.app-main-64:/drawable/empty_reports.png"
     }
 ]

@@ -200,89 +200,99 @@ fun ReportsScreen(
             } else {
 
                 // 2. KPI Cards Grid
-                item {
-                    Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            KPICard(kpi = kpis[0], modifier = Modifier.weight(1f))
-                            KPICard(kpi = kpis[3], modifier = Modifier.weight(1f)) // Net Profit
-                        }
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            KPICard(kpi = kpis[1], modifier = Modifier.weight(1f))
-                            KPICard(kpi = kpis[2], modifier = Modifier.weight(1f))
-                        }
-                    }
-                }
-
-                item { Spacer(modifier = Modifier.height(24.dp)) }
-
-                // 3. Sales Trends Chart
-                item {
-                    if (salesTrendRaw.isNotEmpty()) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = CardDefaults.cardElevation(0.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Sales Trends", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.height(16.dp))
-                                SalesTrendChart(data = salesTrendData, modifier = Modifier.fillMaxWidth().height(180.dp))
-                                // Simple X-Axis: Show start and end date of range?
+                if (summary.totalSales == 0.0 && summary.salesCount == 0L) {
+                     item {
+                         com.neobuk.app.ui.components.EmptyState(
+                            title = "No Sales Data",
+                            description = "Records sales to see detailed reports and insights here.",
+                            imageId = com.neobuk.app.R.drawable.empty_reports
+                         )
+                     }
+                } else {
+                    item {
+                        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                KPICard(kpi = kpis[0], modifier = Modifier.weight(1f))
+                                KPICard(kpi = kpis[3], modifier = Modifier.weight(1f)) // Net Profit
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                KPICard(kpi = kpis[1], modifier = Modifier.weight(1f))
+                                KPICard(kpi = kpis[2], modifier = Modifier.weight(1f))
                             }
                         }
                     }
-                }
 
-                item { Spacer(modifier = Modifier.height(24.dp)) }
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
 
-                // 4. Payment Methods
-                if (paymentMethods.isNotEmpty()) {
+                    // 3. Sales Trends Chart
                     item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = CardDefaults.cardElevation(0.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Sales by Payment Method", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    DonutChart(data = paymentMethods, modifier = Modifier.size(120.dp))
-                                    Spacer(modifier = Modifier.width(24.dp))
-                                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                        paymentMethods.forEach { method ->
-                                            PaymentLegendItem(color = method.color, label = method.method, percentage = method.percentage)
+                        if (salesTrendRaw.isNotEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                shape = RoundedCornerShape(16.dp),
+                                elevation = CardDefaults.cardElevation(0.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text("Sales Trends", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    SalesTrendChart(data = salesTrendData, modifier = Modifier.fillMaxWidth().height(180.dp))
+                                    // Simple X-Axis: Show start and end date of range?
+                                }
+                            }
+                        }
+                    }
+
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
+
+                    // 4. Payment Methods
+                    if (paymentMethods.isNotEmpty()) {
+                        item {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                shape = RoundedCornerShape(16.dp),
+                                elevation = CardDefaults.cardElevation(0.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text("Sales by Payment Method", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        DonutChart(data = paymentMethods, modifier = Modifier.size(120.dp))
+                                        Spacer(modifier = Modifier.width(24.dp))
+                                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                            paymentMethods.forEach { method ->
+                                                PaymentLegendItem(color = method.color, label = method.method, percentage = method.percentage)
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                        item { Spacer(modifier = Modifier.height(24.dp)) }
                     }
-                    item { Spacer(modifier = Modifier.height(24.dp)) }
-                }
 
-                // 5. Top Products
-                if (topProductsRaw.isNotEmpty()) {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = CardDefaults.cardElevation(0.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Best Sellers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.height(16.dp))
-                                topProductsRaw.forEachIndexed { index, product ->
-                                    TopProductItem(product = product, rank = index + 1)
-                                    if (index < topProductsRaw.size - 1) Spacer(modifier = Modifier.height(16.dp))
+                    // 5. Top Products
+                    if (topProductsRaw.isNotEmpty()) {
+                        item {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                shape = RoundedCornerShape(16.dp),
+                                elevation = CardDefaults.cardElevation(0.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text("Best Sellers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    topProductsRaw.forEachIndexed { index, product ->
+                                        TopProductItem(product = product, rank = index + 1)
+                                        if (index < topProductsRaw.size - 1) Spacer(modifier = Modifier.height(16.dp))
+                                    }
                                 }
                             }
                         }

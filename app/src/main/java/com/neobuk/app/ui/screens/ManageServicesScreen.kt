@@ -156,24 +156,34 @@ fun ServicesContent(
             }
 
             // Services List
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f)
-            ) {
-                items(services) { service ->
-                    ServiceCard(
-                        service = service,
-                        onEdit = { editingService = service },
-                        onToggleActive = {
-                            servicesViewModel.toggleServiceDefinitionActive(
-                                serviceId = service.id,
-                                isActive = !service.isActive
-                            )
-                        }
-                    )
+            if (services.isEmpty()) {
+                com.neobuk.app.ui.components.EmptyState(
+                    title = "No Services Added",
+                    description = "Define the services you offer to start tracking them.",
+                    imageId = com.neobuk.app.R.drawable.empty_services,
+                    buttonText = "Add Service",
+                    onButtonClick = { showAddSheet = true }
+                )
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(services) { service ->
+                        ServiceCard(
+                            service = service,
+                            onEdit = { editingService = service },
+                            onToggleActive = {
+                                servicesViewModel.toggleServiceDefinitionActive(
+                                    serviceId = service.id,
+                                    isActive = !service.isActive
+                                )
+                            }
+                        )
+                    }
+                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
-                item { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
 
@@ -281,24 +291,34 @@ fun StaffContent(
             }
 
             // Staff List
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f)
-            ) {
-            items(providers) { provider ->
-                    StaffCard(
-                        provider = provider,
-                        onEdit = { editingProvider = provider },
-                        onToggleActive = {
-                            servicesViewModel.toggleServiceProviderActive(
-                                providerId = provider.id,
-                                isActive = !provider.isActive
-                            )
-                        }
-                    )
+            if (providers.isEmpty()) {
+                com.neobuk.app.ui.components.EmptyState(
+                    title = "No Staff Members",
+                    description = "Add service providers who will perform services.",
+                    imageId = com.neobuk.app.R.drawable.empty_services, // Reusing services image or generic
+                    buttonText = "Add Staff",
+                    onButtonClick = { showAddSheet = true }
+                )
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                items(providers) { provider ->
+                        StaffCard(
+                            provider = provider,
+                            onEdit = { editingProvider = provider },
+                            onToggleActive = {
+                                servicesViewModel.toggleServiceProviderActive(
+                                    providerId = provider.id,
+                                    isActive = !provider.isActive
+                                )
+                            }
+                        )
+                    }
+                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
-                item { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
 

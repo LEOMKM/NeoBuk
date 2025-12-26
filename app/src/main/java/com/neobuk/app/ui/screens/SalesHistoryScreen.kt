@@ -171,9 +171,13 @@ fun SalesHistoryScreen(
             }
         } else if (sales.isEmpty()) {
              item {
-                Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                    Text("No sales found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                 com.neobuk.app.ui.components.EmptyState(
+                     title = "No Sales Yet",
+                     description = "Your sales history is empty. Start recording transactions to see them here.",
+                     imageId = com.neobuk.app.R.drawable.empty_sales,
+                     buttonText = "Record First Sale",
+                     onButtonClick = { showNewSaleSheet = true }
+                 )
             }
         } else {
             items(sales) { sale ->

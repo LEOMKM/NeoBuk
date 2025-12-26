@@ -7,6 +7,9 @@ color neobuk_teal_dark
 color splash_background_dark
 color splash_background_light
 drawable empty_inventory
+drawable empty_reports
+drawable empty_sales
+drawable empty_services
 drawable icon1
 drawable icon2
 drawable icon3
