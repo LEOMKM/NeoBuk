@@ -240,6 +240,7 @@ sealed class SheetScreen {
     object Profile : SheetScreen()
     object DayEndClosure : SheetScreen()
     object NetProfitInfo : SheetScreen()
+    object AddProductFlow : SheetScreen() // New Unified Flow
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -564,7 +565,7 @@ fun NeoBukApp(
                         viewModel = inventoryViewModel,
                         onAddProduct = {
                             guard {
-                                currentSheetScreen = SheetScreen.ScanProduct
+                                currentSheetScreen = SheetScreen.AddProductFlow
                                 showBottomSheet = true
                             }
                         }
@@ -617,7 +618,7 @@ fun NeoBukApp(
                             onOptionSelected = { type ->
                                 businessType = type
                                 if (type == BusinessType.RETAIL) {
-                                    currentSheetScreen = SheetScreen.ScanProduct
+                                    currentSheetScreen = SheetScreen.AddProductFlow // Default to new Flow
                                 } else {
                                     // TODO: Handle Services flow
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -626,6 +627,45 @@ fun NeoBukApp(
                                 }
                             }
                         )
+                    }
+
+                    is SheetScreen.AddProductFlow -> {
+                         com.neobuk.app.ui.screens.products.UnifiedAddProductSheet(
+                             onDismiss = {
+                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                     if (!sheetState.isVisible) showBottomSheet = false
+                                 }
+                             },
+                             checkProductExists = { barcode ->
+                                 inventoryViewModel.getProductByBarcode(barcode) != null
+                             },
+                             onProductExists = { barcode ->
+                                 val product = inventoryViewModel.getProductByBarcode(barcode)
+                                 if (product != null) {
+                                     currentSheetScreen = SheetScreen.UpdateStock(product)
+                                 }
+                             },
+                             onSubmit = { draft ->
+                                 guard {
+                                     // Convert Draft to Product
+                                     val newProduct = Product(
+                                         name = draft.name,
+                                         description = draft.description,
+                                         categoryId = draft.category,
+                                         barcode = draft.barcode,
+                                         unit = draft.unit,
+                                         costPrice = draft.costPrice,
+                                         sellingPrice = draft.sellingPrice,
+                                         quantity = draft.quantity.toDouble()
+                                     )
+                                     inventoryViewModel.addProduct(newProduct)
+                                     
+                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                         if (!sheetState.isVisible) showBottomSheet = false
+                                     }
+                                 }
+                             }
+                         )
                     }
 
                     is SheetScreen.ScanProduct -> {

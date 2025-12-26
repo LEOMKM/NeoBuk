@@ -42,33 +42,59 @@ fun ScanStockSheet(
     onManualEntry: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    ScanStockContent(
+        onBarcodeScanned = onBarcodeScanned,
+        onManualEntry = onManualEntry,
+        onDismiss = onDismiss,
+        showHeader = true
+    )
+}
+
+@Composable
+fun ScanStockContent(
+    onBarcodeScanned: (String) -> Unit,
+    onManualEntry: () -> Unit,
+    onDismiss: () -> Unit,
+    showHeader: Boolean,
+    modifier: Modifier = Modifier
+) {
     var manualBarcode by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
         // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onDismiss) {
-                Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurface)
-            }
-            Text(
-                "Scan Product",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            IconButton(onClick = { /* Toggle Flash */ }) {
-                Icon(Icons.Default.FlashOn, contentDescription = "Flash", tint = MaterialTheme.colorScheme.onSurface)
+        if (showHeader) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Close",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                Text(
+                    "Scan Product",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                IconButton(onClick = { /* Toggle Flash */ }) {
+                    Icon(
+                        Icons.Default.FlashOn,
+                        contentDescription = "Flash",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
 
@@ -122,6 +148,20 @@ fun ScanStockSheet(
         }
 
         // Manual Entry
+        if (showHeader) { // Only show manual entry button if we are in standalone mode? 
+            // Actually user said "tab one for scan product and the other add new product".
+            // If in tab mode, "Manual Entry" is just switching the tab.
+            // So maybe hide this entire bottom block or change it?
+            // The prompt "Let's have a tab one for scan product and the other add new products so user can easily toggle" implies the tabs REPLACES this manual entry link.
+            // So yes, if !showHeader (tab mode), we probably don't need this bottom section asking to switch to manual.
+        }
+        
+        // Wait, if I hide the bottom section, I can't type the barcode manually in the "Scan" tab.
+        // Usually "Scan" tab allows manual entry of barcode too.
+        // But the other tab "Add New Product" IS the manual entry form.
+        // I will hide the explicit "Or enter barcode manually" navigation button, but keep the input field? 
+        // Actually, the input field is useful.
+        
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -177,7 +217,7 @@ fun ScanStockSheet(
                         if (manualBarcode.isNotEmpty()) {
                             onBarcodeScanned(manualBarcode)
                         } else {
-                            onManualEntry()
+                            if (showHeader) onManualEntry() else { /* Do nothing or toast? Or maybe we don't show this button if empty? */ }
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
@@ -185,14 +225,16 @@ fun ScanStockSheet(
                     modifier = Modifier.height(56.dp)
                 ) {
                     Icon(
-                        if (manualBarcode.isNotEmpty()) Icons.Default.QrCodeScanner else Icons.Default.Archive,
+                        if (manualBarcode.isNotEmpty()) Icons.Default.QrCodeScanner else Icons.Default.Archive, // Archive icon was used as 'Manual' fallback
                         contentDescription = null
                     )
                 }
             }
             
-            TextButton(onClick = onManualEntry, modifier = Modifier.padding(top = 8.dp)) {
-                Text("Detailed Manual Add", color = NeoBukTeal)
+            if (showHeader) {
+                TextButton(onClick = onManualEntry, modifier = Modifier.padding(top = 8.dp)) {
+                    Text("Detailed Manual Add", color = NeoBukTeal)
+                }
             }
         }
     }
