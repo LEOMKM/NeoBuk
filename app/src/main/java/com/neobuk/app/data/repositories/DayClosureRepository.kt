@@ -57,7 +57,7 @@ class DayClosureRepository(private val supabase: SupabaseClient) {
                     put("p_cash_actual", cashActual)
                     put("p_notes", notes)
                 }
-            ).decodeSingle<DayClosure>()
+            ).decodeList<DayClosure>().first()
             Result.success(closure)
         } catch (e: Exception) {
             Result.failure(e)
