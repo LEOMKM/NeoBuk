@@ -6,6 +6,7 @@ color neobuk_teal
 color neobuk_teal_dark
 color splash_background_dark
 color splash_background_light
+drawable empty_inventory
 drawable icon1
 drawable icon2
 drawable icon3

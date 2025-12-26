@@ -236,27 +236,73 @@ fun ProductsScreen(
             // 5. Product Grid (Using FlowRow logic for simplicity inside LazyColumn or fixed inner grid)
             // Since we are inside a LazyColumn, we can't easily put a LazyVerticalGrid. 
             // We'll simulate a 2-column grid manually for this layout.
+            // 5. Product Grid or Empty State
             item {
-                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                    val rows = products.chunked(2)
-                    for (rowItems in rows) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            for (product in rowItems) {
-                                Box(modifier = Modifier.weight(1f)) {
-                                    ProductCard(product)
+                if (products.isEmpty()) {
+                   EmptyInventoryState(onAddProduct = onAddProduct)
+                } else {
+                    Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                        val rows = products.chunked(2)
+                        for (rowItems in rows) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                for (product in rowItems) {
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        ProductCard(product)
+                                    }
+                                }
+                                if (rowItems.size == 1) {
+                                    Spacer(modifier = Modifier.weight(1f))
                                 }
                             }
-                            if (rowItems.size == 1) {
-                                Spacer(modifier = Modifier.weight(1f))
-                            }
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EmptyInventoryState(onAddProduct: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp, horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(id = com.neobuk.app.R.drawable.empty_inventory),
+            contentDescription = "Empty Inventory",
+            modifier = Modifier.size(200.dp),
+            contentScale = ContentScale.Fit
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            text = "Your inventory is empty",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface 
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Start by adding your first product to track stock and sales.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Button(
+            onClick = onAddProduct,
+            colors = ButtonDefaults.buttonColors(containerColor = NeoBukTeal),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+        ) {
+            Icon(Icons.Default.Add, null, tint = Color.White)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Add First Product", color = Color.White)
         }
     }
 }
