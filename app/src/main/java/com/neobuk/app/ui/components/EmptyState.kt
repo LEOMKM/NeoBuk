@@ -30,12 +30,26 @@ fun EmptyState(
         verticalArrangement = Arrangement.Center
     ) {
         val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+        // Invert colors in dark mode for correct visibility of black-line illustrations
+        val colorFilter = if (isDark) {
+             androidx.compose.ui.graphics.ColorFilter.colorMatrix(
+                 androidx.compose.ui.graphics.ColorMatrix(
+                     floatArrayOf(
+                         -1f, 0f, 0f, 0f, 255f,
+                         0f, -1f, 0f, 0f, 255f,
+                         0f, 0f, -1f, 0f, 255f,
+                         0f, 0f, 0f, 1f, 0f
+                     )
+                 )
+             )
+        } else null
+
         Image(
             painter = painterResource(id = imageId),
             contentDescription = null,
             modifier = Modifier.size(200.dp),
             contentScale = ContentScale.Fit,
-            colorFilter = if (isDark) androidx.compose.ui.graphics.ColorFilter.tint(MaterialTheme.colorScheme.onSurface) else null
+            colorFilter = colorFilter
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
